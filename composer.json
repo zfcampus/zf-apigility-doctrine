@@ -1,0 +1,32 @@
+{
+    "name": "soliantconsulting/apigility-client",
+    "type": "library",
+    "description": "An ORM Apigility Client based on Doctrine Common",
+    "keywords": [
+        "apigility",
+        "api client"
+    ],
+    "homepage": "http://www.soliantconsulting.com/",
+    "license": "Apache 2.0",
+    "authors": [
+        {
+            "name": "Tom Anderson",
+            "email": "tanderson@soliantconsulting.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": ">=2.2",
+        "doctrine/common": ">=2.4.x-dev",
+        "rhumsaa/uuid": ">=2.1",
+        "moontoast/math": "1.1.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "SoliantConsulting\\ApigilityClient\\": "src/"
+        }
+    }
+}

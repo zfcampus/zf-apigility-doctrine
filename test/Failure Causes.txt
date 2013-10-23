@@ -1,0 +1,27 @@
+Unit testing failures and errors
+
+1) StormpathTest\Resource\DirectoryTest::testIsDefaultGroupStore
+Failed asserting that null matches expected '21ppKgukLE8NIld0BIZXtk'.
+
+The Application is not returing the defaultGroupStoreMapping.
+The Application returns an empty string after the defaultGroupStore is set and persisted.
+
+
+2) StormpathTest\Resource\AccountStoreMappingTest::testEagerLoading
+Undefined index: tenant
+
+Set expand resources on account store mappings do not return full application mappings.
+
+
+3) StormpathTest\Resource\ApplicationTest::testLoginAttempt
+Failed asserting that null matches expected '6y4RuEg0qNGPOsVAdSOvdO'.
+
+LoginAttempt does not return expanded resources
+
+
+4) StormpathTest\Resource\ApplicationTest::testDefaultAccountStoreMapping
+Failed asserting that null matches expected '72Vxo6PW82eKGxya4V7lZW'.
+
+Application::defaultAccountStoreMapping is not returned from the servcie.
+
+
