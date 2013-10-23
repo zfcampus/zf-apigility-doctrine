@@ -1,5 +1,5 @@
 {
-    "name": "soliantconsulting/apigility-orm-client",
+    "name": "soliantconsulting/apigility-client",
     "type": "library",
     "description": "An ORM Apigility Client based on Doctrine Common",
     "keywords": [
