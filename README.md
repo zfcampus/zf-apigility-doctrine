@@ -24,8 +24,7 @@ This client is an HTTP client and not ment to consume Apigility resources direct
 Apigility Configuration
 -----------------------
 
-Doctrine Entities should be ArraySerlizeable.  You should not include embedded resources.
-identifier_name must be 'id'.
+Doctrine Entities should be ArraySerializable.  You should not include embedded resources.  Resource identifier_name must be 'id'.
 
 ```php
   'zf-hal' =>
