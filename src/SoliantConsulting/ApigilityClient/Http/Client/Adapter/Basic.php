@@ -1,8 +1,7 @@
 <?php
 
-namespace Stormpath\Http\Client\Adapter;
+namespace SoliantConsutling\ApigilityClient\Http\Client\Adapter;
 
-use Stormpath\Service\StormpathService as Stormpath;
 use Zend\Http\Client\Adapter\Socket;
 use Zend\Http\Request;
 use Rhumsaa\Uuid\Uuid;
@@ -22,7 +21,7 @@ class Basic extends Socket
      */
     public function write($method, $uri, $httpVer = '1.1', $headers = array(), $body = '')
     {
-        $headers['Authorization'] = 'Basic ' . base64_encode(Stormpath::getApiKey()->getId() . ':' . Stormpath::getApiKey()->getSecret());
+        $headers['Authorization'] = 'Basic ' . base64_encode('user:pass');
         $headers['Content-Type'] = 'application/json;charset=UTF-8';
         return parent::write($method, $uri, $httpVer, $headers, $body);
     }
