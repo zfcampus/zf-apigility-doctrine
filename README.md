@@ -36,6 +36,49 @@ Doctrine Entities should be ArraySerializable.  You should not include embedded 
     ],
 ```
 
+module.config.php for Apigility
+
+return array (
+  'service_manager' =>
+  array (
+    'invokables' =>
+    array (
+      'SoliantConsultingApi\\V1\\Rest\\UserGroup\\UserGroupResource' => 'SoliantConsultingApi\\V1\\Rest\\UserGroup\\UserGroupResource',
+      'SoliantConsultingApi\\V1\\Rest\\User\\UserResource' => 'SoliantConsultingApi\\V1\\Rest\\User\\UserResource',
+    ),
+  ),
+  'router' =>
+  array (
+    'routes' =>
+    array (
+      'soliant-consulting-api.rest.userGroup' =>
+      array (
+        'type' => 'Segment',
+        'options' =>
+        array (
+          'route' => '/api/userGroup[/:id]',
+          'defaults' =>
+          array (
+            'controller' => 'SoliantConsultingApi\\V1\\Rest\\UserGroup\\Controller',
+          ),
+        ),
+      ),
+      'soliant-consulting-api.rest.user' =>
+      array (
+        'type' => 'Segment',
+        'options' =>
+        array (
+          'route' => '/api/user[/:id]',
+          'defaults' =>
+          array (
+            'controller' => 'DbLoadCdApi\\V1\\Rest\\User\\Controller',
+          ),
+        ),
+      ),
+    ),
+  ),
+
+
 Client Configuration
 --------------------
 
@@ -54,8 +97,9 @@ Doctrine entities and rpc calls are mapped to the client through a resource map
         ),
         
         'entities' => array(
-            'SoliantConsulting\Entity\User' => '/user',
-            'SoliantConsulting\Entity\Address' => '/address',
+            'SoliantConsulting\Entity\User' => 'user',
+            'SoliantConsulting\Entity\Address' => 'address',
+            'SoliantConsulting\Entity\UserGroup' => 'userGroup',
             ...
     ));
 ```

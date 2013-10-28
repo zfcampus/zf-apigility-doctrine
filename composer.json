@@ -21,8 +21,6 @@
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2",
         "doctrine/common": ">=2.4.x-dev",
-        "rhumsaa/uuid": ">=2.1",
-        "moontoast/math": "1.1.0",
         "ocramius/proxy-manager": "*"
     },
     "autoload": {

@@ -31,6 +31,17 @@ class EntityManager implements ObjectManager
         return $this;
     }
 
+    public function getBaseUrl()
+    {
+        return $this->baseUrl;
+    }
+
+    public function setBaseUrl($value)
+    {
+        $this->baseUrl = $value;
+        return $this;
+    }
+
     public function getCache()
     {
         return $this->cache;
@@ -80,10 +91,11 @@ class EntityManager implements ObjectManager
                     throw new \Exception("Class name not found for embedded $key");
                 }
 
+                $id = str_replace($this->getBaseUrl() . $key . '/', '', $value['_links']['self']['href']);
                 if (!$id) {
-                    throw new \Exception('id not founf for url ' . $value['_links']['self']['href']);
+                    throw new \Exception('id not found for url ' . $value['_links']['self']['href']);
                 }
-                $id = str_replace('http://localhost:8079/api/' . $key . '/', '', $value['_links']['self']['href']);
+
                 $return[$key] = $this->find($className, $id);
             }
         }
@@ -114,7 +126,7 @@ class EntityManager implements ObjectManager
                 }
 
                 $client = $this->getHttpClient();
-                $client->setUri('http://localhost:8079/api/' . $this->getEntityMap()['entities'][$className] . '/' . $id);
+                $client->setUri($this->getBaseUrl() . $this->getEntityMap()['entities'][$className] . '/' . $id);
                 $client->setMethod('GET');
 
                 $response = $client->send();
@@ -136,9 +148,9 @@ class EntityManager implements ObjectManager
             }
         };
 
-        $instance = $factory->createProxy($className, $initializer);
+        $entity = $factory->createProxy($className, $initializer);
 
-        return $instance;
+        return $entity;
     }
 
     /**
@@ -263,23 +275,23 @@ class EntityManager implements ObjectManager
                 switch(get_class($resource)) {
                     case 'SoliantConsulting\ApigilityClient\Resource\Account':
                         if ($resource->getDirectory()) {
-                            $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/accounts');
+                            $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/accounts');
                         } else {
-                            $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/accounts');
+                            $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/accounts');
                         }
                         break;
                     case 'SoliantConsulting\ApigilityClient\Resource\Group':
-                        $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/groups');
+                        $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/groups');
                         break;
                     case 'SoliantConsulting\ApigilityClient\Resource\LoginAttempt':
-                        $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/loginAttempts');
+                        $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/loginAttempts');
                         break;
                     case 'SoliantConsulting\ApigilityClient\Resource\PasswordResetToken':
-                        $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/passwordResetTokens');
+                        $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/passwordResetTokens');
                         break;
                     case 'SoliantConsulting\ApigilityClient\Resource\EmailVerificationToken':
                         // @codeCoverageIgnoreStart
-                        $resource->_setUrl(SoliantConsulting\ApigilityClientService::getBaseUrl() . $resource->_getUrl() . '/' . $resource->getToken());
+                        $resource->_setUrl($this->getBaseUrl() . $resource->_getUrl() . '/' . $resource->getToken());
                         break;
                         // @codeCoverageIgnoreEnd
                     default:

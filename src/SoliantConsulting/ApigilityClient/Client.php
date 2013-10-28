@@ -19,7 +19,7 @@ class Client
     private $httpClient;
     private $cache;
     private $entityMap;
-    private $baseUrl = 'https://github.com/soliantconsulting';
+    private $baseUrl;
 
     public function getBaseUrl()
     {
@@ -69,9 +69,10 @@ class Client
     public function getEntityManager()
     {
         $resourceManager = new EntityManager();
-        $resourceManager->setHttpClient(self::getHttpClient());
-        $resourceManager->setCache(self::getCache());
+        $resourceManager->setHttpClient($this->getHttpClient());
+        $resourceManager->setCache($this->getCache());
         $resourceManager->setEntityMap($this->getEntityMap());
+        $resourceManager->setBaseUrl($this->getBaseUrl());
 
         return $resourceManager;
     }
