@@ -86,12 +86,17 @@ class EntityManager implements ObjectManager
             unset($hal['_embedded']);
 
             foreach ($embedded as $key => $value) {
-                $className = array_search($key, $this->getEntityMap()['entities']);
+                $className = null;
+
+                if (isset($this->getEntityMap()['entities'][$key])) {
+                    $className = $this->getEntityMap()['entities'][$key];
+                }
+
                 if (!$className) {
                     throw new \Exception("Class name not found for embedded $key");
                 }
 
-                $id = str_replace($this->getBaseUrl() . $key . '/', '', $value['_links']['self']['href']);
+                $id = str_replace($this->getBaseUrl() . '/' . $key . '/', '', $value['_links']['self']['href']);
                 if (!$id) {
                     throw new \Exception('id not found for url ' . $value['_links']['self']['href']);
                 }
@@ -115,18 +120,19 @@ class EntityManager implements ObjectManager
         $factory     = new LazyLoadingValueHolderFactory();
         $initializer = function (& $wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, & $initializer) use ($entityManager, $className, $id)
         {
-            $cachedJson = $this->getCache()->getItem($className . $id, $success);
+            $cachedJson = $entityManager->getCache()->getItem($className . $id, $success);
 
             if ($success) {
                 $wrappedObject = new $className;
                 $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse($cachedJson));
             } else {
-                if (!$this->getEntityMap()['entities'][$className]) {
+
+                if (!in_array($className, $entityManager->getEntityMap()['entities'])) {
                     throw new \Exception("$className is not mapped in EntityManager entity map");
                 }
 
-                $client = $this->getHttpClient();
-                $client->setUri($this->getBaseUrl() . $this->getEntityMap()['entities'][$className] . '/' . $id);
+                $client = $entityManager->getHttpClient();
+                $client->setUri($entityManager->getBaseUrl() . '/' . array_search($className, $entityManager->getEntityMap()['entities']) . '/' . $id);
                 $client->setMethod('GET');
 
                 $response = $client->send();
