@@ -10,6 +10,7 @@ use Zend\Cache\Storage\StorageInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use ZF\ApiProblem\ApiProblem;
+use SoliantConsulting\ApigilityClient\Collections\RelationCollection;
 
 class EntityManager implements ObjectManager
 {
@@ -71,9 +72,8 @@ class EntityManager implements ObjectManager
         return $this;
     }
 
-    public function decodeSingleHalResponse($halJson)
+    public function decodeSingleHalResponse($hal)
     {
-        $hal = json_decode($halJson, true);
         $return = [];
 
         if (isset($hal['_links'])) {
@@ -93,12 +93,12 @@ class EntityManager implements ObjectManager
                 }
 
                 if (!$className) {
-                    throw new \Exception("Class name not found for embedded $key");
+                    die('EntityManager: No class name found for key ' . $key);
                 }
 
                 $id = str_replace($this->getBaseUrl() . '/' . $key . '/', '', $value['_links']['self']['href']);
                 if (!$id) {
-                    throw new \Exception('id not found for url ' . $value['_links']['self']['href']);
+                    die('id not found for key ' . $key . ' url ' . $value['_links']['self']['href']);
                 }
 
                 $return[$key] = $this->find($className, $id);
@@ -113,6 +113,36 @@ class EntityManager implements ObjectManager
         return $return;
     }
 
+    /**
+     * Initialize one to many relationships with collection classes
+     */
+    public function initRelations($entity)
+    {
+        if (!method_exists($entity, 'getRelationMap')) {
+            return;
+            die('Relation map does not exist for entity ' . get_class($entity));
+        }
+
+        foreach ($entity->getRelationMap() as $relation => $method) {
+            if (!method_exists($entity, $method)) {
+                die('Method ' . $method . ' does not exist on ' . get_class($entity));
+            }
+
+            if (!isset($this->getEntityMap()['collections'][$relation])) {
+                die('Relation ' . $relation . ' not found on ' . get_class($entity));
+            }
+
+            $fieldName = $this->getEntityMap()['collections'][$relation];
+
+            $relation = new RelationCollection($this, $fieldName);
+
+            $relationFilterField = array_search(get_class($entity), $this->getEntityMap()['entities']);
+            $relation->addFilter($relationFilterField, $entity->getId());
+
+            $entity->$method($relation);
+        }
+    }
+
     public function find($className, $id)
     {
         $entityManager = $this;
@@ -124,7 +154,9 @@ class EntityManager implements ObjectManager
 
             if ($success) {
                 $wrappedObject = new $className;
-                $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse($cachedJson));
+                $halData = json_decode($halJson, true);
+                $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse($halData));
+                $this->initRelations($wrappedObject);
             } else {
 
                 if (!in_array($className, $entityManager->getEntityMap()['entities'])) {
@@ -138,7 +170,7 @@ class EntityManager implements ObjectManager
                 $response = $client->send();
                 if ($response->isSuccess()) {
                     $wrappedObject = new $className;
-                    $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse($response->getBody()));
+                    $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
 
                     $this->getCache()->setItem($className . $id, $response->getBody());
                 } else {
@@ -147,6 +179,7 @@ class EntityManager implements ObjectManager
                     // @codeCoverageIgnoreEnd
                 }
 
+                $this->initRelations($wrappedObject);
                 // Initiation has started, disable lazy loading
                 $initializer   = null;
 
@@ -166,6 +199,8 @@ class EntityManager implements ObjectManager
     {
         $body = json_decode($response->getBody(), true);
         $problem = new ApiProblem($body['httpStatus'], $body['detail'], $body['problemType'], $body['title']);
+
+        throw new \Exception('API Problem');
 
         print_r($problem);die();
     }

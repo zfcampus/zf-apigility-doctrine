@@ -1,6 +1,6 @@
 <?php
 
-namespace Stormpath\Collections;
+namespace SoliantConsulting\ApigilityClient\Collections;
 
 use Closure, ArrayIterator;
 use Doctrine\Common\Collections\Expr\Expression;
@@ -8,33 +8,48 @@ use Doctrine\Common\Collections\Expr\ClosureExpressionVisitor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Collections\Criteria;
-use Stormpath\Persistence\ResourceManager;
+use SoliantConsulting\ApigilityClient\Persistence\EntityManager;
 
-class ResourceCollection implements Collection, Selectable
+class RelationCollection implements Collection, Selectable
 {
-    private $_resourceManager;
+    private $_entityManager;
     private $_className;
-    private $_href;
 
     private $_elements;
     private $_isInitialized = false;
 
-    private $offset = 0;
+    private $page = 0;
     private $limit = 25;
-    private $search;
+
+    /**
+     * A filter is set by the entity creating this collection
+     * for back references and such e.g. a collection of items
+     * from a specific vendor will have a filter of array(array('vendor' => 4));
+     * Values added to the filter cannot be changed or removed.
+     */
+    private $filter;
+
+    /**
+     *  A dynamic query which can be modified between requests
+     */
+    private $query;
+
+    /**
+     * OrderBy must be an array as [["fieldName" => "ASC|DESC"]["field2" => "ASC|DESC"]]
+     */
     private $orderBy;
 
-    public function __construct(ResourceManager $resourceManager, $className, $href)
+    public function __construct(EntityManager $entityManager, $fieldName)
     {
-        $this->setResourceManager($resourceManager);
-        $this->setClassName($className);
-        $this->setHref($href);
-
         $this->_isInitialized = false;
+
+        $this->setEntityManager($entityManager);
+        $this->setFieldName($fieldName);
     }
 
     private function _load()
     {
+
         if ($this->_isInitialized) {
             return;
         }
@@ -42,30 +57,23 @@ class ResourceCollection implements Collection, Selectable
         $this->clear();
         $this->_isInitialized = true;
 
-        $client = $this->getResourceManager()->getHttpClient();
-        $client->setUri($this->getHref());
+        $client = $this->getEntityManager()->getHttpClient();
+        $client->setUri($this->getEntityManager()->getBaseUrl() . '/' . $this->getFieldName());
         $client->setMethod('GET');
 
-        // Build pagination and search
+        // Build pagination and query
         $get = array(
-            'offset' => $this->getOffset(),
-            'limit' => $this->getLimit(),
+            '_page' => $this->getPage(),
+            '_limit' => $this->getLimit(),
         );
 
-#        // sending a query in the request is creating problems,
-#        // hence setting it to an empty array.
-#        // It passes through most of the unit test cases
-#        $get = array();
-
-        if ($this->getSearch()) {
-            if (is_array($this->getSearch())) {
-                $get = array_merge($get, $this->getSearch());
-            } else {
-                $get['q'] = $this->getSearch();
-            }
+        foreach ($this->getFilter() as $field => $value) {
+            $get = array_merge($get, $this->getFilter());
         }
 
-
+        if ($this->getQuery()) {
+            $get = array_merge($get, $this->getQuery());
+        }
 
         // Build orderBy
         if ($this->getOrderBy()) {
@@ -80,73 +88,85 @@ class ResourceCollection implements Collection, Selectable
                 $sorts[] = $field . ' ' . $order;
             }
 
-            $get['orderBy'] = implode(',', $sorts);
+            $get['_orderBy'] = implode(',', $sorts);
         }
 
         $client->setParameterGet($get);
-
+#print_r($get);die();
         $response = $client->send();
 
-        if ($response->isSuccess()) {
-            $className = $this->getClassName();
+        if ($response->isSuccess())
+        {
+            $className = $this->getEntityManager()->getEntityMap()['entities'][$this->getFieldName()];
             $body = json_decode($response->getBody(), true);
-            if (!isset($body['items'])) return;
 
-            foreach ($body['items'] as $data) {
-                $resource = new $className();
-                $resource->setResourceManager($this->getResourceManager());
-                $resource->exchangeArray($data);
-                $this->add($resource);
+            if (!isset($body['_embedded'][$this->getFieldName()])) return;
+            $halArray = $body['_embedded'][$this->getFieldName()];
+
+            foreach ($halArray as $key => $data) {
+                $entity = new $className;
+
+                $res = $this->getEntityManager()->decodeSingleHalResponse($data);
+                $entity->exchangeArray($res);
+                $this->getEntityManager()->initRelations($entity);
+
+#                $this->getEntityManager()->getCache()->setItem($className . $this->getId(), $data);
+                $this->add($entity);
             }
         } else {
             // @codeCoverageIgnoreStart
-            $this->getResourceManager()->handleInvalidResponse($response);
+            $this->getEntityManager()->handleInvalidResponse($response);
             // @codeCoverageIgnoreEnd
         }
     }
 
-    public function getResourceManager()
+    public function getId()
     {
-        return $this->resourceManager;
+        return $this->id;
     }
 
-    public function setResourceManager(ResourceManager $resourceManager)
+    public function setId($value)
     {
-        $this->resourceManager = $resourceManager;
+        $this->id = $value;
         return $this;
     }
 
-    public function getClassName()
+    public function getEntityManager()
     {
-        return $this->className;
+        return $this->entityManager;
     }
 
-    public function setClassName($value)
+    public function setEntityManager(EntityManager $entityManager)
     {
-        $this->className = $value;
+        $this->entityManager = $entityManager;
         return $this;
     }
 
-    public function getHref()
+    public function getFieldName()
     {
-        return $this->href;
+        return $this->fieldName;
     }
 
-    public function setHref($href)
+    public function setFieldName($value)
     {
-        $this->href = $href;
+        $this->fieldName = $value;
+        return $this;
     }
 
-    public function setOffset($value)
+    public function setPage($value)
     {
         $this->clear();
-        $this->offset = $value;
+        $this->page = $value;
         return $this;
     }
 
-    public function getOffset()
+    public function getPage()
     {
-        return $this->offset;
+        if (!$this->page) {
+            $this->page = 0;
+        }
+
+        return $this->page;
     }
 
     public function setLimit($value)
@@ -161,16 +181,27 @@ class ResourceCollection implements Collection, Selectable
         return $this->limit;
     }
 
-    public function setSearch($value)
+    public function getFilter()
     {
-        $this->clear();
-        $this->search = $value;
+        return $this->filter;
+    }
+
+    public function addFilter($key, $value)
+    {
+        $this->filter[$key] = $value;
         return $this;
     }
 
-    public function getSearch()
+    public function setQuery($value)
     {
-        return $this->search;
+        $this->clear();
+        $this->query = $value;
+        return $this;
+    }
+
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     public function getOrderBy()
