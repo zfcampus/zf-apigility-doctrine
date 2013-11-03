@@ -92,6 +92,7 @@ class RelationCollection implements Collection, Selectable
         }
 
         $client->setParameterGet($get);
+#print_r($client->getUri());
 #print_r($get);die();
         $response = $client->send();
 
