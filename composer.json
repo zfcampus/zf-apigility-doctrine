@@ -25,7 +25,8 @@
     },
     "autoload": {
         "psr-0": {
-            "SoliantConsulting\\Apigility\\": "src/"
+            "SoliantConsulting\\Apigility\\Server": "src/"
+            "SoliantConsulting\\Apigility\\Client": "src/"
         }
     }
 }
