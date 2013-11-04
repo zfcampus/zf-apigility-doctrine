@@ -1,12 +1,13 @@
 <?php
-namespace SoliantConsulting\ApigilityClient\Resource;
+namespace SoliantConsulting\Apigility\Client\Resource;
 
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Zend\ServiceManager\ServiceManager as ZendServiceManager;
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 class AbstractResource extends AbstractResourceListener implements ServiceManagerAwareInterface

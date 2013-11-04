@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\ApigilityClient\Collections;
+namespace SoliantConsulting\Apigility\Client\Collections;
 
 use Closure, ArrayIterator;
 use Doctrine\Common\Collections\Expr\Expression;
@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Expr\ClosureExpressionVisitor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Collections\Criteria;
-use SoliantConsulting\ApigilityClient\Persistence\EntityManager;
+use SoliantConsulting\Apigility\Client\Persistence\EntityManager;
 
 class RelationCollection implements Collection, Selectable
 {

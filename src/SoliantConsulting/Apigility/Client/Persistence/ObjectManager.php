@@ -1,25 +1,37 @@
 <?php
 
-namespace SoliantConsulting\ApigilityClient\Persistence;
+namespace SoliantConsulting\Apigility\Client\Persistence;
 
 use Zend\Http\Client;
 use Zend\Http\Response;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectManager as CommonObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Cache\Storage\StorageInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use ZF\ApiProblem\ApiProblem;
-use SoliantConsulting\ApigilityClient\Collections\RelationCollection;
+use SoliantConsulting\Apigility\Client\Collections\RelationCollection;
 
-class ObjectManager implements ObjectManager
+class ObjectManager implements CommonObjectManager
 {
+    private $entityManager;
     private $httpClient;
     private $entityMap;
     private $cache;
     private $insert;
     private $update;
     private $delete;
+
+    public function setEntityManager(EntityManager $entityManager)
+    {
+        $this->entityManager = $entityManager;
+        return $this;
+    }
+
+    public function getEntityManager()
+    {
+        return $this->entityManager;
+    }
 
     public function getEntityMap()
     {
@@ -122,6 +134,22 @@ class ObjectManager implements ObjectManager
             return;
             die('Relation map does not exist for entity ' . get_class($entity));
         }
+/*
+        $metadataFactory = $this->getMetadataFactory();
+        $entityMetadata = $metadataFactory->getMetadataFor(get_class($entity));
+die('got metadata');
+        foreach($entityMetadata->getAssociationMappings() as $map) {
+            switch($map['type']) {
+                case 4:
+                    $data[$map['fieldName']] = $this->getObjectManager()->find($map['targetEntity'], $data[$map['fieldName']]);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $data;
+*/
 
         foreach ($entity->getRelationMap() as $relation => $method) {
             if (!method_exists($entity, $method)) {
@@ -314,23 +342,23 @@ class ObjectManager implements ObjectManager
         if ($this->insert) {
             foreach ($this->insert as $resource) {
                 switch(get_class($resource)) {
-                    case 'SoliantConsulting\ApigilityClient\Resource\Account':
+                    case 'SoliantConsulting\Apigility\Client\Resource\Account':
                         if ($resource->getDirectory()) {
                             $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/accounts');
                         } else {
                             $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/accounts');
                         }
                         break;
-                    case 'SoliantConsulting\ApigilityClient\Resource\Group':
+                    case 'SoliantConsulting\Apigility\Client\Resource\Group':
                         $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/groups');
                         break;
-                    case 'SoliantConsulting\ApigilityClient\Resource\LoginAttempt':
+                    case 'SoliantConsulting\Apigility\Client\Resource\LoginAttempt':
                         $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/loginAttempts');
                         break;
-                    case 'SoliantConsulting\ApigilityClient\Resource\PasswordResetToken':
+                    case 'SoliantConsulting\Apigility\Client\Resource\PasswordResetToken':
                         $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/passwordResetTokens');
                         break;
-                    case 'SoliantConsulting\ApigilityClient\Resource\EmailVerificationToken':
+                    case 'SoliantConsulting\Apigility\Client\Resource\EmailVerificationToken':
                         // @codeCoverageIgnoreStart
                         $resource->_setUrl($this->getBaseUrl() . $resource->_getUrl() . '/' . $resource->getToken());
                         break;
