@@ -1,5 +1,5 @@
 {
-    "name": "soliantconsulting/apigility-client",
+    "name": "soliantconsulting/apigility",
     "type": "library",
     "description": "An ORM Apigility Client based on Doctrine Common",
     "keywords": [
@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-0": {
-            "SoliantConsulting\\Apigility\\Client\\": "src/"
+            "SoliantConsulting\\Apigility\\": "src/"
         }
     }
 }
