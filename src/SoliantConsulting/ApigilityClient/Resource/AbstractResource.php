@@ -25,7 +25,8 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 
     public function setObjectManager(ObjectManager $objectManager)
     {
-        $this->objectManager = $objectManager
+        $this->objectManager = $objectManager;
+        return $this;
     }
 
     public function getObjectManager()
