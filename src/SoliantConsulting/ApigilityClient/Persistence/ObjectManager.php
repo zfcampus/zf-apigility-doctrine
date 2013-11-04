@@ -12,7 +12,7 @@ use ProxyManager\Proxy\LazyLoadingInterface;
 use ZF\ApiProblem\ApiProblem;
 use SoliantConsulting\ApigilityClient\Collections\RelationCollection;
 
-class EntityManager implements ObjectManager
+class ObjectManager implements ObjectManager
 {
     private $httpClient;
     private $entityMap;
@@ -93,7 +93,7 @@ class EntityManager implements ObjectManager
                 }
 
                 if (!$className) {
-                    die('EntityManager: No class name found for key ' . $key);
+                    die('ObjectManager: No class name found for key ' . $key);
                 }
 
                 $id = str_replace($this->getBaseUrl() . '/' . $key . '/', '', $value['_links']['self']['href']);
@@ -145,32 +145,32 @@ class EntityManager implements ObjectManager
 
     public function find($className, $id)
     {
-        $entityManager = $this;
+        $objectManager = $this;
 
         $factory     = new LazyLoadingValueHolderFactory();
-        $initializer = function (& $wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, & $initializer) use ($entityManager, $className, $id)
+        $initializer = function (& $wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, & $initializer) use ($objectManager, $className, $id)
         {
-            $cachedJson = $entityManager->getCache()->getItem($className . $id, $success);
+            $cachedJson = $objectManager->getCache()->getItem($className . $id, $success);
 
             if ($success) {
                 $wrappedObject = new $className;
                 $halData = json_decode($halJson, true);
-                $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse($halData));
+                $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($halData));
                 $this->initRelations($wrappedObject);
             } else {
 
-                if (!in_array($className, $entityManager->getEntityMap()['entities'])) {
-                    throw new \Exception("$className is not mapped in EntityManager entity map");
+                if (!in_array($className, $objectManager->getEntityMap()['entities'])) {
+                    throw new \Exception("$className is not mapped in ObjectManager entity map");
                 }
 
-                $client = $entityManager->getHttpClient();
-                $client->setUri($entityManager->getBaseUrl() . '/' . array_search($className, $entityManager->getEntityMap()['entities']) . '/' . $id);
+                $client = $objectManager->getHttpClient();
+                $client->setUri($objectManager->getBaseUrl() . '/' . array_search($className, $objectManager->getEntityMap()['entities']) . '/' . $id);
                 $client->setMethod('GET');
 
                 $response = $client->send();
                 if ($response->isSuccess()) {
                     $wrappedObject = new $className;
-                    $wrappedObject->exchangeArray($entityManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
+                    $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
 
                     $this->getCache()->setItem($className . $id, $response->getBody());
                 } else {

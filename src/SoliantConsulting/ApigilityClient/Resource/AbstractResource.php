@@ -1,167 +1,223 @@
 <?php
+namespace SoliantConsulting\ApigilityClient\Resource;
 
-namespace Stormpath\Resource;
+use ZF\ApiProblem\ApiProblem;
+use ZF\Rest\AbstractResourceListener;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Zend\ServiceManager\ServiceManager as ZendServiceManager;
+use Doctrine\Common\Persistence\ObjectManager;
 
-use Stormpath\Persistence\ResourceManager;
-use Stormpath\Service\StormpathService;
 
-abstract class AbstractResource
+class AbstractResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
+    private $serviceManager;
+    private $objectManager;
+
+    public function setServiceManager(ZendServiceManager $serviceManager) {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+    public function getServiceManager() {
+        return $this->serviceManager;
+    }
+
+    public function setObjectManager(ObjectManager $objectManager)
+    {
+        $this->objectManager = $objectManager
+    }
+
+    public function getObjectManager()
+    {
+        if (!$this->objectManager) {
+            $this->setObjectManager($this->getServiceManager()->get('doctrine.entitymanager.orm_default'));
+        }
+
+        return $this->objectManager;
+    }
+
     /**
-     * Set the $_url to the url to fetch a resource from for this resource type
+     * Create a resource
      *
-     * @required per resource
+     * @param  mixed $data
+     * @return ApiProblem|mixed
      */
-    protected $_url = '';
-
-    /**
-     * The instance of the resource manager which manages this resource
-     */
-    protected $_resourceManager;
-
-    /**
-     * When lazy loading is used this variable is set to false
-     * until the loading of the resource has occured
-     */
-    private $_isInitialized = true;
-
-    /**
-     * The id for this resource.  This variable is only used
-     * for lazy loading
-     */
-    private $_identifier;
-
-    /**
-     * The true identifier of this resource.  Populated only after
-     * the resource has been loaded
-     */
-    private $id;
-
-    /**
-     * The url primary key
-     */
-    private $href;
-
-    /**
-     * A string of all references on the Resource to eagerly load with Expand Resources
-     */
-    protected $_expandString;
-
-    /**
-     * An array of get parameters to add to the next request.  This is reset between requests.
-     */
-    protected $_additionalQueryParameters = array();
-
-    public function __construct()
+    public function create($data)
     {
-        $this->_setUrl(StormpathService::getBaseUrl() . $this->_getUrl());
-    }
+        $entity = new $this->getEntityClass();
+        $entity->exchangeArray($this->populateReferences($data));
 
-    public function getAdditionalQueryParameters()
-    {
-        return $this->_additionalQueryParameters;
-    }
+        $this->getObjectManager()->persist($entity);
+        $this->getObjectManager()->flush();
 
-    public function resetAdditionalQueryParameters()
-    {
-        $this->_additionalQueryParameters = array();
-        return $this;
-    }
-
-    public function getExpandString()
-    {
-        return $this->_expandString;
+        return $entity;
     }
 
     /**
-     * Get the resource manager managing this resource
+     * Delete a resource
+     *
+     * @param  mixed $id
+     * @return ApiProblem|mixed
      */
-    public function getResourceManager()
+    public function delete($id)
     {
-        return $this->_resourceManager;
-    }
-
-    /**
-     * Set the resource manager
-     */
-    public function setResourceManager(ResourceManager $resourceManager)
-    {
-        $this->_resourceManager = $resourceManager;
-        return $this;
-    }
-
-    /**
-     * Initialize this resource for lazy loading
-     */
-    public function _lazy($resourceManager, $identifier)
-    {
-        $this->_isInitialized = false;
-        $this->_identifier = $identifier;
-        $this->setResourceManager($resourceManager);
-    }
-
-    /**
-     * Load a lazy initialized resource
-     */
-    public function _load($overrideIdentifierAndForceLoad = false)
-    {
-        if (!$overrideIdentifierAndForceLoad
-            and ($this->_isInitialized or !$this->_identifier)) {
-            return;
+        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        if (!$entity) {
+            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
 
-        $this->_isInitialized = true;
+        if ($entity->canDelete()) {
+            $this->getObjectManager()->remove($entity);
+            $this->getObjectManager()->flush();
 
-        $this->setId($overrideIdentifierAndForceLoad ?: $this->_identifier);
-        $this->_resourceManager->load($this->getId(), $this);
-
-        unset($this->_entityPersister, $this->_identifier);
-    }
-
-    public function getId()
-    {
-        $this->_load();
-        return $this->id;
-    }
-
-    protected function setId($value)
-    {
-        $this->id = $value;
-        return $this;
-    }
-
-    public function getHref()
-    {
-        if ($this->href) {
-            return $this->href;
+            return true;
         }
 
-        if ($this->getId()) {
-            return $this->_getUrl() . '/' . $this->getId();
+        return new ApiProblem(403, 'Cannot delete entity with id ' . $id);
+    }
+
+    /**
+     * Delete a collection, or members of a collection
+     *
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function deleteList($data)
+    {
+        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
+    }
+
+    /**
+     * Fetch a resource
+     *
+     * @param  mixed $id
+     * @return ApiProblem|mixed
+     */
+    public function fetch($id)
+    {
+        return $this->getObjectManager()->find($this->getEntityClass(), $id);
+    }
+
+    /**
+     * Fetch all or a subset of resources
+     *
+     * @param  array $params
+     * @return ApiProblem|mixed
+     */
+    public function fetchAll($params = array())
+    {
+
+        $queryBuilder = $this->getObjectManager()->createQueryBuilder();
+        $queryBuilder->select('row')
+            ->from($this->getEntityClass(), 'row');
+
+        $parameters = $this->getEvent()->getQueryParams();
+
+        // Defaults
+        if (!isset($parameters['_page'])) {
+            $parameters['_page'] = 0;
         }
+        if (!isset($parameters['_limit'])) {
+            $parameters['_limit'] = 25;
+        }
+        if ($parameters['_limit'] > 100) {
+            $parameters['_limit'] = 100;
+        }
+
+        // Limits
+        $queryBuilder->setFirstResult($parameters['_page'] * $parameters['_limit']);
+        $queryBuilder->setMaxResults($parameters['_limit']);
+
+        // Orderby
+        if (!isset($parameters['_orderBy'])) {
+            $parameters['_orderBy'] = array('id' => 'asc');
+        }
+        foreach($parameters['_orderBy'] as $fieldName => $sort) {
+            $queryBuilder->addOrderBy("row.$fieldName", $sort);
+        }
+
+        unset($parameters['_limit'], $parameters['_page'], $parameters['_orderBy']);
+
+        // Add variable parameters
+        foreach ($parameters as $key => $value) {
+            $queryBuilder->andWhere("row.$key = :param_$key");
+            $queryBuilder->setParameter("param_$key", $value);
+        }
+
+        return new Paginator($queryBuilder->getQuery(), false);
     }
 
-    public function setHref($value)
+    /**
+     * Patch (partial in-place update) a resource
+     *
+     * @param  mixed $id
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function patch($id, $data)
     {
-        $this->href = $value;
+        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        if (!$entity) {
+            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
+        }
 
-        $this->setId(substr($value, strrpos($value, '/') + 1));
+        $data = $this->populateReferences($data);
 
-        return $this;
+        $entity->exchangeArray(array_merge($entity->getArrayCopy(), $data));
+        $this->getObjectManager()->flush();
+
+        return $entity;
     }
 
-    public function _getUrl()
+    /**
+     * Replace a collection or members of a collection
+     *
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function replaceList($data)
     {
-        return $this->_url;
+        return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
-    public function _setUrl($value)
+    /**
+     * Update a resource
+     *
+     * @param  mixed $id
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function update($id, $data)
     {
-        $this->_url = $value;
-        return $this;
+        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        if (!$entity) {
+            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
+        }
+
+        $data = $this->populateReferences($data);
+
+        $entity->exchangeArray($data);
+        $this->getObjectManager()->flush();
+
+        return $entity;
     }
 
-    abstract public function exchangeArray($values);
+    private function populateReferences($data)
+    {
+        $metadataFactory = $this->getObjectManager()->getMetadataFactory();
+        $entityMetadata = $metadataFactory->getMetadataFor($this->getEntityClass());
 
-    abstract public function getArrayCopy();
+        foreach($entityMetadata->getAssociationMappings() as $map) {
+            switch($map['type']) {
+                case 2:
+                    $data[$map['fieldName']] = $this->getObjectManager()->find($map['targetEntity'], $data[$map['fieldName']]);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $data;
+    }
 }
