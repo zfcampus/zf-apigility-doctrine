@@ -207,6 +207,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 
     private function populateReferences($data)
     {
+throw new \Exception('incomplete');
         $metadataFactory = $this->getObjectManager()->getMetadataFactory();
         $entityMetadata = $metadataFactory->getMetadataFor($this->getEntityClass());
 
