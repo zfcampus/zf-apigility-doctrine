@@ -21,7 +21,8 @@
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2",
-        "zfcampus/zf-apigility": "dev-develop",
+        "zfcampus/zf-apigility": "*",
+        "zfcampus/zf-rpc": "*",
         "doctrine/common": ">=2.4.x-dev",
         "doctrine/doctrine-orm-module": "*",
         "ocramius/proxy-manager": "*"
