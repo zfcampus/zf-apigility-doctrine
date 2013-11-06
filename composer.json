@@ -16,13 +16,18 @@
     ],
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
+        "zfcampus/zf-apigility-admin": "dev-master",
     },
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2",
+        "zfcampus/zf-apigility": "dev-master",
         "doctrine/common": ">=2.4.x-dev",
         "doctrine/doctrine-orm-module": "*",
-        "ocramius/proxy-manager": "*"
+        "ocramius/proxy-manager": "*",
+        "rwoverdijk/assetmanager": "dev-master",
+        "zfcampus/zf-api-problem": "dev-master",
+        "zfcampus/zf-configuration": "dev-master"
     },
     "autoload": {
         "psr-0": {
