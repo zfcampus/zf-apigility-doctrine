@@ -1,83 +1,66 @@
-Client for Apigility
-====================
+Soliant Consulting 
+==================
 
-This API client is an [Object Relational Mapper]
+Apigility for Doctrine
+----------------------
+
+This library has three parts.  
+
+1. An API client [Object Relational Mapper]
 (https://en.wikipedia.org/wiki/Object-relational_mapping) based on the 
 [Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
-project library, hereafter referred to as Client, for Apigility.
+project library.
+
+2. An API server AbstractService class to handle most API interations.
+
+3. An Admin tool to create an Apigility-enabled module with support for all 
+Doctrine Entities in scope.
 
 
-Apigility Server and Client use common Doctrine Entities
+All parts use common Doctrine Entities
 --------------------------------------------------------
 
-Your Apigility server should serve Doctrine entities from the same entity code 
-base as the resources mapped to the service.  This can be accomplished by 
-keeping all your Doctrine entities in the same ZF2 module and either:
+Your API client must have a copy of the same Entity code base as the server 
+and as the Admin module used to build the Apigility-enabled module.
 
-a. Include this library with the Apigility service in the same code base
-
-b. Include this library in a code base which shares the same Doctrine entities module.
-
-This client is an HTTP client and not ment to consume Apigility resources directly, but only through an HTTP API.
+This is best accomplished by creating a distinct module for your entities and 
+repositories.
 
 
-Apigility Configuration
+Installation
+------------
+  1. edit `composer.json` file with following contents:
+
+     ```json
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/TomHAnderson/soliantconsulting-apigility"
+        }
+    ],
+    "require": {
+        "soliantconsulting/apigility": "dev-master"
+    }
+     ```
+  2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
+     http://getcomposer.org/installer and execute it with PHP)
+  3. run `php composer.phar install`
+
+
+Doctrine Entity Configuration
 -----------------------
 
-Doctrine Entities should be ArraySerializable.  You should not include embedded resources.  Resource identifier_name must be 'id'.
+Doctrine Entities should be ArraySerializable.  You should not include embedded 
+resources.
 
-```php
-  'zf-hal' =>
-  array (
-    'renderer' =>
-    [
-      'default_hydrator' => 'ArraySerializable',
-      'render_embedded_resources' => false, // see https://github.com/zfcampus/zf-hal/pull/3
-    ],
-```
 
-module.config.php for Apigility
+Creating the Apigility-enabled module
+-------------------------------------
 
-return array (
-  'service_manager' =>
-  array (
-    'invokables' =>
-    array (
-      'SoliantConsultingApi\\V1\\Rest\\UserGroup\\UserGroupResource' => 'SoliantConsultingApi\\V1\\Rest\\UserGroup\\UserGroupResource',
-      'SoliantConsultingApi\\V1\\Rest\\User\\UserResource' => 'SoliantConsultingApi\\V1\\Rest\\User\\UserResource',
-    ),
-  ),
-  'router' =>
-  array (
-    'routes' =>
-    array (
-      'soliant-consulting-api.rest.userGroup' =>
-      array (
-        'type' => 'Segment',
-        'options' =>
-        array (
-          'route' => '/api/userGroup[/:id]',
-          'defaults' =>
-          array (
-            'controller' => 'SoliantConsultingApi\\V1\\Rest\\UserGroup\\Controller',
-          ),
-        ),
-      ),
-      'soliant-consulting-api.rest.user' =>
-      array (
-        'type' => 'Segment',
-        'options' =>
-        array (
-          'route' => '/api/user[/:id]',
-          'defaults' =>
-          array (
-            'controller' => 'DbLoadCdApi\\V1\\Rest\\User\\Controller',
-          ),
-        ),
-      ),
-    ),
-  ),
-
+Browse to http://localhost/soliantconsulting/apigility/admin
+Enter the name of your new module.  I suggest DoctrineEntityModuleName + Api such as DbApi.
+Click Build Module.  The module will be created and you will be sent to the 
+Build Entity API Resources screen.
 
 Client Configuration
 --------------------

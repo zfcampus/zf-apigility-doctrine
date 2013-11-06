@@ -21,6 +21,7 @@
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2",
         "doctrine/common": ">=2.4.x-dev",
+        "doctrine/doctrine-orm-module": "*",
         "ocramius/proxy-manager": "*"
     },
     "autoload": {
