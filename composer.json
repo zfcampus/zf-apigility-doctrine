@@ -24,10 +24,7 @@
         "zfcampus/zf-apigility": "*",
         "doctrine/common": ">=2.4.x-dev",
         "doctrine/doctrine-orm-module": "*",
-        "ocramius/proxy-manager": "*",
-        "rwoverdijk/assetmanager": "dev-master",
-        "zfcampus/zf-api-problem": "*",
-        "zfcampus/zf-configuration": "*"
+        "ocramius/proxy-manager": "*"
     },
     "autoload": {
         "psr-0": {
