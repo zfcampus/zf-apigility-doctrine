@@ -108,7 +108,6 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function fetchAll($params = array())
     {
-
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->select('row')
             ->from($this->getEntityClass(), 'row');
@@ -145,7 +144,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             $queryBuilder->andWhere("row.$key = :param_$key");
             $queryBuilder->setParameter("param_$key", $value);
         }
-
+//die('paginator!');
         return new Paginator($queryBuilder->getQuery(), false);
     }
 

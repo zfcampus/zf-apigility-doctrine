@@ -9,6 +9,7 @@ namespace SoliantConsulting\Apigility\Admin\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use ZF\Configuration\ConfigResource;
+use Zend\Config\Writer\PhpArray as PhpArrayWriter;
 
 class AppController extends AbstractActionController
 {
@@ -28,12 +29,23 @@ class AppController extends AbstractActionController
 
         $moduleName = 'DoctrineApi';
 
-        $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
-        $serviceResource->setModuleName($moduleName);
-
         $metadata = $moduleResource->create(array(
             'name' =>  $moduleName,
         ));
+
+        // Set renderer defaults
+        $patchConfig = array('zf-hal' => array(
+            'renderer' => array (
+              'default_hydrator' => 'ArraySerializable',
+              'render_embedded_resources' => false,
+            ),
+        ));
+
+        $config = $this->getServiceLocator()->get('Config');
+        $writer = new PhpArrayWriter();
+        $moduleConfig = new ConfigResource($config, 'module/' . $moduleName . '/config/module.config.php', $writer);
+
+        $moduleConfig->patch($patchConfig, true);
 
         die($moduleName . ' created');
 /*
@@ -41,43 +53,27 @@ class AppController extends AbstractActionController
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 
+        $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
+        $serviceResource->setModuleName($moduleName);
 
         foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
-
             $resourceName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
+
+//        echo "create $resourceName\n";
+
+            $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
                 'resourcename' => $resourceName,
                 'entityClass' => $entityMetadata->name,
+                'pageSizeParam' => 'page',
+                'identifierName' => 'id',
             ));
         }
+
 
 #        print_r(get_class_methods($serviceResource));
         die('API Created');
 
-
-        die('DoctrineApi created');
-
-
-//        $this->moduleManager = $this->getServiceLocator()->get('Zend\ModuleManager\ModuleManager');
-#        $this->moduleManager->expects($this->any())
-#                            ->method('getLoadedModules')
-#                            ->will($this->returnValue($modules));
-
-        $model = new ModuleModel($this->moduleManager, $restConfig = array(), $rpcConfig = array());
-        $resource = new ModuleResource($model);
-
-        $moduleName = uniqid('Foo');
-        $module = $this->resource->create(array(
-            'name' => $moduleName,
-        ));
-
-
-        foreach ($entityMetadata as $classMetadata) {
-            print_r(($classMetadata));
-            die();
-        }
-
-//        $viewModel->setVariable('entities', $entityList);
 
         return $viewModel;
     }
