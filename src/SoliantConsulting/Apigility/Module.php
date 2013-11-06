@@ -29,8 +29,8 @@ class Module
 
     public function onBootstrap(MvcEvent $e)
     {
-#        $app      = $e->getApplication();
-#        $this->sm = $app->getServiceManager();
+        $app      = $e->getApplication();
+#        print_r($app->getServiceManager()->get('Config'));die();
 #        $events   = $app->getEventManager();
 #        $events->attach('render', array($this, 'onRender'), 100);
     }

@@ -28,7 +28,7 @@ class AppController extends AbstractActionController
 
 
         $moduleName = 'DoctrineApi';
-
+/*
         $metadata = $moduleResource->create(array(
             'name' =>  $moduleName,
         ));
@@ -48,8 +48,7 @@ class AppController extends AbstractActionController
         $moduleConfig->patch($patchConfig, true);
 
         die($moduleName . ' created');
-/*
-*/
+//    */
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 

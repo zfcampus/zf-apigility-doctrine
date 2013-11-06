@@ -196,6 +196,7 @@ die('got metadata');
                 $client->setMethod('GET');
 
                 $response = $client->send();
+
                 if ($response->isSuccess()) {
                     $wrappedObject = new $className;
                     $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
@@ -208,6 +209,7 @@ die('got metadata');
                 }
 
                 $this->initRelations($wrappedObject);
+
                 // Initiation has started, disable lazy loading
                 $initializer   = null;
 

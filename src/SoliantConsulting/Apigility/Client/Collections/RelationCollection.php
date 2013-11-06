@@ -5,14 +5,15 @@ namespace SoliantConsulting\Apigility\Client\Collections;
 use Closure, ArrayIterator;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\ClosureExpressionVisitor;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Collections\Criteria;
-use SoliantConsulting\Apigility\Client\Persistence\EntityManager;
+use SoliantConsulting\Apigility\Client\Persistence\ObjectManager;
 
-class RelationCollection implements Collection, Selectable
+class RelationCollection extends ArrayCollection implements Collection, Selectable
 {
-    private $_entityManager;
+    private $_objectManager;
     private $_className;
 
     private $_elements;
@@ -39,11 +40,11 @@ class RelationCollection implements Collection, Selectable
      */
     private $orderBy;
 
-    public function __construct(EntityManager $entityManager, $fieldName)
+    public function __construct(ObjectManager $objectManager, $fieldName)
     {
         $this->_isInitialized = false;
 
-        $this->setEntityManager($entityManager);
+        $this->setObjectManager($objectManager);
         $this->setFieldName($fieldName);
     }
 
@@ -57,8 +58,8 @@ class RelationCollection implements Collection, Selectable
         $this->clear();
         $this->_isInitialized = true;
 
-        $client = $this->getEntityManager()->getHttpClient();
-        $client->setUri($this->getEntityManager()->getBaseUrl() . '/' . $this->getFieldName());
+        $client = $this->getObjectManager()->getHttpClient();
+        $client->setUri($this->getObjectManager()->getBaseUrl() . '/' . $this->getFieldName());
         $client->setMethod('GET');
 
         // Build pagination and query
@@ -98,7 +99,7 @@ class RelationCollection implements Collection, Selectable
 
         if ($response->isSuccess())
         {
-            $className = $this->getEntityManager()->getEntityMap()['entities'][$this->getFieldName()];
+            $className = $this->getObjectManager()->getEntityMap()['entities'][$this->getFieldName()];
             $body = json_decode($response->getBody(), true);
 
             if (!isset($body['_embedded'][$this->getFieldName()])) return;
@@ -107,16 +108,16 @@ class RelationCollection implements Collection, Selectable
             foreach ($halArray as $key => $data) {
                 $entity = new $className;
 
-                $res = $this->getEntityManager()->decodeSingleHalResponse($data);
+                $res = $this->getObjectManager()->decodeSingleHalResponse($data);
                 $entity->exchangeArray($res);
-                $this->getEntityManager()->initRelations($entity);
+                $this->getObjectManager()->initRelations($entity);
 
-#                $this->getEntityManager()->getCache()->setItem($className . $this->getId(), $data);
+#                $this->getObjectManager()->getCache()->setItem($className . $this->getId(), $data);
                 $this->add($entity);
             }
         } else {
             // @codeCoverageIgnoreStart
-            $this->getEntityManager()->handleInvalidResponse($response);
+            $this->getObjectManager()->handleInvalidResponse($response);
             // @codeCoverageIgnoreEnd
         }
     }
@@ -132,14 +133,14 @@ class RelationCollection implements Collection, Selectable
         return $this;
     }
 
-    public function getEntityManager()
+    public function getObjectManager()
     {
-        return $this->entityManager;
+        return $this->objectManager;
     }
 
-    public function setEntityManager(EntityManager $entityManager)
+    public function setObjectManager(ObjectManager $objectManager)
     {
-        $this->entityManager = $entityManager;
+        $this->objectManager = $objectManager;
         return $this;
     }
 
