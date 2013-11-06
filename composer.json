@@ -15,19 +15,19 @@
         }
     ],
     "require-dev": {
-        "zfcampus/zf-apigility-admin": "dev-master",
+        "zfcampus/zf-apigility-admin": "*",
         "phpunit/phpunit": "3.7.*"
     },
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2",
-        "zfcampus/zf-apigility": "dev-master",
+        "zfcampus/zf-apigility": "*",
         "doctrine/common": ">=2.4.x-dev",
         "doctrine/doctrine-orm-module": "*",
         "ocramius/proxy-manager": "*",
         "rwoverdijk/assetmanager": "dev-master",
-        "zfcampus/zf-api-problem": "dev-master",
-        "zfcampus/zf-configuration": "dev-master"
+        "zfcampus/zf-api-problem": "*",
+        "zfcampus/zf-configuration": "*"
     },
     "autoload": {
         "psr-0": {
