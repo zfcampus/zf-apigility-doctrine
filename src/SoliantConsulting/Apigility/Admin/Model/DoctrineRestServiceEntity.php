@@ -8,7 +8,7 @@ namespace SoliantConsulting\Apigility\Admin\Model;
 
 use Zend\Filter\FilterChain;
 
-class RestServiceEntity
+class DoctrineRestServiceEntity
 {
     protected $filters = array();
 

@@ -7,10 +7,11 @@
 namespace SoliantConsulting\Apigility\Admin\Model;
 
 use ZF\Apigility\Admin\Exception;
+use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
 
-class RestServiceModelFactory extends RpcServiceModelFactory
+class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
 {
-    const TYPE_DEFAULT      = 'SoliantConsulting\Apigility\Admin\Model\RestServiceModel';
+    const TYPE_DEFAULT      = 'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModel';
 
     /**
      * @param  string $module
@@ -28,7 +29,7 @@ class RestServiceModelFactory extends RpcServiceModelFactory
         $config       = $this->configFactory->factory($module);
         $moduleEntity = $this->moduleModel->getModule($moduleName);
 
-        $restModel = new RestServiceModel($moduleEntity, $this->modules, $config);
+        $restModel = new DoctrineRestServiceModel($moduleEntity, $this->modules, $config);
         $restModel->getEventManager()->setSharedManager($this->sharedEventManager);
 
         switch ($type) {

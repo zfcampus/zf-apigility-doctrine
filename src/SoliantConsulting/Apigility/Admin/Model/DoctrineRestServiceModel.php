@@ -17,8 +17,11 @@ use ZF\Apigility\Admin\Exception;
 use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
+use Zf\Apigility\Admin\Model\ModuleEntity;
+use Zf\Apigility\Admin\Model\NewRestServiceEntity;
+use SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 
-class RestServiceModel implements EventManagerAwareInterface
+class DoctrineRestServiceModel implements EventManagerAwareInterface
 {
     /**
      * @var ConfigResource
@@ -261,18 +264,19 @@ class RestServiceModel implements EventManagerAwareInterface
         $entity       = new RestServiceEntity();
         $entity->exchangeArray($details->getArrayCopy());
 
-        $controllerService = $this->createControllerServiceName($resourceName);
-        $resourceClass     = $this->createResourceClass($resourceName);
-        $entityClass       = $this->createEntityClass($resourceName);
-        $collectionClass   = $this->createCollectionClass($resourceName);
-        $routeName         = $this->createRoute($resourceName, $details->routeMatch, $details->identifierName, $controllerService);
         $mediaType         = $this->createMediaType();
+        $routeName         = ($details->routeName) ? $details->routeName: $this->createRoute($resourceName, $details->routeMatch, $details->identifierName, $controllerService);
+        $controllerService = ($details->controllerServiceName) ? $details->controllerServiceName: $this->createControllerServiceName($resourceName);
+        $resourceClass     = ($details->resourceClass) ? $details->resourceClass: $this->createResourceClass($resourceName);
+        $collectionClass   = ($details->collectionClass) ? $details->collectionClass: $this->createCollectionClass($resourceName);
+        $entityClass       = ($details->entityClass) ? $details->entityClass: $this->createEntityClass($resourceName);
+        $module            = ($details->module) ? $details->module: $this->module;
 
         $entity->exchangeArray(array(
             'collection_class'        => $collectionClass,
             'controller_service_name' => $controllerService,
             'entity_class'            => $entityClass,
-            'module'                  => $this->module,
+            'module'                  => $module,
             'resource_class'          => $resourceClass,
             'route_name'              => $routeName,
             'accept_whitelist'        => array(
@@ -440,12 +444,15 @@ class RestServiceModel implements EventManagerAwareInterface
             'classname' => $className,
             'version'   => $this->moduleEntity->getLatestVersion(),
         ));
+// Entity creation removed for Doctrine
+        /*
         if (!$this->createClassFile($view, $template, $classPath)) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create entity "%s"; unable to write file',
                 $className
             ));
         }
+        */
 
         $fullClassName = sprintf(
             '%s\\V%s\\Rest\\%s\\%s',
@@ -569,7 +576,7 @@ class RestServiceModel implements EventManagerAwareInterface
      * @param  string $resourceClass
      * @param  string $routeName
      */
-    public function createRestConfig(RestServiceEntity $details, $controllerService, $resourceClass, $routeName)
+    public function createRestConfig(DoctrineRestServiceEntity $details, $controllerService, $resourceClass, $routeName)
     {
         $config = array('zf-rest' => array(
             $controllerService => array(
@@ -812,8 +819,8 @@ class RestServiceModel implements EventManagerAwareInterface
      */
     protected function injectResolver(PhpRenderer $renderer, $type)
     {
-        $template = sprintf('code-connected/rest-', $type);
-        $path     = sprintf('%s/../../../../../view/code-connected/rest-%s.phtml', __DIR__, $type);
+        $template = sprintf('doctrine/rest-', $type);
+        $path     = sprintf('%s/../../../../../view/doctrine/rest-%s.phtml', __DIR__, $type);
         $resolver = new Resolver\TemplateMapResolver(array(
             $template => $path,
         ));

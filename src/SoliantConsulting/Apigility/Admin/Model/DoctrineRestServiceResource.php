@@ -11,8 +11,9 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
+use ZF\Apigility\Admin\Model\NewRestServiceEntity;
 
-class RestServiceResource extends AbstractResourceListener
+class DoctrineRestServiceResource extends AbstractResourceListener
 {
     /**
      * @var RestServiceModel
@@ -32,9 +33,15 @@ class RestServiceResource extends AbstractResourceListener
     /**
      * @param  RestServiceModelFactory $restFactory
      */
-    public function __construct(RestServiceModelFactory $restFactory)
+    public function __construct(DoctrineRestServiceModelFactory $restFactory)
     {
         $this->restFactory = $restFactory;
+    }
+
+    public function setModuleName($value)
+    {
+        $this->moduleName = $value;
+        return $this;
     }
 
     /**
@@ -61,9 +68,9 @@ class RestServiceResource extends AbstractResourceListener
     /**
      * @return RestServiceModel
      */
-    public function getModel($type = RestServiceModelFactory::TYPE_DEFAULT)
+    public function getModel($type = DoctrineRestServiceModelFactory::TYPE_DEFAULT)
     {
-        if ($this->model instanceof RestServiceModel) {
+        if ($this->model instanceof DoctrineRestServiceModel) {
             return $this->model;
         }
         $moduleName = $this->getModuleName();
@@ -84,15 +91,11 @@ class RestServiceResource extends AbstractResourceListener
             $data = (array) $data;
         }
 
-        $type = RestServiceModelFactory::TYPE_DEFAULT;
-        if (isset($data['table_name'])) {
-            $creationData = new DbConnectedRestServiceEntity();
-            $type = RestServiceModelFactory::TYPE_DB_CONNECTED;
-        } else {
-            $creationData = new NewRestServiceEntity();
-        }
+        $type = DoctrineRestServiceModelFactory::TYPE_DEFAULT;
+        $creationData = new NewRestServiceEntity();
 
         $creationData->exchangeArray($data);
+
         $model = $this->getModel($type);
 
         try {
@@ -113,7 +116,7 @@ class RestServiceResource extends AbstractResourceListener
     public function fetch($id)
     {
         $service = $this->getModel()->fetch($id);
-        if (!$service instanceof RestServiceEntity) {
+        if (!$service instanceof DoctrineRestServiceEntity) {
             return new ApiProblem(404, 'REST service not found');
         }
         return $service;
@@ -161,11 +164,7 @@ class RestServiceResource extends AbstractResourceListener
 
         try {
             switch (true) {
-                case ($entity instanceof DbConnectedRestServiceEntity):
-                    $model   = $this->restFactory->factory($this->getModuleName(), RestServiceModelFactory::TYPE_DB_CONNECTED);
-                    $updated = $model->updateService($entity);
-                    break;
-                case ($entity instanceof RestServiceEntity):
+                case ($entity instanceof DoctrineRestServiceEntity):
                 default:
                     $updated = $model->updateService($entity);
             }
@@ -190,11 +189,7 @@ class RestServiceResource extends AbstractResourceListener
 
         try {
             switch (true) {
-                case ($entity instanceof DbConnectedRestServiceEntity):
-                    $model   = $this->restFactory->factory($this->getModuleName(), RestServiceModelFactory::TYPE_DB_CONNECTED);
-                    $model->deleteService($entity);
-                    break;
-                case ($entity instanceof RestServiceEntity):
+                case ($entity instanceof DoctrineRestServiceEntity):
                 default:
                     $model->deleteService($entity->controllerServiceName);
             }

@@ -50,4 +50,39 @@ class Module
     {
         return include __DIR__ . '/../../../config/module.config.php';
     }
+
+    public function getServiceConfig()
+    {
+        return array('factories' => array(
+            'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
+                if (!$services->has('ZF\Configuration\ModuleUtils')
+                    || !$services->has('ZF\Configuration\ConfigResourceFactory')
+                    || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
+                    || !$services->has('SharedEventManager')
+                ) {
+                    throw new ServiceNotCreatedException(
+                        'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory is missing one or more dependencies from ZF\Configuration'
+                    );
+                }
+                $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
+                $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
+                $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
+                $sharedEvents  = $services->get('SharedEventManager');
+
+                // Wire DB-Connected fetch listener
+                $sharedEvents->attach(__NAMESPACE__ . '\Admin\Model\DoctrineRestServiceModel', 'fetch', 'ZF\Apigility\Admin\Model\DbConnectedRestServiceModel::onFetch');
+
+                return new Admin\Model\DoctrineRestServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
+            },
+            'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource' => function ($services) {
+                if (!$services->has('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory')) {
+                    throw new ServiceNotCreatedException(
+                        'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource is missing one or more dependencies'
+                    );
+                }
+                $factory = $services->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory');
+                return new Admin\Model\DoctrineRestServiceResource($factory);
+            },
+        ));
+    }
 }

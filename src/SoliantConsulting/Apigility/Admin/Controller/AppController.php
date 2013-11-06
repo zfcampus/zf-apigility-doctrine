@@ -18,10 +18,58 @@ class AppController extends AbstractActionController
         $viewModel->setTemplate('soliantconsulting/apigility/admin/app/index.phtml');
         $viewModel->setTerminal(true);
 
+        $moduleResource = $this->getServiceLocator()->get('ZF\Apigility\Admin\Model\ModuleResource');
+        $moduleResource->setModulePath(realpath(__DIR__ . '/../../../../../../../../'));
+
+/*
+        print_r(($metadata));die();
+*/
+
+
+        $moduleName = 'DoctrineApi';
+
+        $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
+        $serviceResource->setModuleName($moduleName);
+
+        $metadata = $moduleResource->create(array(
+            'name' =>  $moduleName,
+        ));
+
+        die($moduleName . ' created');
+/*
+*/
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
-        $entityMetadata = $metadataFactory->getAllMetadata();
 
+
+        foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
+
+            $resourceName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
+            $serviceResource->create(array(
+                'resourcename' => $resourceName,
+                'entityClass' => $entityMetadata->name,
+            ));
+        }
+
+#        print_r(get_class_methods($serviceResource));
+        die('API Created');
+
+
+        die('DoctrineApi created');
+
+
+//        $this->moduleManager = $this->getServiceLocator()->get('Zend\ModuleManager\ModuleManager');
+#        $this->moduleManager->expects($this->any())
+#                            ->method('getLoadedModules')
+#                            ->will($this->returnValue($modules));
+
+        $model = new ModuleModel($this->moduleManager, $restConfig = array(), $rpcConfig = array());
+        $resource = new ModuleResource($model);
+
+        $moduleName = uniqid('Foo');
+        $module = $this->resource->create(array(
+            'name' => $moduleName,
+        ));
 
 
         foreach ($entityMetadata as $classMetadata) {
