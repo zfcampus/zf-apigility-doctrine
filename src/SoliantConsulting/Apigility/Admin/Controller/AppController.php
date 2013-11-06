@@ -66,6 +66,7 @@ class AppController extends AbstractActionController
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
                 'identifierName' => 'id',
+                'routeMatch' => strtolower(substr($resourceName, 0, 1)) . substr($resourceName, 1),
             ));
         }
 

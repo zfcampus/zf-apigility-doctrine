@@ -528,7 +528,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
                     $routeName => array(
                         'type' => 'Segment',
                         'options' => array(
-                            'route' => sprintf('%s[/:%s]', $route, $identifier),
+                            'route' => sprintf('/api/%s[/:%s]', $route, $identifier),
                             'defaults' => array(
                                 'controller' => $controllerService,
                             ),
