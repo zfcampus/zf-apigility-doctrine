@@ -34,12 +34,14 @@ class AppController extends AbstractActionController
         ));
 
         // Set renderer defaults
-        $patchConfig = array('zf-hal' => array(
-            'renderer' => array (
-              'default_hydrator' => 'ArraySerializable',
-              'render_embedded_resources' => false,
-            ),
-        ));
+        $patchConfig = array(
+            'zf-hal' => array(
+                'renderer' => array (
+                  'default_hydrator' => 'ArraySerializable',
+                  'render_embedded_resources' => false,
+                ),
+            )
+        );
 
         $config = $this->getServiceLocator()->get('Config');
         $writer = new PhpArrayWriter();
@@ -53,7 +55,6 @@ class AppController extends AbstractActionController
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
-        $serviceResource->setModuleName($moduleName);
 
         foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
             $resourceName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
