@@ -15,6 +15,24 @@ class AppController extends AbstractActionController
 {
     public function indexAction()
     {
+        $viewModel = new ViewModel;
+        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/index.phtml');
+
+        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $metadataFactory = $objectManager->getMetadataFactory();
+
+        // FIXME:
+
+//        $allMetadata = $metadataFactory->getAllMetadata();
+
+        // $viewModel->setVariable('allMetadata', $allMetadata);
+
+        return $viewModel;
+    }
+
+
+    public function createModuleAction()
+    {
         $viewModel = new ViewModel();
         $viewModel->setTemplate('soliantconsulting/apigility/admin/app/index.phtml');
         $viewModel->setTerminal(true);

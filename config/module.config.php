@@ -30,7 +30,7 @@ return array(
             'soliantconsulting-apigility-admin' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route' => '/soliantconsulting/apigility/admin',
+                    'route' => '/soliant-consulting/apigility/admin',
                     'defaults' => array(
                         'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
                         'action'     => 'index',
