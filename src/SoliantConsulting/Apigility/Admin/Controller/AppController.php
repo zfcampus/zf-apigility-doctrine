@@ -21,43 +21,25 @@ class AppController extends AbstractActionController
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        try {
-        foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
-            die('found');
-        }
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-            die('exception');
-        }
-
-        $allMetadata = array();
-
-        // FIXME:
-print_r(get_class($metadataFactory->getAllMetadata()));
-//        $allMetadata = $metadataFactory->getAllMetadata();
-die('ok');
-        $viewModel->setVariable('allMetadata', $allMetadata);
+        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
 
         return $viewModel;
     }
 
-
     public function createModuleAction()
     {
-        $viewModel = new ViewModel();
-        $viewModel->setTemplate('soliantconsulting/apigility/admin/app/index.phtml');
-        $viewModel->setTerminal(true);
+        if (!$this->getRequest()->isPost()) {
+            return $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin');
+        }
+
+        $moduleName = $this->getRequest()->getPost()->get('moduleName');
+        if (!$moduleName) {
+            throw new \Exception('Invalid or missing module name');
+        }
 
         $moduleResource = $this->getServiceLocator()->get('ZF\Apigility\Admin\Model\ModuleResource');
         $moduleResource->setModulePath(realpath(__DIR__ . '/../../../../../../../../'));
 
-/*
-        print_r(($metadata));die();
-*/
-
-
-        $moduleName = 'DoctrineApi';
-/*
         $metadata = $moduleResource->create(array(
             'name' =>  $moduleName,
         ));
@@ -78,40 +60,78 @@ die('ok');
 
         $moduleConfig->patch($patchConfig, true);
 
-        die($moduleName . ' created');
-//    */
+        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-select-entities', array('moduleName' => $moduleName));
+    }
+
+    public function selectEntitiesAction()
+    {
+        $moduleName = $this->params()->fromRoute('moduleName');
+        if (!$moduleName) {
+            throw new \Exception('Invalid or missing module name');
+        }
+
+        $viewModel = new ViewModel;
+        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/select-entities.phtml');
+
+        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $metadataFactory = $objectManager->getMetadataFactory();
+
+        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
+        $viewModel->setVariable('moduleName', $moduleName);
+
+        return $viewModel;
+    }
+
+    public function createResourcesAction()
+    {
+        $moduleName = $this->params()->fromRoute('moduleName');
+        if (!$moduleName) {
+            throw new \Exception('Invalid or missing module name');
+        }
+
+        $entitiyClassNames = $this->params()->fromPost('entityClassName');
+        if (!sizeof($entitiyClassNames)) {
+            throw new \Exception('No entities selected to Apigility-enable');
+        }
+
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
 
         foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
+            if (!in_array($entityMetadata->name, $entitiyClassNames)) continue;
+
             $resourceName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
 
-//        echo "create $resourceName\n";
+            if (sizeof($entityMetadata->identifier) !== 1) {
+                throw new \Exception($entityMetadata->name . " does not have exactly one identifier and cannot be generated");
+            }
+
 
             $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
                 'resourcename' => $resourceName,
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
-                'identifierName' => 'id',
+                'identifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => strtolower(substr($resourceName, 0, 1)) . substr($resourceName, 1),
             ));
         }
 
-
-#        print_r(get_class_methods($serviceResource));
-        die('API Created');
-
-
-        return $viewModel;
+        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-done', array('moduleName' => $moduleName));
     }
 
-    public function buildAction()
-    {
-        if ($this->getRequest()->getPost()->get('run')) die ('no run');
+    public function doneAction() {
+        $moduleName = $this->params()->fromRoute('moduleName');
+        if (!$moduleName) {
+            throw new \Exception('Invalid or missing module name');
+        }
 
-        die('run');
+        $viewModel = new ViewModel;
+        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/done.phtml');
+        $viewModel->setVariable('moduleName', $moduleName);
+
+        return $viewModel;
     }
 }

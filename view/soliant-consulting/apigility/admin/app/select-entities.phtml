@@ -1,0 +1,33 @@
+<h1>Soliant Consulting</h1>
+<h2>Apigility for Doctrine</h2>
+
+<h3>Select entities to Apigility-enable for module <?= $this->escapeHtml($this->moduleName); ?></h3>
+
+<script>
+    function toggleCheckboxes(source) {
+        checkboxes = document.getElementsByName('entityClassName[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+</script>
+
+<input type="checkbox" name="toggleCheckboxes" value="" onClick="toggleCheckboxes(this);">
+<br>
+
+<form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)); ?>">
+
+<?php
+    foreach ($this->allMetadata as $metadata) {
+?>
+
+<input type="checkbox" name="entityClassName[]" value="<?= $this->escapeHtml($metadata->name); ?>">
+<?= $this->escapeHtml($metadata->name); ?>
+<br>
+
+<?
+    }
+?>
+
+<input type="submit" value="Create Resources">
+</form>

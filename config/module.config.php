@@ -37,6 +37,47 @@ return array(
                     ),
                 ),
             ),
+            'soliantconsulting-apigility-admin-create-module' => array(
+                'type'  => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route' => '/soliant-consulting/apigility/admin/create-module',
+                    'defaults' => array(
+                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'action'     => 'createModule',
+                    ),
+                ),
+            ),
+            'soliantconsulting-apigility-admin-select-entities' => array(
+                'type'  => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName]',
+                    'defaults' => array(
+                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'action'     => 'selectEntities',
+                    ),
+                ),
+            ),
+            'soliantconsulting-apigility-admin-create-resources' => array(
+                'type'  => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route' => '/soliant-consulting/apigility/admin/create-resources[/:moduleName]',
+                    'defaults' => array(
+                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'action'     => 'createResources',
+                    ),
+                ),
+            ),
+
+            'soliantconsulting-apigility-admin-done' => array(
+                'type'  => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route' => '/soliant-consulting/apigility/admin/done[/:moduleName]',
+                    'defaults' => array(
+                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'action'     => 'done',
+                    ),
+                ),
+            ),
         ),
     ),
 );

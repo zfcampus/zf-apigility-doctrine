@@ -1,23 +1,11 @@
 <h1>Soliant Consulting</h1>
 <h2>Apigility for Doctrine</h2>
 
-<form method="get" action="<?= $this->url('soliantconsulting-apigility-admin', array()); ?>">
+Create new Apigility-enabled module
+<br>
+
+<form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-module'); ?>">
     Module Name: <input type="text" name="moduleName">
 
-    <input class="btn btn-default" type="submit" value="Create Doctrine API">
-
+    <input class="btn btn-default" type="submit" value="Create Doctrine API and Continue">
 </form>
-
-<h3>Apigility resources will be created for these entities</h3>
-
-<ul>
-<?php
-    foreach ($this->allMetadata as $metadata) {
-?>
-    <li><?= $this->escapeHtml($metadata->name); ?></li>
-<?
-    }
-?>
-</ul>
-
-End
