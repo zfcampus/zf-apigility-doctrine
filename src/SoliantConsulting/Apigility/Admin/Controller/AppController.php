@@ -21,11 +21,22 @@ class AppController extends AbstractActionController
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 
+        try {
+        foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
+            die('found');
+        }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            die('exception');
+        }
+
+        $allMetadata = array();
+
         // FIXME:
-
+print_r(get_class($metadataFactory->getAllMetadata()));
 //        $allMetadata = $metadataFactory->getAllMetadata();
-
-        // $viewModel->setVariable('allMetadata', $allMetadata);
+die('ok');
+        $viewModel->setVariable('allMetadata', $allMetadata);
 
         return $viewModel;
     }

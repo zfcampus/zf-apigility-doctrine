@@ -7,8 +7,6 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager as ZendServiceManager;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-
 class AbstractResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
     private $serviceManager;
@@ -47,7 +45,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
     public function create($data)
     {
         $entity = new $this->getEntityClass();
-        $entity->exchangeArray($this->populateReferences($data));
+        $entity->exchangeArray($this->populateReferences((array)$data));
 
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
@@ -144,8 +142,10 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             $queryBuilder->andWhere("row.$key = :param_$key");
             $queryBuilder->setParameter("param_$key", $value);
         }
-//die('paginator!');
-        return new Paginator($queryBuilder->getQuery(), false);
+
+        $collectionClass = $this->getCollectionClass();
+
+        return new $collectionClass($queryBuilder->getQuery(), false);
     }
 
     /**
@@ -164,7 +164,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 
         $data = $this->populateReferences($data);
 
-        $entity->exchangeArray(array_merge($entity->getArrayCopy(), $data));
+        $entity->exchangeArray(array_merge($entity->getArrayCopy(), (array)$data));
         $this->getObjectManager()->flush();
 
         return $entity;
@@ -195,9 +195,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
 
-        $data = $this->populateReferences($data);
-
-        $entity->exchangeArray($data);
+        $entity->exchangeArray($this->populateReferences((array)$data));
         $this->getObjectManager()->flush();
 
         return $entity;
