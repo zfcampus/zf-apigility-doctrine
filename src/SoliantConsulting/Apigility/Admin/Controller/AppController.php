@@ -115,7 +115,7 @@ class AppController extends AbstractActionController
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
                 'identifierName' => array_pop($entityMetadata->identifier),
-                'routeMatch' => strtolower(substr($resourceName, 0, 1)) . substr($resourceName, 1),
+                'routeMatch' => '/api/' . strtolower(substr($resourceName, 0, 1)) . substr($resourceName, 1),
             ));
         }
 
