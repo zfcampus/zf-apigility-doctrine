@@ -39,7 +39,7 @@ Installation
         }
     ],
     "require": {
-        "soliantconsulting/apigility": "dev-master"
+        "soliantconsulting/soliantconsulting-apigility": "dev-master"
     }
      ```
   2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
