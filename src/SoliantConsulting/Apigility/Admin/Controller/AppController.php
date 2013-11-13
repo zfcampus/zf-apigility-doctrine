@@ -10,6 +10,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use ZF\Configuration\ConfigResource;
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
+use Zend\Filter\FilterChain;
 
 class AppController extends AbstractActionController
 {
@@ -108,6 +109,9 @@ class AppController extends AbstractActionController
                 throw new \Exception($entityMetadata->name . " does not have exactly one identifier and cannot be generated");
             }
 
+            $filter = new FilterChain();
+            $filter->attachByName('WordCamelCaseToUnderscore')
+                   ->attachByName('StringToLower');
 
             $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
@@ -115,7 +119,8 @@ class AppController extends AbstractActionController
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
                 'identifierName' => array_pop($entityMetadata->identifier),
-                'routeMatch' => '/api/' . strtolower(substr($resourceName, 0, 1)) . substr($resourceName, 1),
+
+                'routeMatch' => '/api/' . $filter($resourceName),
             ));
         }
 
@@ -131,6 +136,11 @@ class AppController extends AbstractActionController
         $viewModel = new ViewModel;
         $viewModel->setTemplate('soliant-consulting/apigility/admin/app/done.phtml');
         $viewModel->setVariable('moduleName', $moduleName);
+
+        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $metadataFactory = $objectManager->getMetadataFactory();
+
+        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
 
         return $viewModel;
     }
