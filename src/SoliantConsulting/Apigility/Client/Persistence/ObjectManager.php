@@ -200,6 +200,7 @@ die('got metadata');
                 if ($response->isSuccess()) {
                     $wrappedObject = new $className;
                     $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
+                    $wrappedObject->setId($id);
 
                     $this->getCache()->setItem($className . $id, $response->getBody());
                 } else {
