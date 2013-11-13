@@ -130,8 +130,58 @@ class ObjectManager implements CommonObjectManager
         }
 
         // use array merge
-        foreach ($hal as $key => $value) {
-            $return[$key] = $value;
+        foreach ($metadata->fieldMappings as $field) {
+            if (!isset($hal[$field['fieldName']])) {
+                continue; // This field not covered by getArrayCopy and exchangeArray
+            }
+
+            $value = $hal[$field['fieldName']];
+
+            switch ($field['type']) {
+                case 'string':
+                case 'text':
+                    $value = (string)$value;
+                    break;
+
+                case 'integer':
+                case 'smallint':
+                    $value = (int)$value;
+
+                case 'bigint':
+                    break;
+
+                case 'boolean':
+                    $value = (boolean)$value;
+                    break;
+
+                case 'decimal':
+                case 'float':
+                    break;
+
+                case 'object':
+                case 'array':
+                    $value = unserialize($value);
+                    break;
+
+                case 'datetime':
+                    switch ($value['timezone_type']) {
+                        case 3:
+                            $value = new \DateTime($value['date'], new \DateTimeZone($value['timezone']));
+                            break;
+                        case 2:
+                        case 1:
+                        default:
+                            throw new \Exception("Unexpected DateTime timezone_type: " . $value['timezone_type']);
+                    }
+                    break;
+                case 'date':
+                case 'time':
+                default:
+                    throw new \Exception('Datatype ' . $field['type'] . ' not handled by this client');
+                    break;
+           }
+
+           $return[$field['fieldName']] = $value;
         }
 
         return $return;
