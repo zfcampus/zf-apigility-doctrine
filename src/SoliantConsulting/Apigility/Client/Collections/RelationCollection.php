@@ -105,8 +105,8 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
             $className = $this->getClassName();
             $body = json_decode($response->getBody(), true);
 
-            if (!isset($body['_embedded'][$this->getFieldName()])) return;
-            $halArray = $body['_embedded'][$this->getFieldName()];
+            if (!isset($body['_embedded'][$filter($this->getFieldName())])) return;
+            $halArray = $body['_embedded'][$filter($this->getFieldName())];
 
             foreach ($halArray as $key => $data) {
                 $entity = new $className;
