@@ -10,14 +10,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Collections\Criteria;
 use SoliantConsulting\Apigility\Client\Persistence\ObjectManager;
+use Zend\Filter\FilterChain;
 
 class RelationCollection extends ArrayCollection implements Collection, Selectable
 {
-    private $_objectManager;
-    private $_className;
+    private $objectManager;
+    private $className;
 
-    private $_elements;
-    private $_isInitialized = false;
+    private $elements;
+    private $isInitialized = false;
 
     private $page = 0;
     private $limit = 25;
@@ -40,26 +41,30 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
      */
     private $orderBy;
 
-    public function __construct(ObjectManager $objectManager, $fieldName)
+    public function __construct(ObjectManager $objectManager, $className, $fieldName)
     {
-        $this->_isInitialized = false;
+        $this->isInitialized = false;
 
         $this->setObjectManager($objectManager);
+        $this->setClassName($className);
         $this->setFieldName($fieldName);
     }
 
     private function _load()
     {
-
-        if ($this->_isInitialized) {
+        if ($this->isInitialized) {
             return;
         }
 
         $this->clear();
-        $this->_isInitialized = true;
+        $this->isInitialized = true;
+
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
 
         $client = $this->getObjectManager()->getHttpClient();
-        $client->setUri($this->getObjectManager()->getBaseUrl() . '/' . $this->getFieldName());
+        $client->setUri($this->getObjectManager()->getBaseUrl() . '/' . $filter($this->getFieldName()));
         $client->setMethod('GET');
 
         // Build pagination and query
@@ -93,13 +98,11 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
         }
 
         $client->setParameterGet($get);
-#print_r($client->getUri());
-#print_r($get);die();
         $response = $client->send();
 
         if ($response->isSuccess())
         {
-            $className = $this->getObjectManager()->getEntityMap()['entities'][$this->getFieldName()];
+            $className = $this->getClassName();
             $body = json_decode($response->getBody(), true);
 
             if (!isset($body['_embedded'][$this->getFieldName()])) return;
@@ -108,8 +111,9 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
             foreach ($halArray as $key => $data) {
                 $entity = new $className;
 
-                $res = $this->getObjectManager()->decodeSingleHalResponse($data);
+                $res = $this->getObjectManager()->decodeSingleHalResponse($className, $data);
                 $entity->exchangeArray($res);
+                $entity->setId($data['id']);
                 $this->getObjectManager()->initRelations($entity);
 
 #                $this->getObjectManager()->getCache()->setItem($className . $this->getId(), $data);
@@ -141,6 +145,17 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function setObjectManager(ObjectManager $objectManager)
     {
         $this->objectManager = $objectManager;
+        return $this;
+    }
+
+    public function getClassName()
+    {
+        return $this->className;
+    }
+
+    public function setClassName($value)
+    {
+        $this->className = $value;
         return $this;
     }
 
@@ -225,7 +240,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function toArray()
     {
         $this->_load();
-        return $this->_elements;
+        return $this->elements;
     }
 
     /**
@@ -237,7 +252,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function first()
     {
         $this->_load();
-        return reset($this->_elements);
+        return reset($this->elements);
     }
 
     /**
@@ -249,7 +264,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function last()
     {
         $this->_load();
-        return end($this->_elements);
+        return end($this->elements);
     }
 
     /**
@@ -260,7 +275,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function key()
     {
         $this->_load();
-        return key($this->_elements);
+        return key($this->elements);
     }
 
     /**
@@ -271,7 +286,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function next()
     {
         $this->_load();
-        return next($this->_elements);
+        return next($this->elements);
     }
 
     /**
@@ -282,7 +297,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function current()
     {
         $this->_load();
-        return current($this->_elements);
+        return current($this->elements);
     }
 
     /**
@@ -294,9 +309,9 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function remove($key)
     {
         $this->_load();
-        if (isset($this->_elements[$key])) {
-            $removed = $this->_elements[$key];
-            unset($this->_elements[$key]);
+        if (isset($this->elements[$key])) {
+            $removed = $this->elements[$key];
+            unset($this->elements[$key]);
 
             return $removed;
         }
@@ -313,10 +328,10 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function removeElement($element)
     {
         $this->_load();
-        $key = array_search($element, $this->_elements, true);
+        $key = array_search($element, $this->elements, true);
 
         if ($key !== false) {
-            unset($this->_elements[$key]);
+            unset($this->elements[$key]);
 
             return true;
         }
@@ -391,7 +406,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function containsKey($key)
     {
         $this->_load();
-        return isset($this->_elements[$key]);
+        return isset($this->elements[$key]);
     }
 
     /**
@@ -407,7 +422,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function contains($element)
     {
         $this->_load();
-        foreach ($this->_elements as $collectionElement) {
+        foreach ($this->elements as $collectionElement) {
             if ($element === $collectionElement) {
                 return true;
             }
@@ -426,7 +441,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function exists(Closure $p)
     {
         $this->_load();
-        foreach ($this->_elements as $key => $element) {
+        foreach ($this->elements as $key => $element) {
             if ($p($key, $element)) {
                 return true;
             }
@@ -447,7 +462,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function indexOf($element)
     {
         $this->_load();
-        return array_search($element, $this->_elements, true);
+        return array_search($element, $this->elements, true);
     }
 
     /**
@@ -459,8 +474,8 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function get($key)
     {
         $this->_load();
-        if (isset($this->_elements[$key])) {
-            return $this->_elements[$key];
+        if (isset($this->elements[$key])) {
+            return $this->elements[$key];
         }
         return null;
     }
@@ -474,7 +489,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function getKeys()
     {
         $this->_load();
-        return array_keys($this->_elements);
+        return array_keys($this->elements);
     }
 
     /**
@@ -486,7 +501,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function getValues()
     {
         $this->_load();
-        return array_values($this->_elements);
+        return array_values($this->elements);
     }
 
     /**
@@ -499,7 +514,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function count()
     {
         $this->_load();
-        return count($this->_elements);
+        return count($this->elements);
     }
 
     /**
@@ -514,7 +529,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function set($key, $value)
     {
         $this->_load();
-        $this->_elements[$key] = $value;
+        $this->elements[$key] = $value;
     }
 
     /**
@@ -526,7 +541,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function add($value)
     {
         $this->_load();
-        $this->_elements[] = $value;
+        $this->elements[] = $value;
         return true;
     }
 
@@ -540,7 +555,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function isEmpty()
     {
         $this->_load();
-        return ! $this->_elements;
+        return ! $this->elements;
     }
 
     /**
@@ -552,7 +567,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function getIterator()
     {
         $this->_load();
-        return new ArrayIterator($this->_elements);
+        return new ArrayIterator($this->elements);
     }
 
     /**
@@ -566,7 +581,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function map(Closure $func)
     {
         $this->_load();
-        return new static(array_map($func, $this->_elements));
+        return new static(array_map($func, $this->elements));
     }
 
     /**
@@ -580,7 +595,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function filter(Closure $p)
     {
         $this->_load();
-        return new static(array_filter($this->_elements, $p));
+        return new static(array_filter($this->elements, $p));
     }
 
     /**
@@ -594,7 +609,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function forAll(Closure $p)
     {
         $this->_load();
-        foreach ($this->_elements as $key => $element) {
+        foreach ($this->elements as $key => $element) {
             if ( ! $p($key, $element)) {
                 return false;
             }
@@ -635,8 +650,8 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
      */
     public function clear()
     {
-        $this->_isInitialized = false;
-        $this->_elements = array();
+        $this->isInitialized = false;
+        $this->elements = array();
     }
 
     /**
@@ -654,7 +669,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     public function slice($offset, $length = null)
     {
         $this->_load();
-        return array_slice($this->_elements, $offset, $length, true);
+        return array_slice($this->elements, $offset, $length, true);
     }
 
     /**
@@ -669,7 +684,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
     {
         $this->_load();
         $expr     = $criteria->getWhereExpression();
-        $filtered = $this->_elements;
+        $filtered = $this->elements;
 
         if ($expr) {
             $visitor  = new ClosureExpressionVisitor();

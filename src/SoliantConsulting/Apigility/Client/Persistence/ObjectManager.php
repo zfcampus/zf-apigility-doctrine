@@ -11,6 +11,8 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use ZF\ApiProblem\ApiProblem;
 use SoliantConsulting\Apigility\Client\Collections\RelationCollection;
+use Doctrine\ORM\EntityManager;
+use Zend\Filter\FilterChain;
 
 class ObjectManager implements CommonObjectManager
 {
@@ -84,9 +86,10 @@ class ObjectManager implements CommonObjectManager
         return $this;
     }
 
-    public function decodeSingleHalResponse($hal)
+    public function decodeSingleHalResponse($className, $hal)
     {
         $return = [];
+        $metadata = $this->getEntityManager()->getMetadataFactory()->getMetadataFor($className);
 
         if (isset($hal['_links'])) {
             $links = $hal['_links'];
@@ -98,22 +101,31 @@ class ObjectManager implements CommonObjectManager
             unset($hal['_embedded']);
 
             foreach ($embedded as $key => $value) {
-                $className = null;
+                $referencedClassProperty = null;
 
-                if (isset($this->getEntityMap()['entities'][$key])) {
-                    $className = $this->getEntityMap()['entities'][$key];
+                foreach ($metadata->associationMappings as $mapping) {
+                    if ($mapping['type'] != 2) continue;
+                    if ($mapping['fieldName'] != $key) continue;
+
+                    $targetEntity = $mapping['targetEntity'];
                 }
 
-                if (!$className) {
+                if (!$targetEntity) {
                     die('ObjectManager: No class name found for key ' . $key);
                 }
 
-                $id = str_replace($this->getBaseUrl() . '/' . $key . '/', '', $value['_links']['self']['href']);
+                $filter = new FilterChain();
+                $filter->attachByName('WordCamelCaseToUnderscore')
+                       ->attachByName('StringToLower');
+
+                $route = $filter($key);
+
+                $id = str_replace($this->getBaseUrl() . '/' . $route . '/', '', $value['_links']['self']['href']);
                 if (!$id) {
                     die('id not found for key ' . $key . ' url ' . $value['_links']['self']['href']);
                 }
 
-                $return[$key] = $this->find($className, $id);
+                $return[$key] = $this->find($targetEntity, $id);
             }
         }
 
@@ -130,45 +142,27 @@ class ObjectManager implements CommonObjectManager
      */
     public function initRelations($entity)
     {
-        if (!method_exists($entity, 'getRelationMap')) {
-            return;
-            die('Relation map does not exist for entity ' . get_class($entity));
-        }
-/*
-        $metadataFactory = $this->getMetadataFactory();
+        $metadataFactory = $this->getEntityManager()->getMetadataFactory();
         $entityMetadata = $metadataFactory->getMetadataFor(get_class($entity));
-die('got metadata');
+
         foreach($entityMetadata->getAssociationMappings() as $map) {
             switch($map['type']) {
                 case 4:
-                    $data[$map['fieldName']] = $this->getObjectManager()->find($map['targetEntity'], $data[$map['fieldName']]);
+                    $collection = new RelationCollection($this, $map['targetEntity'], $this->classNameToCanonicalName($map['targetEntity']));
+                    $relationFilterField = $this->classNameToCanonicalName($map['sourceEntity']);
+                    $collection->addFilter($relationFilterField, $entity->getId());
+                    $method = 'set' . $map['fieldName'];
+                    $entity->$method($collection);
                     break;
                 default:
                     break;
             }
         }
+    }
 
-        return $data;
-*/
-
-        foreach ($entity->getRelationMap() as $relation => $method) {
-            if (!method_exists($entity, $method)) {
-                die('Method ' . $method . ' does not exist on ' . get_class($entity));
-            }
-
-            if (!isset($this->getEntityMap()['collections'][$relation])) {
-                die('Relation ' . $relation . ' not found on ' . get_class($entity));
-            }
-
-            $fieldName = $this->getEntityMap()['collections'][$relation];
-
-            $relation = new RelationCollection($this, $fieldName);
-
-            $relationFilterField = array_search(get_class($entity), $this->getEntityMap()['entities']);
-            $relation->addFilter($relationFilterField, $entity->getId());
-
-            $entity->$method($relation);
-        }
+    private function classNameToCanonicalName($className) {
+        return strtolower(substr(substr($className, strrpos($className, '\\') + 1), 0, 1))
+            . substr($className, strrpos($className, '\\') + 2);
     }
 
     public function find($className, $id)
@@ -183,23 +177,23 @@ die('got metadata');
             if ($success) {
                 $wrappedObject = new $className;
                 $halData = json_decode($halJson, true);
-                $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($halData));
+                $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($className, $halData));
                 $this->initRelations($wrappedObject);
             } else {
 
-                if (!in_array($className, $objectManager->getEntityMap()['entities'])) {
-                    throw new \Exception("$className is not mapped in ObjectManager entity map");
-                }
+                $filter = new FilterChain();
+                $filter->attachByName('WordCamelCaseToUnderscore')
+                       ->attachByName('StringToLower');
 
                 $client = $objectManager->getHttpClient();
-                $client->setUri($objectManager->getBaseUrl() . '/' . array_search($className, $objectManager->getEntityMap()['entities']) . '/' . $id);
+                $client->setUri($objectManager->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName($className)) . '/' . $id);
                 $client->setMethod('GET');
 
                 $response = $client->send();
 
                 if ($response->isSuccess()) {
                     $wrappedObject = new $className;
-                    $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse(json_decode($response->getBody(), true)));
+                    $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($className, json_decode($response->getBody(), true)));
                     $wrappedObject->setId($id);
 
                     $this->getCache()->setItem($className . $id, $response->getBody());
@@ -230,8 +224,8 @@ die('got metadata');
     {
         $body = json_decode($response->getBody(), true);
         $problem = new ApiProblem($body['httpStatus'], $body['detail'], $body['problemType'], $body['title']);
-
-        throw new \Exception('API Problem');
+#print_r($body);die('end');
+//        throw new \Exception('API Problem');
 
         print_r($problem);die();
     }
