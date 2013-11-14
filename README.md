@@ -212,19 +212,27 @@ Reserved Words
 
 Return a page of the first five results
 
-```/api/user_data?_page=0&_limit=5```
+```
+    /api/user_data?_page=0&_limit=5
+```
 
 Return results six through ten
 
-```/api/user_data?_page=1&_limit=5```
+```
+    /api/user_data?_page=1&_limit=5
+```
 
 Sort by columnOne ascending
 
-```/api/user_data?_orderBy%5BcolumnOne%5D=ASC```
+```
+    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
+```
 
 Sort by columnOne ascending then columnTwo decending
 
-```/api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC```
+```
+    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
+```
 
 
 Querying Data
@@ -234,7 +242,9 @@ Simple Query
 
 Any field passed in the GET to a collection resource is added to the query by name
 
-```/api/user_data?user_id=1```
+```
+    /api/user_data?user_id=1
+```
 
 
 Client Collection
@@ -266,15 +276,31 @@ $collection->setOrderBy(array(
 ));
 ```
 
-```setPage(#)``` sets the page of results to return based on ```setLimit(#)``` 
+```
+    setPage(#)
+``` 
+
+sets the page of results to return based on ```setLimit(#)``` 
 so if yo call setLimit(10) and setPage(2) the collection will return results 31-40.
 
-```addFilter(field, value)``` is used internally to set persistant filters.  Filters are not
+```
+    addFilter(field, value)
+``` 
+
+is used internally to set persistant filters.  Filters are not
 reset between collection api calls and cannot be modified.
 
-```setQuery(array(field => value))``` can be modified and are not reset between api calls```
+```
+    setQuery(array(field => value))
+``` 
 
-```setOrderBy(array(field => sort))``` sets the order to return results.
+can be modified and are not reset between api calls
+
+```
+    setOrderBy(array(field => sort))
+``` 
+
+sets the order to return results.
 
 After any of these calls are made the collection resets itself.  This allows loooping.  This example 
 echos 50 results.
