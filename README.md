@@ -306,16 +306,17 @@ After any of these calls are made the collection resets itself.  This allows loo
 echos 50 results.
 
 ```
-$collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
+    $collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
 
-$collection->setLimit(10);
-for ($page = 0; $page <= 4; $page++) {
-    $collection->setPage($page); 
-    
-    foreach ($collection as $entity) {
-        echo $entity->getName();    
+    $collection->setLimit(10);
+    for ($page = 0; $page <= 4; $page++) {
+        $collection->setPage($page); 
+
+        foreach ($collection as $entity) {
+            echo $entity->getName();    
+        }
     }
-}
+```
 
 
 TODO Short Term
@@ -326,13 +327,13 @@ Add update and delete to the object manager.
 TODO: Complex Query - Find a format which supports doctrine query builder more completely.
 
 ```
-user_id = array(
-    'comparator' => 'EQ, LT, GT', // See Doctrine Query Builder documentation
-    and
-    'values' => array(1,2,3),
-    or
-    'rangeStart' => 3,
-    'rangeEnd' => 5,
+    user_id = array(
+        'comparator' => 'EQ, LT, GT', // See Doctrine Query Builder documentation
+        and
+        'values' => array(1,2,3),
+        or
+        'rangeStart' => 3,
+        'rangeEnd' => 5,
 ```
 
 
