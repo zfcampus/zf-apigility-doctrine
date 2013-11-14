@@ -6,6 +6,11 @@ This documents the reqiurements of your entities to work with this library.
 The ArraySerializable hydrator is used by default.  This requires
 
 ```
+public function setId($value) 
+{
+    $this->id = $value;
+}
+
 public function getArrayCopy() 
 {
     return array(
@@ -14,11 +19,7 @@ public function getArrayCopy()
         'referenceToAnotherEntity' => $this->getReferenceToAnotherEntity(),
     );
 }
-```
 
-and 
-
-```
 public function exchangeArray($data) 
 {
     $this->setAnotherField(isset($data['anotherField']) ? $data['anotherField']: null);
@@ -30,6 +31,6 @@ It is important the id is not in exchangeArray and is in getArrayCopy.
 All fields and references need to be in both functions.  Collections
 such as many to one relationships are in neither function.  
 
-*** note the DoctrineEntity hydrator may be preferred.  To impliment this hydrator
-you must create a hydrator which can dyanamicly compose a DoctrineEntity hydrator 
-from the given object manager. ***
+```setId($value)``` is generally not implemented by traditional Doctrine entity design
+but if using the Client and because ArraySerializable hydration is used and becuase 
+setting the id in exchangeArray() is not advised, this setter is required.

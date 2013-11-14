@@ -164,14 +164,18 @@ class ObjectManager implements CommonObjectManager
                     break;
 
                 case 'datetime':
-                    switch ($value['timezone_type']) {
-                        case 3:
-                            $value = new \DateTime($value['date'], new \DateTimeZone($value['timezone']));
-                            break;
-                        case 2:
-                        case 1:
-                        default:
-                            throw new \Exception("Unexpected DateTime timezone_type: " . $value['timezone_type']);
+                    if ($value) {
+                        switch ($value['timezone_type']) {
+                            case 3:
+                                $value = new \DateTime($value['date'], new \DateTimeZone($value['timezone']));
+                                break;
+                            case 2:
+                            case 1:
+                            default:
+                                print_r($value);
+                                die();
+                                throw new \Exception("Unexpected DateTime timezone_type: " . $value['timezone_type']);
+                        }
                     }
                     break;
                 case 'date':
