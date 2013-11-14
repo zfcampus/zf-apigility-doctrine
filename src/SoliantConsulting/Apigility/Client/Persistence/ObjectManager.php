@@ -71,11 +71,6 @@ class ObjectManager implements CommonObjectManager
     public function getHttpClient()
     {
         $this->httpClient->resetParameters();
-        $headers = $this->httpClient->getRequest()->getHeaders();
-
-        // Setting a single header. Will not overwrite any
-        // previously-added headers of the same name.
-        $headers->addHeaderLine('Accept', '*/*');
 
         return $this->httpClient;
     }
@@ -86,10 +81,10 @@ class ObjectManager implements CommonObjectManager
         return $this;
     }
 
-    public function decodeSingleHalResponse($className, $hal)
+    public function decodeSingleHalResponse($entityClassName, $hal)
     {
         $return = [];
-        $metadata = $this->getEntityManager()->getMetadataFactory()->getMetadataFor($className);
+        $metadata = $this->getEntityManager()->getMetadataFactory()->getMetadataFor($entityClassName);
 
         if (isset($hal['_links'])) {
             $links = $hal['_links'];
@@ -125,7 +120,7 @@ class ObjectManager implements CommonObjectManager
                     die('id not found for key ' . $key . ' url ' . $value['_links']['self']['href']);
                 }
 
-                $return[$key] = $this->find($targetEntity, $id);
+                $return[$key] = $this->initializeEntity($targetEntity, $id);
             }
         }
 
@@ -214,59 +209,45 @@ class ObjectManager implements CommonObjectManager
         }
     }
 
-    private function classNameToCanonicalName($className) {
-        return strtolower(substr(substr($className, strrpos($className, '\\') + 1), 0, 1))
-            . substr($className, strrpos($className, '\\') + 2);
+    public function classNameToCanonicalName($entityClassName) {
+        return strtolower(substr(substr($entityClassName, strrpos($entityClassName, '\\') + 1), 0, 1))
+            . substr($entityClassName, strrpos($entityClassName, '\\') + 2);
     }
 
-    public function find($className, $id)
+    public function find($entityClassName, $id)
     {
         $objectManager = $this;
 
-        $factory     = new LazyLoadingValueHolderFactory();
-        $initializer = function (& $wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, & $initializer) use ($objectManager, $className, $id)
-        {
-            $cachedJson = $objectManager->getCache()->getItem($className . $id, $success);
+        $cachedJson = $objectManager->getCache()->getItem($entityClassName . $id, $success);
 
-            if ($success) {
-                $wrappedObject = new $className;
-                $halData = json_decode($halJson, true);
-                $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($className, $halData));
-                $this->initRelations($wrappedObject);
+        if ($success) {
+            $entity = new $entityClassName;
+            $entity->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($halJson, true)));
+            $this->initRelations($entity);
+        } else {
+
+            $filter = new FilterChain();
+            $filter->attachByName('WordCamelCaseToUnderscore')
+                   ->attachByName('StringToLower');
+
+            $client = $objectManager->getHttpClient();
+            $client->setUri($objectManager->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName($entityClassName)) . '/' . $id);
+            $client->setMethod('GET');
+
+            $response = $client->send();
+
+            if ($response->isSuccess()) {
+                $entity = new $entityClassName;
+                $entity->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($response->getBody(), true)));
+                $entity->setId($id);
+
+                $this->getCache()->setItem($entityClassName . $id, $response->getBody());
             } else {
-
-                $filter = new FilterChain();
-                $filter->attachByName('WordCamelCaseToUnderscore')
-                       ->attachByName('StringToLower');
-
-                $client = $objectManager->getHttpClient();
-                $client->setUri($objectManager->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName($className)) . '/' . $id);
-                $client->setMethod('GET');
-
-                $response = $client->send();
-
-                if ($response->isSuccess()) {
-                    $wrappedObject = new $className;
-                    $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($className, json_decode($response->getBody(), true)));
-                    $wrappedObject->setId($id);
-
-                    $this->getCache()->setItem($className . $id, $response->getBody());
-                } else {
-                    // @codeCoverageIgnoreStart
-                    $this->handleInvalidResponse($response);
-                    // @codeCoverageIgnoreEnd
-                }
-
-                $this->initRelations($wrappedObject);
-
-                // Initiation has started, disable lazy loading
-                $initializer   = null;
-
-                return true; // confirm that initialization occurred correctly
+                  return false;  #FIXME
             }
-        };
 
-        $entity = $factory->createProxy($className, $initializer);
+            $this->initRelations($entity);
+        }
 
         return $entity;
     }
@@ -278,8 +259,6 @@ class ObjectManager implements CommonObjectManager
     {
         $body = json_decode($response->getBody(), true);
         $problem = new ApiProblem($body['httpStatus'], $body['detail'], $body['problemType'], $body['title']);
-#print_r($body);die('end');
-//        throw new \Exception('API Problem');
 
         print_r($problem);die();
     }
@@ -390,119 +369,88 @@ class ObjectManager implements CommonObjectManager
      */
     function flush()
     {
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
+
         if ($this->insert) {
-            foreach ($this->insert as $resource) {
-                switch(get_class($resource)) {
-                    case 'SoliantConsulting\Apigility\Client\Resource\Account':
-                        if ($resource->getDirectory()) {
-                            $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/accounts');
-                        } else {
-                            $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/accounts');
-                        }
-                        break;
-                    case 'SoliantConsulting\Apigility\Client\Resource\Group':
-                        $resource->_setUrl($this->getBaseUrl() . '/directories/' . $resource->getDirectory()->getId() . '/groups');
-                        break;
-                    case 'SoliantConsulting\Apigility\Client\Resource\LoginAttempt':
-                        $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/loginAttempts');
-                        break;
-                    case 'SoliantConsulting\Apigility\Client\Resource\PasswordResetToken':
-                        $resource->_setUrl($this->getBaseUrl() . '/applications/' . $resource->getApplication()->getId() . '/passwordResetTokens');
-                        break;
-                    case 'SoliantConsulting\Apigility\Client\Resource\EmailVerificationToken':
-                        // @codeCoverageIgnoreStart
-                        $resource->_setUrl($this->getBaseUrl() . $resource->_getUrl() . '/' . $resource->getToken());
-                        break;
-                        // @codeCoverageIgnoreEnd
-                    default:
-                        break;
-                }
+            foreach ($this->insert as $entity) {
+                $url = $this->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName(get_class($entity)));
+
                 // Create a resource
                 $client = $this->getHttpClient();
-                $client->setUri($resource->_getUrl());
+                $client->setUri($url);
                 $client->setMethod('POST');
+                $client->setHeaders(array(
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ));
 
-                $client->setRawBody(json_encode($resource->getArrayCopy()));
-
-                if ($resource->getAdditionalQueryParameters()) {
-                    foreach ($resource->getAdditionalQueryParameters() as $key => $value) {
-                        $client->getRequest()->getQuery()->set($key, $value);
-                    }
-                    $resource->resetAdditionalQueryParameters();
-                }
+                $client->setRawBody(json_encode($entity->getArrayCopy()));
 
                 $response = $client->send();
 
                 if ($response->isSuccess()) {
-                    $resource->setResourceManager($this);
                     $newProperties = json_decode($response->getBody(), true);
 
-                    $resource->exchangeArray($newProperties);
-                    $this->getCache()->setItem(get_class($resource) . $resource->getId(), $response->getBody());
+                    $entity->exchangeArray((array)$newProperties);
+                    $entity->setId($newProperties['id']);
+                    $this->getCache()->setItem(get_class($entity) . $entity->getId(), $response->getBody());
                 } else {
                     // @codeCoverageIgnoreStart
                     $this->handleInvalidResponse($response);
                     // @codeCoverageIgnoreEnd
                 }
 
-                $this->insert->removeElement($resource);
+                $this->insert->removeElement($entity);
             }
         }
 
         if ($this->update) {
-            foreach ($this->update as $resource) {
-                $resource->_load();
+            foreach ($this->update as $entity) {
+                $entity->getId();  #Init entity of still proxy
 
-                // Delete a resource
+                $url = $this->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName(get_class($entity))) . '/' . $entity->getId();
+
+                // Create a resource
                 $client = $this->getHttpClient();
-                $client->setUri($resource->getHref());
-                $client->setMethod('POST');
+                $client->setUri($url);
+                $client->setMethod('PUT');
+                $client->setHeaders(array(
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ));
 
-                $client->setRawBody(json_encode($resource->getArrayCopy()));
-
-                // Remove code coverage ignore when/if features are added which affect a update
-                // @codeCoverageIgnoreStart
-                if ($resource->getAdditionalQueryParameters()) {
-                    foreach ($resource->getAdditionalQueryParameters() as $key => $value) {
-                        $client->getRequest()->getQuery()->set($key, $value);
-                    }
-                    $resource->resetAdditionalQueryParameters();
-                }
-                // @codeCoverageIgnoreEnd
+                $client->setRawBody(json_encode($entity->getArrayCopy()));
 
                 $response = $client->send();
 
                 if ($response->isSuccess()) {
-                    $resource->exchangeArray(json_decode($response->getBody(), true));
-                    $this->getCache()->setItem(get_class($resource) . $resource->getId(), $response->getBody());
+                    $entity->exchangeArray(json_decode($response->getBody(), true));
+                    $this->getCache()->setItem(get_class($entity) . $entity->getId(), $response->getBody());
                 } else {
                     // @codeCoverageIgnoreStart
                     $this->handleInvalidResponse($response);
                     // @codeCoverageIgnoreEnd
                 }
 
-                $this->update->removeElement($resource);
+                $this->update->removeElement($entity);
             }
         }
 
         if ($this->delete) {
-            foreach ($this->delete as $resource) {
-                $resource->_load();
+            foreach ($this->delete as $entity) {
+                $entity->getId(); # init the entity
 
-                // Delete a resource
+                $url = $this->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName(get_class($entity))) . '/' . $entity->getId();
+
                 $client = $this->getHttpClient();
-                $client->setUri($resource->getHref());
+                $client->setUri($url);
                 $client->setMethod('DELETE');
-
-                // Remove code coverage ignore when/if features are added which affect a delete
-                // @codeCoverageIgnoreStart
-                if ($resource->getAdditionalQueryParameters()) {
-                    foreach ($resource->getAdditionalQueryParameters() as $key => $value) {
-                        $client->getRequest()->getQuery()->set($key, $value);
-                    }
-                    $resource->resetAdditionalQueryParameters();
-                }
-                // @codeCoverageIgnoreEnd
+                $client->setHeaders(array(
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ));
 
                 $response = $client->send();
 
@@ -513,8 +461,8 @@ class ObjectManager implements CommonObjectManager
                     // @codeCoverageIgnoreEnd
                 }
 
-                $this->getCache()->removeItem(get_class($resource) . $resource->getId());
-                $this->delete->removeElement($resource);
+                $this->getCache()->removeItem(get_class($entity) . $entity->getId());
+                $this->delete->removeElement($entity);
             }
         }
     }
@@ -529,7 +477,7 @@ class ObjectManager implements CommonObjectManager
      */
     function getRepository($className)
     {
-
+        throw new \Exception("Repositories are not implemented");
     }
 
     /**
@@ -544,7 +492,7 @@ class ObjectManager implements CommonObjectManager
      */
     function getClassMetadata($className)
     {
-
+        throw new \Exception('This ORM does not have class metadata');
     }
 
     /**
@@ -555,7 +503,7 @@ class ObjectManager implements CommonObjectManager
      */
     function getMetadataFactory()
     {
-
+        throw new \Exception('This ORM does not have a metadata factory');
     }
 
     /**
@@ -568,7 +516,59 @@ class ObjectManager implements CommonObjectManager
      */
     function initializeObject($obj)
     {
+        throw new \Exception('Lazy loading is handled through proxies');
+    }
 
+    /**
+     * Lazy load a known-valid entity by id
+     */
+    function initializeEntity($entityClassName, $id)
+    {
+        $objectManager = $this;
+
+        $factory     = new LazyLoadingValueHolderFactory();
+        $initializer = function (& $wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, & $initializer) use ($objectManager, $entityClassName, $id)
+        {
+            $cachedJson = $objectManager->getCache()->getItem($entityClassName . $id, $success);
+
+            if ($success) {
+                $wrappedObject = new $entityClassName;
+                $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($halJson, true)));
+                $this->initRelations($wrappedObject);
+            } else {
+
+                $filter = new FilterChain();
+                $filter->attachByName('WordCamelCaseToUnderscore')
+                       ->attachByName('StringToLower');
+
+                $client = $objectManager->getHttpClient();
+                $client->setUri($objectManager->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName($entityClassName)) . '/' . $id);
+                $client->setMethod('GET');
+
+                $response = $client->send();
+
+                if ($response->isSuccess()) {
+                    $wrappedObject = new $entityClassName;
+                    $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($response->getBody(), true)));
+                    $wrappedObject->setId($id);
+
+                    $this->getCache()->setItem($entityClassName . $id, $response->getBody());
+                } else {
+                      return false;  #FIXME
+                }
+
+                $this->initRelations($wrappedObject);
+
+                // Initiation has started, disable lazy loading
+                $initializer   = null;
+
+                return true; // confirm that initialization occurred correctly
+            }
+        };
+
+        $entity = $factory->createProxy($entityClassName, $initializer);
+
+        return $entity;
     }
 
     /**
@@ -579,8 +579,24 @@ class ObjectManager implements CommonObjectManager
      * @return bool
      * @codeCoverageIgnore
      */
-    function contains($object)
+    function contains($entity)
     {
+        if ($this->insert) {
+            if ($this->insert->contains($entity)) {
+                return true;
+            }
+        }
+        if ($this->update) {
+            if ($this->update->contains($entity)) {
+                return true;
+            }
+        }
+        if ($this->delete) {
+            if ($this->delete->contains($entity)) {
+                return true;
+            }
+        }
 
+        return false;
     }
 }

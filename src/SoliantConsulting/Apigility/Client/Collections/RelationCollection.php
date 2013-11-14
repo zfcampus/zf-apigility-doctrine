@@ -41,13 +41,18 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
      */
     private $orderBy;
 
-    public function __construct(ObjectManager $objectManager, $className, $fieldName)
+    public function __construct(ObjectManager $objectManager, $className, $fieldName = null)
     {
         $this->isInitialized = false;
 
         $this->setObjectManager($objectManager);
         $this->setClassName($className);
-        $this->setFieldName($fieldName);
+
+        if ($fieldName) {
+            $this->setFieldName($fieldName);
+        } else {
+            $this->setFieldName($objectManager->classNameToCanonicalName($className));
+        }
     }
 
     private function _load()
