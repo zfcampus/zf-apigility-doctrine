@@ -72,6 +72,11 @@ class ObjectManager implements CommonObjectManager
     {
         $this->httpClient->resetParameters();
 
+        $this->httpClient->setHeaders(array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ));
+
         return $this->httpClient;
     }
 
@@ -223,7 +228,6 @@ class ObjectManager implements CommonObjectManager
         if ($success) {
             $entity = new $entityClassName;
             $entity->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($halJson, true)));
-            $this->initRelations($entity);
         } else {
 
             $filter = new FilterChain();
@@ -243,11 +247,13 @@ class ObjectManager implements CommonObjectManager
 
                 $this->getCache()->setItem($entityClassName . $id, $response->getBody());
             } else {
+                print_r($response->getBody());
+                die('error');
                   return false;  #FIXME
             }
-
-            $this->initRelations($entity);
         }
+
+        $this->initRelations($entity);
 
         return $entity;
     }
@@ -381,10 +387,6 @@ class ObjectManager implements CommonObjectManager
                 $client = $this->getHttpClient();
                 $client->setUri($url);
                 $client->setMethod('POST');
-                $client->setHeaders(array(
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ));
 
                 $client->setRawBody(json_encode($entity->getArrayCopy()));
 
@@ -416,10 +418,6 @@ class ObjectManager implements CommonObjectManager
                 $client = $this->getHttpClient();
                 $client->setUri($url);
                 $client->setMethod('PUT');
-                $client->setHeaders(array(
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ));
 
                 $client->setRawBody(json_encode($entity->getArrayCopy()));
 
@@ -447,10 +445,6 @@ class ObjectManager implements CommonObjectManager
                 $client = $this->getHttpClient();
                 $client->setUri($url);
                 $client->setMethod('DELETE');
-                $client->setHeaders(array(
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ));
 
                 $response = $client->send();
 
