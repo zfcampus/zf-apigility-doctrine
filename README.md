@@ -9,7 +9,7 @@ This library has three parts.
 1. An Admin tool to create an Apigility-enabled module with support for all 
 Doctrine Entities in scope.
 
-2. An API server AbstractService class to handle API interations from resources
+2. An API server AbstractService class to handle API interactions from resources
 created with the Admin tool.
 
 3. An API client [Object Relational Mapper]
@@ -23,7 +23,8 @@ All parts use common Doctrine Entities
 --------------------------------------------------------
 
 Your API client must have a copy of the same Entity code base as the server 
-and as the Admin module used to build the Apigility-enabled module.
+and as the Admin module used to build the Apigility-enabled module, if you
+choose to use the Client.
 
 This is best accomplished by creating a distinct module for your entities and 
 repositories then requiring this repository from composer.
@@ -134,12 +135,17 @@ Add a service factory for the client to the Application module's setServiceConfi
                 'apigility_client' => function($serviceManager) {
                     $objectManager = new ObjectManager;
 
-                    $objectManager->setBaseUrl('http://localhost:8079/api');  # no trailing slash
+                    # no trailing slash
+                    $objectManager->setBaseUrl('http://localhost:8079/api');  
                     
-                    // The entity manager you set here should not connect to your database.  It is used
-                    // by the objectManager to introspect entities at run time.  Because the client is not
-                    // an Doctrine Entity Manager it doesn't have the entity metadata available to it.
-                    $objectManager->setEntityManager($serviceManager->get('doctrine.entitymanager.orm_default'));
+                    // The entity manager you set here should not connect 
+                    // to your database.  It is used by the objectManager 
+                    // to introspect entities at run time.  Because the 
+                    // client is not an Doctrine Entity Manager it doesn't 
+                    // have the entity metadata available to it.
+                    $objectManager->setEntityManager(
+                        $serviceManager->get('doctrine.entitymanager.orm_default')
+                    );
                     
                     $objectManager->setHttpClient(new HttpClient(null, array('keepalive' => true)));
                     $objectManager->setCache(StorageFactory::adapterFactory('memory'));
@@ -148,7 +154,7 @@ Add a service factory for the client to the Application module's setServiceConfi
                 },
 ```
 
-To fetch the object manager is a controller:
+To fetch the object manager in a controller:
 ```
 namespace Application\Controller;
 
@@ -199,9 +205,9 @@ Direct API Calls
 Reserved Words
 
 ```
-_page
-_limit
-_orderBy
+    _page
+    _limit
+    _orderBy
 ```
 
 Return a page of the first five results
@@ -231,8 +237,8 @@ Any field passed in the GET to a collection resource is added to the query by na
 ```/api/user_data?user_id=1```
 
 
-Collection Calls
-----------------
+Client Collection
+=================
 
 A collection is returned from the object manager any time a collection is requested such 
 as ```$artifact->getReferencedData();```
