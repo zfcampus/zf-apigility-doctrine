@@ -71,7 +71,7 @@ return array(
             'soliantconsulting-apigility-admin-done' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/done[/:moduleName]',
+                    'route' => '/soliant-consulting/apigility/admin/done[/:moduleName][/:results]',
                     'defaults' => array(
                         'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
                         'action'     => 'done',

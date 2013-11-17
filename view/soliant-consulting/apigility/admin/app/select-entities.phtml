@@ -1,50 +1,60 @@
+<script>
+$(function() {
+    $('#toggleCheckboxes').on('click', function(event) {
+        $('[name="entityClassName[]"]').prop("checked", $(this).is(':checked'));
+    });
+});
+</script>
+
 <h1>Soliant Consulting</h1>
 <h2>Apigility for Doctrine</h2>
 
-<h3>Select entities to Apigility-enable for module <?= $this->escapeHtml($this->moduleName); ?></h3>
+<form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)); ?>">
 
-<script>
-    function toggleCheckboxes(source) {
-        checkboxes = document.getElementsByName('entityClassName[]');
-        for(var i=0, n=checkboxes.length;i<n;i++) {
-            checkboxes[i].checked = source.checked;
-        }
-    }
-</script>
+<h3>Route Options</h3>
 
 Route Prefix
-<input type="text" value="" name="routePrefix">
+<input type="text" name="routePrefix" value="api">
+
 <br>
-Include beginning slash and no trailing slash e.g. <b>/api<b>
 <br>
-<br>
+
 
 Use Entity Namespaces for Route
 <input type="checkbox" name="useEntityNamespacesForRoute" value="1">
 <br>
-Should entity namespaces be used in route names?  e.g. entity name EtreeDb\Entity\UserMeta would route to
-{route prefix} . <b>/etree_db/entity/user_meta<b>
-<b>
-If you do not select this option the same route would be {route prefix} . <b>/user_meta</b>
 <br>
-<br>
+Should entity namespaces be used in route names?  e.g. entity name EtreeDb\Db\Entity\UserMeta would route to
+<b>{route prefix} . /etree_db/db/entity/user_meta</b>
 
-<input type="checkbox" name="toggleCheckboxes" value="" onClick="toggleCheckboxes(this);">
-<br>
+If you do not select this option the same route would be <b>{route prefix} . /user_meta</b>
 
-<form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)); ?>">
+<hr>
+
+<h3>Select Entities</h3>
+
+<table class="table table-striped table-hover">
+<tr>
+    <th>
+        <input type="checkbox" id="toggleCheckboxes">
+    </th>
+</tr>
+
 
 <?php
     foreach ($this->allMetadata as $metadata) {
 ?>
-
+<tr>
+    <td>
 <input type="checkbox" name="entityClassName[]" value="<?= $this->escapeHtml($metadata->name); ?>">
 <?= $this->escapeHtml($metadata->name); ?>
-<br>
-
+    </td>
+</tr>
 <?
     }
 ?>
-<br>
+</table>
+
 <input class="btn btn-success" type="submit" value="Create Api">
+
 </form>

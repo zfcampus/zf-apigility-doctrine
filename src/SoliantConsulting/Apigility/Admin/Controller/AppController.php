@@ -95,9 +95,19 @@ class AppController extends AbstractActionController
             throw new \Exception('No entities selected to Apigility-enable');
         }
 
+        // Get the route prefix and remove any / from ends of string
         $routePrefix = $this->params()->fromPost('routePrefix');
         if (!$routePrefix) {
-            $routePrefix = '/api';
+            $routePrefix = 'api';
+            die('no post');
+        } else {
+            while(substr($routePrefix, 0, 1) == '/') {
+                $routePrefix = substr($routePrefix, 1);
+            }
+
+            while(substr($routePrefix, strlen($routePrefix) - 1) == '/') {
+                $routePrefix = substr($routePrefix, 0, strlen($routePrefix) - 1);
+            }
         }
 
         $useEntityNamespacesForRoute = (boolean)$this->params()->fromPost('useEntityNamespacesForRoute');
@@ -106,6 +116,10 @@ class AppController extends AbstractActionController
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
+
+        // Generate a session id for results on next page
+        session_start();
+        $results = md5(uniqid());
 
         foreach ($metadataFactory->getAllMetadata() as $entityMetadata) {
             if (!in_array($entityMetadata->name, $entitiyClassNames)) continue;
@@ -121,9 +135,9 @@ class AppController extends AbstractActionController
                    ->attachByName('StringToLower');
 
             if ($useEntityNamespacesForRoute) {
-                $route = $routePrefix . '/' . $filter(str_replace('\\', '/', $entityMetadata->name));
+                $route = '/' . $routePrefix . '/' . $filter(str_replace('\\', '/', $entityMetadata->name));
             } else {
-                $route = $routePrefix . '/' . $filter($resourceName);
+                $route = '/' . $routePrefix . '/' . $filter($resourceName);
             }
 
             $serviceResource->setModuleName($moduleName);
@@ -134,9 +148,12 @@ class AppController extends AbstractActionController
                 'identifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => $route,
             ));
+
+            $_SESSION[$results][$entityMetadata->name] = $route;
         }
 
-        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-done', array('moduleName' => $moduleName));
+#print_r($_SESSION[$results]);die('asdf');
+        return $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-done', array('moduleName' => $moduleName, 'results' => $results));
     }
 
     public function doneAction() {
@@ -144,6 +161,9 @@ class AppController extends AbstractActionController
         if (!$moduleName) {
             throw new \Exception('Invalid or missing module name');
         }
+
+        session_start();
+        $results = $this->params()->fromRoute('results');
 
         $viewModel = new ViewModel;
         $viewModel->setTemplate('soliant-consulting/apigility/admin/app/done.phtml');
@@ -153,6 +173,7 @@ class AppController extends AbstractActionController
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
+        $viewModel->setVariable('results', $_SESSION[$results]);
 
         return $viewModel;
     }
