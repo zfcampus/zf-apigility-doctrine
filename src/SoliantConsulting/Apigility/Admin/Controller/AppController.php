@@ -95,6 +95,13 @@ class AppController extends AbstractActionController
             throw new \Exception('No entities selected to Apigility-enable');
         }
 
+        $routePrefix = $this->params()->fromPost('routePrefix');
+        if (!$routePrefix) {
+            $routePrefix = '/api';
+        }
+
+        $useEntityNamespacesForRoute = (boolean)$this->params()->fromPost('useEntityNamespacesForRoute');
+
         $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $objectManager->getMetadataFactory();
 
@@ -113,14 +120,19 @@ class AppController extends AbstractActionController
             $filter->attachByName('WordCamelCaseToUnderscore')
                    ->attachByName('StringToLower');
 
+            if ($useEntityNamespacesForRoute) {
+                $route = $routePrefix . '/' . $filter(str_replace('\\', '/', $entityMetadata->name));
+            } else {
+                $route = $routePrefix . '/' . $filter($resourceName);
+            }
+
             $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
                 'resourcename' => $resourceName,
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
                 'identifierName' => array_pop($entityMetadata->identifier),
-
-                'routeMatch' => '/api/' . $filter($resourceName),
+                'routeMatch' => $route,
             ));
         }
 

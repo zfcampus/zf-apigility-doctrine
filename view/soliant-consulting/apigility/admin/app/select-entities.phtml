@@ -12,6 +12,23 @@
     }
 </script>
 
+Route Prefix
+<input type="text" value="" name="routePrefix">
+<br>
+Include beginning slash and no trailing slash e.g. <b>/api<b>
+<br>
+<br>
+
+Use Entity Namespaces for Route
+<input type="checkbox" name="useEntityNamespacesForRoute" value="1">
+<br>
+Should entity namespaces be used in route names?  e.g. entity name EtreeDb\Entity\UserMeta would route to
+{route prefix} . <b>/etree_db/entity/user_meta<b>
+<b>
+If you do not select this option the same route would be {route prefix} . <b>/user_meta</b>
+<br>
+<br>
+
 <input type="checkbox" name="toggleCheckboxes" value="" onClick="toggleCheckboxes(this);">
 <br>
 
