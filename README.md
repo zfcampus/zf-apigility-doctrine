@@ -6,13 +6,13 @@ Apigility for Doctrine
 
 This library has three parts.  
 
-1. An Admin to create an Apigility-enabled modules with support for all 
-Doctrine Entities in scope.
+1. An Admin to create Apigility-enabled modules with support for all 
+Doctrine Entities.
 
-2. An API server AbstractService class to handle API interactions from resources
+2. An API Server AbstractService class to handle API interactions from resources
 created with the Admin tool.
 
-3. An API client [Object Relational Mapper]
+3. An API Client [Object Relational Mapper]
 (https://en.wikipedia.org/wiki/Object-relational_mapping) based on the 
 [Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
 project library which works in tandem with a Doctrine ORM class to make interacting
@@ -64,6 +64,7 @@ generated resources are extended from this abstract.  The abstract supports
 GET, POST, PUT, and DELETE requests.
 
 A GET request to /api/entity_name/1 will return the matching record for EntityName id = 1
+
 A GET request to /api/entity_name will return a collection.
 
 
@@ -115,6 +116,8 @@ Note these are field names, not database column names.
 ```
     /api/entity_name?user=1
 ```
+
+See TODO
 
 
 Doctrine Entity Configuration
