@@ -11,7 +11,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
-use ZF\Apigility\Admin\Model\NewRestServiceEntity;
+use SoliantConsulting\Apigility\Admin\Model\NewRestServiceEntity;
 
 class DoctrineRestServiceResource extends AbstractResourceListener
 {

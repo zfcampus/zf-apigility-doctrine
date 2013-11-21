@@ -18,7 +18,7 @@ use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
-use Zf\Apigility\Admin\Model\NewRestServiceEntity;
+use SoliantConsulting\Apigility\Admin\Model\NewRestServiceEntity;
 use SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 
 class DoctrineRestServiceModel implements EventManagerAwareInterface
@@ -260,13 +260,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         $entity->exchangeArray($details->getArrayCopy());
 
         $mediaType         = $this->createMediaType();
-        $resourceClass     = ($details->resourceClass) ? $details->resourceClass: $this->createResourceClass($resourceName);
+        $resourceClass     = ($details->resourceClass) ? $details->resourceClass: $this->createResourceClass($resourceName, $details);
         $collectionClass   = ($details->collectionClass) ? $details->collectionClass: $this->createCollectionClass($resourceName);
-        $entityClass       = ($details->entityClass) ? $details->entityClass: $this->createEntityClass($resourceName);
+        $entityClass       = ($details->entityClass) ? $details->entityClass: $this->createEntityClass($resourceName, $details);
         $module            = ($details->module) ? $details->module: $this->module;
 
         $controllerService = ($details->controllerServiceName) ? $details->controllerServiceName: $this->createControllerServiceName($resourceName);
         $routeName         = ($details->routeName) ? $details->routeName: $this->createRoute($resourceName, $details->routeMatch, $details->identifierName, $controllerService);
+
+        $objectManager     = ($details->objectManager) ? $details->objectManager: 'doctrine.entitymanager.orm_default';
 
         $entity->exchangeArray(array(
             'collection_class'        => $collectionClass,
@@ -284,6 +286,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
                 $mediaType,
                 'application/json',
             ),
+            'object_manager' => $objectManager,
         ));
 
         $this->createRestConfig($entity, $controllerService, $resourceClass, $routeName);
@@ -365,7 +368,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      * @param  string $resourceName
      * @return string The name of the newly created class
      */
-    public function createResourceClass($resourceName)
+    public function createResourceClass($resourceName, NewRestServiceEntity $details)
     {
         $module  = $this->module;
         $srcPath = $this->getSourcePath($resourceName);
@@ -384,6 +387,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             'module'    => $module,
             'resource'  => $resourceName,
             'classname' => $className,
+            'details'   => $details,
             'version'   => $this->moduleEntity->getLatestVersion(),
         ));
         if (!$this->createClassFile($view, 'resource', $classPath)) {

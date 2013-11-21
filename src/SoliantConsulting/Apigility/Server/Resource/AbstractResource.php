@@ -9,8 +9,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class AbstractResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
-    private $serviceManager;
-    private $objectManager;
+    protected $serviceManager;
+    protected $objectManager;
+    protected $objectManagerAlias;
 
     public function setServiceManager(ZendServiceManager $serviceManager) {
         $this->serviceManager = $serviceManager;
@@ -27,10 +28,21 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         return $this;
     }
 
+    public function getObjectManagerAlias()
+    {
+        return $this->objectManagerAlias;
+    }
+
+    public function setObjectManagerAlias($value)
+    {
+        $this->objectManagerAlias = $value;
+        return $this;
+    }
+
     public function getObjectManager()
     {
         if (!$this->objectManager) {
-            $this->setObjectManager($this->getServiceManager()->get('doctrine.entitymanager.orm_default'));
+            $this->setObjectManager($this->getServiceManager()->get($this->getObjectManagerAlias()));
         }
 
         return $this->objectManager;
