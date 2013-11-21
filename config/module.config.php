@@ -50,7 +50,7 @@ return array(
             'soliantconsulting-apigility-admin-select-entities' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName]',
+                    'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName][/:objectManagerAlias]',
                     'defaults' => array(
                         'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
                         'action'     => 'selectEntities',

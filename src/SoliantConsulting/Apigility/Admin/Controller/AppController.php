@@ -19,11 +19,6 @@ class AppController extends AbstractActionController
         $viewModel = new ViewModel;
         $viewModel->setTemplate('soliant-consulting/apigility/admin/app/index.phtml');
 
-        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $metadataFactory = $objectManager->getMetadataFactory();
-
-        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
-
         return $viewModel;
     }
 
@@ -61,24 +56,36 @@ class AppController extends AbstractActionController
 
         $moduleConfig->patch($patchConfig, true);
 
-        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-select-entities', array('moduleName' => $moduleName));
+        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-select-entities',
+            array(
+                'moduleName' => $moduleName,
+                'objectManagerAlias' => 'doctrine.entitymanager.orm_default'
+            )
+        );
     }
 
     public function selectEntitiesAction()
     {
         $moduleName = $this->params()->fromRoute('moduleName');
-        if (!$moduleName) {
-            throw new \Exception('Invalid or missing module name');
+        $objectManagerAlias = $this->params()->fromRoute('objectManagerAlias');
+        if (!$moduleName or !$objectManagerAlias) {
+            throw new \Exception('Invalid or missing module name or objectManagerAlias');
         }
 
         $viewModel = new ViewModel;
         $viewModel->setTemplate('soliant-consulting/apigility/admin/app/select-entities.phtml');
 
-        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $metadataFactory = $objectManager->getMetadataFactory();
+        try {
+            $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
+            $metadataFactory = $objectManager->getMetadataFactory();
 
-        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
+            $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
+        } catch (\Exception $e) {
+            $viewModel->setVariable('invalidObjectManager', true);
+        }
+
         $viewModel->setVariable('moduleName', $moduleName);
+        $viewModel->setVariable('objectManagerAlias', $objectManagerAlias);
 
         return $viewModel;
     }
@@ -86,8 +93,9 @@ class AppController extends AbstractActionController
     public function createResourcesAction()
     {
         $moduleName = $this->params()->fromRoute('moduleName');
-        if (!$moduleName) {
-            throw new \Exception('Invalid or missing module name');
+        $objectManagerAlias = $this->params()->fromPost('objectManagerAlias');
+        if (!$moduleName or !$objectManagerAlias) {
+            throw new \Exception('Invalid or missing module name or object manager alias');
         }
 
         $entitiyClassNames = $this->params()->fromPost('entityClassName');
@@ -112,7 +120,7 @@ class AppController extends AbstractActionController
 
         $useEntityNamespacesForRoute = (boolean)$this->params()->fromPost('useEntityNamespacesForRoute');
 
-        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
@@ -142,6 +150,7 @@ class AppController extends AbstractActionController
 
             $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
+                'objectManager' => $objectManagerAlias,
                 'resourcename' => $resourceName,
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'page',
@@ -169,10 +178,6 @@ class AppController extends AbstractActionController
         $viewModel->setTemplate('soliant-consulting/apigility/admin/app/done.phtml');
         $viewModel->setVariable('moduleName', $moduleName);
 
-        $objectManager = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $metadataFactory = $objectManager->getMetadataFactory();
-
-        $viewModel->setVariable('allMetadata', $metadataFactory->getAllMetadata());
         $viewModel->setVariable('results', $_SESSION[$results]);
 
         return $viewModel;
