@@ -6,7 +6,7 @@ Apigility for Doctrine
 
 This library has three parts.  
 
-1. An Admin tool to create an Apigility-enabled module with support for all 
+1. An Admin to create an Apigility-enabled modules with support for all 
 Doctrine Entities in scope.
 
 2. An API server AbstractService class to handle API interactions from resources
@@ -17,24 +17,6 @@ created with the Admin tool.
 [Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
 project library which works in tandem with a Doctrine ORM class to make interacting
 with your entities seemless across the API.
-
-
-All parts use common Doctrine Entities
---------------------------------------------------------
-
-Your API client must have a copy of the same Entity code base as the server 
-and as the Admin module used to build the Apigility-enabled module, if you
-choose to use the Client.
-
-This is best accomplished by creating a distinct module for your entities and 
-repositories then requiring this repository from composer.
-
-
-Everything uses proxy objects for lazy loading
-----------------------------------------------
-
-The ```ocramius/proxy-manager``` library is used to make all api interactivity lazy load,
-including individual find() calls and collections.
 
 
 Installation
@@ -55,12 +37,89 @@ Installation
   2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
      http://getcomposer.org/installer and execute it with PHP)
   3. run `php composer.phar install`
+  4. If you are using the server enable ```SoliantConsulting/Apigility``` module in ```development.config.php``` or ```application.config.php```
+
+
+Admin
+-----
+
+This tool will create a set of Apigility resources for the entities you specify.  You 
+must run this tool inside an application which already has Doctrine entities managed 
+by an object manager.  
+
+Admin supports multiple object managers by alias.  To use this resource creation tool
+you must include ```SoliantConsulting\Apigility``` in your ```application.config.php```
+or ```development.config.php```.  Then browse to the route ```/soliant-consulting/apigility/admin```
+to create your resources.
+
+All entities managed by any object manager will be available to build into a resource, one 
+object manager at a time.  The resources created by the Admin use the Server to do their work.
+
+
+Server
+------
+
+The Server portion is one abstract resource file.  All
+generated resources are extended from this abstract.  The abstract supports 
+GET, POST, PUT, and DELETE requests.
+
+A GET request to /api/entity_name/1 will return the matching record for EntityName id = 1
+A GET request to /api/entity_name will return a collection.
+
+
+Collections 
+--------------------
+
+The API created with this library implements full featured and paginated 
+collection resources returned with a call like /api/entity_name
+
+Reserved Words
+
+```
+    _page
+    _limit
+    _orderBy
+```
+
+Return a page of the first five results
+
+```
+    /api/entity_name?_page=0&_limit=5
+```
+
+Return results six through ten
+
+```
+    /api/entity_name?_page=1&_limit=5
+```
+
+Sort by columnOne ascending
+
+```
+    /api/entity_name?_orderBy%5BcolumnOne%5D=ASC
+```
+
+Sort by columnOne ascending then columnTwo decending
+
+```
+    /api/entity_name?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
+```
+
+
+Filtering Data
+-------------
+
+Any field passed in the GET to a collection resource is added to the query by name.  
+Note these are field names, not database column names.
+
+```
+    /api/entity_name?user=1
+```
 
 
 Doctrine Entity Configuration
 -----------------------
 
-This documents the reqiurements of your entities to work with this library.  
 The ArraySerializable hydrator is used by default.
 
 ```
@@ -97,35 +156,25 @@ At the time of this writing Doctrine many-to-many relationships are not supporte
 library.
 
 
-Creating the Apigility-enabled module
--------------------------------------
+Client
+------
 
-The Admin tool can create an Apigility-enabled module with the Doctrine entities in scope.
-To enable the Admin include ```'SoliantConsulting\Apigility',``` in your 
-development.config.php configuration.
+The Client is a Doctrine Object Relational Mapper based on the Doctrine Common library.
+It works by using the same copy of your entities used to create your Server resources.
+This is best accomplished by keeping each Doctrine connection entities in their own 
+module e.g. Db.  This common entity module is then used in the API application and the
+client application.
 
-Before you begin configure your application with Doctrine entity support and be
-sure you can connect to the database.  All entities 
-managed by the object manager will be available to build into a resource.  
 
-Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter 
-the name of a new module which does not already exist.  When the form is submitted
-the module will be created.
-
-The next page allows you to select entities from the object manager to build into 
-resources.  Check those you want then submit the form.
-
-Done.  Your new module is enabled in your application and you can start making API 
-requests.  
-
-The route for an entity named DataModule\Entity\UserData is
-```/api/user_data``` and after going through the above process your API should be working.
+The ```ocramius/proxy-manager``` library is used to make all client to api 
+interactivity lazy load, including individual find() calls and collections.
 
 
 Client Configuration
 --------------------
 
-Add a service factory for the client to the Application module's setServiceConfig
+For each client add a service factory to the Application module's setServiceConfig.  
+Each client only supports one entity manager.
 
 ```
     public function getServiceConfig()
@@ -166,7 +215,7 @@ class IndexController extends AbstractActionController
     public function testingAction()
     {
         $objectManager = $this->getServiceLocator()->get('apigility_client');
-        $artifact = $objectManager->find('EntityModule\Entity\Artifact', 36);
+        $artifact = $objectManager->find('EntityModule\Entity\Artifact', 1);
 
         return array(
             'artifact' => $artifact,
@@ -193,58 +242,6 @@ foreach ($artifacts as $a) {
 }
 ```
 
-Collections 
-===========
-
-The API created with this library implements full featured and paginated 
-collection resources.
-
-Direct API Calls 
-----------------
-
-Reserved Words
-
-```
-    _page
-    _limit
-    _orderBy
-```
-
-Return a page of the first five results
-
-```
-    /api/user_data?_page=0&_limit=5
-```
-
-Return results six through ten
-
-```
-    /api/user_data?_page=1&_limit=5
-```
-
-Sort by columnOne ascending
-
-```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
-```
-
-Sort by columnOne ascending then columnTwo decending
-
-```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
-```
-
-
-Querying Data
--------------
-
-Simple Query 
-
-Any field passed in the GET to a collection resource is added to the query by name.  Note these are field names, not database column names.
-
-```
-    /api/user_data?user=1
-```
 
 
 Client Collection
@@ -258,13 +255,10 @@ To query for a collection directly create a collection as:
 ```
 use SoliantConsulting\Apigility\Client\Collections\RelationCollection as Collection;
 
-$collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
+$collection = new Collection($objectManager, 'Db\Entity\DataCaptureType');
 ```
 
-When you first receive a collection as a result of an artifact function the entities will be populated.
-When you create a collection from scratch entities will not be populated.
-
-These functions will reset the collection
+The collection is lazy loaded.  These functions will reset the collection
 
 ```
 $collection->setPage(0);
@@ -306,7 +300,7 @@ After any of these calls are made the collection resets itself.  This allows loo
 echos 50 results.
 
 ```
-    $collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
+    $collection = new Collection($objectManager, 'Db\Entity\DataCaptureType');
 
     $collection->setLimit(10);
     for ($page = 0; $page <= 4; $page++) {
@@ -321,8 +315,6 @@ echos 50 results.
 
 TODO Short Term
 ===============
-
-Add update and delete to the object manager.
 
 TODO: Complex Query - Find a format which supports doctrine query builder more completely.
 
