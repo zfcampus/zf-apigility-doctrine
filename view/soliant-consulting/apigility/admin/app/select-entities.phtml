@@ -3,6 +3,12 @@ $(function() {
     $('#toggleCheckboxes').on('click', function(event) {
         $('[name="entityClassName[]"]').prop("checked", $(this).is(':checked'));
     });
+
+    $('#loadObjectManager').on('click', function(event) {
+        window.location = '<?= $this->url('soliantconsulting-apigility-admin-select-entities', array('moduleName' => $this->moduleName)); ?>'
+            + '/' + $('#objectManagerAlias').first().val();
+        return false;
+    });
 });
 </script>
 
@@ -11,6 +17,25 @@ $(function() {
 
 <form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)); ?>">
 
+<h3>Doctrine</h3>
+Object Manager Alias
+<input id="objectManagerAlias" type="text" size="50" name="objectManagerAlias"
+    value="<?= $this->escapeHtml($this->objectManagerAlias); ?>">
+<?php
+if ($this->invalidObjectManager) {
+?>
+<p style="color: red">Invalid Object Manager Alias</p>
+
+<?php
+}
+?>
+<button id="loadObjectManager" class="btn btn-default">
+Refresh Entity List
+</button>
+
+<?php
+if (!$this->invalidObjectManager) {
+?>
 <h3>Route Options</h3>
 
 Route Prefix
@@ -57,4 +82,7 @@ If you do not select this option the same route would be <b>{route prefix} . /us
 
 <input class="btn btn-success" type="submit" value="Create Api">
 
+<?php
+}
+?>
 </form>
