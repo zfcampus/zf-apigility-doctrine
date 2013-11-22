@@ -51,7 +51,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
         if ($fieldName) {
             $this->setFieldName($fieldName);
         } else {
-            $this->setFieldName($objectManager->classNameToCanonicalName($className));
+            $this->setFieldName($objectManager->classNameToFieldName($className));
         }
     }
 
@@ -69,7 +69,7 @@ class RelationCollection extends ArrayCollection implements Collection, Selectab
                ->attachByName('StringToLower');
 
         $client = $this->getObjectManager()->getHttpClient();
-        $client->setUri($this->getObjectManager()->getBaseUrl() . '/' . $filter($this->getFieldName()));
+        $client->setUri($this->getObjectManager()->getUri($this->getClassName()));
         $client->setMethod('GET');
 
         // Build pagination and query

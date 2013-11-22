@@ -13,12 +13,14 @@ use ZF\ApiProblem\ApiProblem;
 use SoliantConsulting\Apigility\Client\Collections\RelationCollection;
 use Doctrine\ORM\EntityManager;
 use Zend\Filter\FilterChain;
+use Zend\Uri\UriFactory;
 
 class ObjectManager implements CommonObjectManager
 {
     private $entityManager;
     private $httpClient;
     private $entityMap;
+    private $useEntityNamespace;
     private $cache;
     private $insert;
     private $update;
@@ -33,6 +35,17 @@ class ObjectManager implements CommonObjectManager
     public function getEntityManager()
     {
         return $this->entityManager;
+    }
+
+    public function getUseEntityNamespace()
+    {
+        return $this->useEntityNamespace;
+    }
+
+    public function setUseEntityNamespace($value)
+    {
+        $this->useEntityNamespace = $value;
+        return $this;
     }
 
     public function getEntityMap()
@@ -86,6 +99,37 @@ class ObjectManager implements CommonObjectManager
         return $this;
     }
 
+    /**
+     * Return a uri for the given class name + id
+     *
+     * @param entityClassName
+     * @param id
+     */
+    public function getUri($entityClassName, $id = null) {
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
+
+        if ($this->getUseEntityNamespace()) {
+            $uri = $this->getBaseUrl() . '/' . str_replace('\\', '/', $filter($entityClassName));
+        } else {
+            $uri = $this->getBaseUrl() . '/' . $filter($this->classNameToFieldName($entityClassName));
+        }
+
+        if (isset($id)) $uri .= '/' . $id;
+
+        return $uri;
+    }
+
+    /**
+     * Remove the namespace from a class
+     * and change caseToThis
+     */
+    public function classNameToFieldName($entityClassName) {
+        return strtolower(substr(substr($entityClassName, strrpos($entityClassName, '\\') + 1), 0, 1))
+            . substr($entityClassName, strrpos($entityClassName, '\\') + 2);
+    }
+
     public function decodeSingleHalResponse($entityClassName, $hal)
     {
         $return = [];
@@ -114,13 +158,11 @@ class ObjectManager implements CommonObjectManager
                     die('ObjectManager: No class name found for key ' . $key);
                 }
 
-                $filter = new FilterChain();
-                $filter->attachByName('WordCamelCaseToUnderscore')
-                       ->attachByName('StringToLower');
+                $uri = new UriFactory($value['_links']['self']['href']);
+                $scheme = $uri->getpath();
 
-                $route = $filter($key);
-
-                $id = str_replace($this->getBaseUrl() . '/' . $route . '/', '', $value['_links']['self']['href']);
+                $id = substr($scheme, strrpos('/'));
+die('found id ' . $id);
                 if (!$id) {
                     die('id not found for key ' . $key . ' url ' . $value['_links']['self']['href']);
                 }
@@ -202,7 +244,7 @@ class ObjectManager implements CommonObjectManager
         foreach($entityMetadata->getAssociationMappings() as $map) {
             switch($map['type']) {
                 case 4:
-                    $collection = new RelationCollection($this, $map['targetEntity'], $this->classNameToCanonicalName($map['targetEntity']));
+                    $collection = new RelationCollection($this, $map['targetEntity'], $this->classNameToFieldName($map['targetEntity']));
                     $relationFilterField = $this->classNameToCanonicalName($map['sourceEntity']);
                     $collection->addFilter($relationFilterField, $entity->getId());
                     $method = 'set' . $map['fieldName'];
@@ -212,11 +254,6 @@ class ObjectManager implements CommonObjectManager
                     break;
             }
         }
-    }
-
-    public function classNameToCanonicalName($entityClassName) {
-        return strtolower(substr(substr($entityClassName, strrpos($entityClassName, '\\') + 1), 0, 1))
-            . substr($entityClassName, strrpos($entityClassName, '\\') + 2);
     }
 
     public function find($entityClassName, $id)
@@ -530,13 +567,8 @@ class ObjectManager implements CommonObjectManager
                 $wrappedObject->exchangeArray($objectManager->decodeSingleHalResponse($entityClassName, json_decode($halJson, true)));
                 $this->initRelations($wrappedObject);
             } else {
-
-                $filter = new FilterChain();
-                $filter->attachByName('WordCamelCaseToUnderscore')
-                       ->attachByName('StringToLower');
-
                 $client = $objectManager->getHttpClient();
-                $client->setUri($objectManager->getBaseUrl() . '/' . $filter($this->classNameToCanonicalName($entityClassName)) . '/' . $id);
+                $client->setUri($this->getUri($entityClassName, $id));
                 $client->setMethod('GET');
 
                 $response = $client->send();
