@@ -119,6 +119,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
     public function fetchAll($params = array())
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
+
         $queryBuilder->select('row')
             ->from($this->getEntityClass(), 'row');
 
@@ -149,12 +150,49 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 
         unset($parameters['_limit'], $parameters['_page'], $parameters['_orderBy']);
 
+        /*
+        echo http_build_query(
+            array(
+                'query' => array(
+                    array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
+                    array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
+                    array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
+                ),
+                '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')));
+
+`       */
+
         // Add variable parameters
         foreach ($parameters as $key => $value) {
-            $queryBuilder->andWhere("row.$key = :param_$key");
-            $queryBuilder->setParameter("param_$key", $value);
+            if ($key == 'query') {
+                foreach ($value as $option) {
+                    switch ($option['type']) {
+                        case 'between':
+                            $queryBuilder->andWhere($queryBuilder->expr()->between('row.'.$option['field'], $option['from'], $option['to']));
+                            break;
+
+                        case 'eq':
+                            $queryBuilder->andWhere($queryBuilder->expr()->eq('row.'.$option['field'] , $option['value']));
+                            break;
+
+                        case 'decimation':
+                            $md5 = 'a'.md5(uniqid());
+                            //$queryBuilder->andWhere("mod(:$md5, row.". $option['field'].")= 0")
+                            $queryBuilder->andWhere("mod( row.". $option['field'].", :$md5)= 0")
+                                         ->setParameter($md5, $option['value']);
+                    }
+                }
+
+            }
+
+            else {
+                $queryBuilder->andWhere("row.$key = :param_$key");
+                $queryBuilder->setParameter("param_$key", $value);
+            }
         }
 
+        //print_r($queryBuilder->getDql());
+        //die();
         $collectionClass = $this->getCollectionClass();
 
         return new $collectionClass($queryBuilder->getQuery(), false);
