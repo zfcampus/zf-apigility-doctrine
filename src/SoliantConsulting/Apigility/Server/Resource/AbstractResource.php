@@ -151,43 +151,45 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         unset($parameters['_limit'], $parameters['_page'], $parameters['_orderBy']);
 
         /*
+        // Testing GET request builder
+
         echo http_build_query(
             array(
-                'query' => array(
+                '_query' => array(
                     array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
                     array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
                     array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
                 ),
-                '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')));
+                '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+            )
+        );
 
-`       */
+        */
 
-        // Add variable parameters
-        foreach ($parameters as $key => $value) {
-            if ($key == 'query') {
-                foreach ($value as $option) {
-                    switch ($option['type']) {
-                        case 'between':
-                            $queryBuilder->andWhere($queryBuilder->expr()->between('row.'.$option['field'], $option['from'], $option['to']));
-                            break;
+        // Add query parameters
+        if (isset($parameters['_query'])) {
+            foreach ($parameters['_query'] as $option) {
+                switch ($option['type']) {
+                    case 'between':
+                        // field, from, to
+                        $queryBuilder->andWhere($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
+                        break;
 
-                        case 'eq':
-                            $queryBuilder->andWhere($queryBuilder->expr()->eq('row.'.$option['field'] , $option['value']));
-                            break;
+                    case 'eq':
+                        // field, value
+                        $queryBuilder->andWhere($queryBuilder->expr()->eq('row.' . $option['field'], $option['value']));
+                        break;
 
-                        case 'decimation':
-                            $md5 = 'a'.md5(uniqid());
-                            //$queryBuilder->andWhere("mod(:$md5, row.". $option['field'].")= 0")
-                            $queryBuilder->andWhere("mod( row.". $option['field'].", :$md5)= 0")
-                                         ->setParameter($md5, $option['value']);
-                    }
+                    case 'decimation':
+                        // field, value
+                        $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
+                        $queryBuilder->andWhere("mod( row." . $option['field'] . ", :$md5)= 0")
+                                     ->setParameter($md5, $option['value']);
+                        break;
+
+                    default:
+                        break;
                 }
-
-            }
-
-            else {
-                $queryBuilder->andWhere("row.$key = :param_$key");
-                $queryBuilder->setParameter("param_$key", $value);
             }
         }
 

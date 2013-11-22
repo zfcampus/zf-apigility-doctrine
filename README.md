@@ -208,6 +208,7 @@ Reserved Words
     _page
     _limit
     _orderBy
+    _query
 ```
 
 Return a page of the first five results
@@ -238,12 +239,45 @@ Sort by columnOne ascending then columnTwo decending
 Querying Data
 -------------
 
-Simple Query 
+Queries are not simple key=value pairs.  The _query parameter is a key-less array of query 
+definitions.  Each query definition is an array and the values vary for each query type.
 
-Any field passed in the GET to a collection resource is added to the query by name.  Note these are field names, not database column names.
+***The goal of querying data is to mirror the doctrine query builder plus custom query solutions**
 
+Building HTTP GET query with PHP
+
+```php
+    echo http_build_query(
+        array(
+            '_query' => array(
+                array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
+                array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
+                array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
+            ),
+            '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+        )
+    );
 ```
-    /api/user_data?user=1
+
+Available Query Types
+---------------------
+
+Equals
+
+```php
+    array('type' => 'eq', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Between
+
+```php
+    array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
+````
+
+Decimation
+
+```php
+    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
 ```
 
 
@@ -266,14 +300,14 @@ When you create a collection from scratch entities will not be populated.
 
 These functions will reset the collection
 
-```
-$collection->setPage(0);
-$collection->setLimit(10);
-$collection->addFilter('id', 100);
-$collection->setQuery(array());
-$collection->setOrderBy(array(
-    'name' => 'ASC'
-));
+```php
+    $collection->setPage(0);
+    $collection->setLimit(10);
+    $collection->addFilter('id', 100);
+    $collection->setQuery(array());
+    $collection->setOrderBy(array(
+        'name' => 'ASC'
+    ));
 ```
 
 ```
@@ -335,6 +369,11 @@ TODO: Complex Query - Find a format which supports doctrine query builder more c
         'rangeStart' => 3,
         'rangeEnd' => 5,
 ```
+
+
+TODO Medium Term
+================
+Fix the client to work with the changes we've made in the server
 
 
 TODO Long Term
