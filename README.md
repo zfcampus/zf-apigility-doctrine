@@ -240,10 +240,10 @@ Querying Data
 
 Simple Query 
 
-Any field passed in the GET to a collection resource is added to the query by name
+Any field passed in the GET to a collection resource is added to the query by name.  Note these are field names, not database column names.
 
 ```
-    /api/user_data?user_id=1
+    /api/user_data?user=1
 ```
 
 
@@ -327,7 +327,7 @@ Add update and delete to the object manager.
 TODO: Complex Query - Find a format which supports doctrine query builder more completely.
 
 ```
-    user_id = array(
+    user = array(
         'comparator' => 'EQ, LT, GT', // See Doctrine Query Builder documentation
         and
         'values' => array(1,2,3),

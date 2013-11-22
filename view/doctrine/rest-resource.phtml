@@ -5,4 +5,5 @@ use SoliantConsulting\Apigility\Server\Resource\AbstractResource;
 
 class <?php echo $classname ?> extends AbstractResource
 {
+    protected $objectManagerAlias = '<?= $details->objectManager; ?>';
 }
