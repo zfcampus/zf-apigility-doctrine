@@ -118,6 +118,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function fetchAll($params = array())
     {
+        die('ok');
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
         $queryBuilder->select('row')
