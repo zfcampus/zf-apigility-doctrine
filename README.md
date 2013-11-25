@@ -208,7 +208,7 @@ Greater Than
     array('type' => 'gt', 'field' => 'fieldName', 'value' => 'matchValue')
 ```
 
-Less Than or Equals
+Greater Than or Equals
 
 ```
     array('type' => 'gte', 'field' => 'fieldName', 'value' => 'matchValue')
