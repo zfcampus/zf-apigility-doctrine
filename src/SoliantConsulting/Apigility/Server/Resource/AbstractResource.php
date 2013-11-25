@@ -202,21 +202,73 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         // Add query parameters
         if (isset($parameters['_query'])) {
             foreach ($parameters['_query'] as $option) {
-                switch ($option['type']) {
-                    case 'between':
-                        // field, from, to
-                        $queryBuilder->andWhere($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
-                        break;
+                // Allow and/or queries
+                if (isset($option['where'])) {
+                    if ($option['where'] == 'and') $queryType = 'andWhere';
+                    if ($option['where'] == 'or') $queryType = 'orWhere';
+                } else {
+                    $queryType == 'andWhere';
+                }
 
+                switch (strtolower($option['type'])) {
                     case 'eq':
                         // field, value
-                        $queryBuilder->andWhere($queryBuilder->expr()->eq('row.' . $option['field'], $option['value']));
+                        $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'neq':
+                        $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'lt':
+                        $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'lte':
+                        $queryBuilder->$queryType($queryBuilder->expr()->lte('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'gt':
+                        $queryBuilder->$queryType($queryBuilder->expr()->gt('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'gte':
+                        $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], $option['value']));
+                        break;
+
+                    case 'isnull':
+                        $queryBuilder->$queryType($queryBuilder->expr()->isNull('row.' . $option['field']));
+                        break;
+
+                    case 'isnotnull':
+                        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull('row.' . $option['field']));
+                        break;
+
+                    case 'in':
+                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], $option['values']));
+                        break;
+
+                    case 'notin':
+                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], $option['values']));
+                        break;
+
+                    case 'like':
+                        $queryBuilder->$queryType($queryBuilder->expr()->like('row.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
+                        break;
+
+                    case 'notlike':
+                        $queryBuilder->$queryType($queryBuilder->expr()->notLike('row.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
+                        break;
+
+                    case 'between':
+                        // field, from, to
+                        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
                         break;
 
                     case 'decimation':
                         // field, value
                         $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
-                        $queryBuilder->andWhere("mod( row." . $option['field'] . ", :$md5)= 0")
+                        $queryBuilder->$queryType("mod( row." . $option['field'] . ", :$md5)= 0")
                                      ->setParameter($md5, $option['value']);
                         break;
 

@@ -19,24 +19,6 @@ project library which works in tandem with a Doctrine ORM class to make interact
 with your entities seemless across the API.
 
 
-All parts use common Doctrine Entities
---------------------------------------------------------
-
-Your API client must have a copy of the same Entity code base as the server 
-and as the Admin module used to build the Apigility-enabled module, if you
-choose to use the Client.
-
-This is best accomplished by creating a distinct module for your entities and 
-repositories then requiring this repository from composer.
-
-
-Everything uses proxy objects for lazy loading
-----------------------------------------------
-
-The ```ocramius/proxy-manager``` library is used to make all api interactivity lazy load,
-including individual find() calls and collections.
-
-
 Installation
 ------------
   1. edit `composer.json` file with following contents:
@@ -104,22 +86,199 @@ The Admin tool can create an Apigility-enabled module with the Doctrine entities
 To enable the Admin include ```'SoliantConsulting\Apigility',``` in your 
 development.config.php configuration.
 
-Before you begin configure your application with Doctrine entity support and be
-sure you can connect to the database.  All entities 
-managed by the object manager will be available to build into a resource.  
+All entities managed by the object manager will be available to build into a resource.  
 
 Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter 
 the name of a new module which does not already exist.  When the form is submitted
 the module will be created.
 
 The next page allows you to select entities from the object manager to build into 
-resources.  Check those you want then submit the form.
+resources.  You may change your object manager and refresh entities for that object
+manager.  Check the entities you want then submit the form.
 
 Done.  Your new module is enabled in your application and you can start making API 
 requests.  
 
 The route for an entity named DataModule\Entity\UserData is
-```/api/user_data``` and after going through the above process your API should be working.
+```/api/user_data``` or, if using namespaced routes, ```/api/data_module/entity/user_data``` 
+After going through the above process your API should be working.
+
+
+Collections 
+===========
+
+The API created with this library implements full featured and paginated 
+collection resources.  A collection is returned from a GET call to a entity endpoint without
+specifying the id.  e.g. ```GET /api/data_module/entity/user_data```
+
+
+Direct API Calls 
+----------------
+
+Reserved Words
+
+```
+    _page
+    _limit
+    _orderBy
+    _query
+```
+
+Return a page of the first five results
+
+```
+    /api/user_data?_page=0&_limit=5
+```
+
+Return results six through ten
+
+```
+    /api/user_data?_page=1&_limit=5
+```
+
+Sort by columnOne ascending
+
+```
+    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
+```
+
+Sort by columnOne ascending then columnTwo decending
+
+```
+    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
+```
+
+
+Querying Collections
+--------------------
+
+Queries are not simple key=value pairs.  The _query parameter is a key-less array of query 
+definitions.  Each query definition is an array and the values vary for each query type.
+
+Each query type requires at a minimum the 'type' and a 'field'.  Each query may also specify
+a 'where' which can be either 'and' or 'or'.  
+
+*** The goal of querying data is to mirror the doctrine query builder plus custom query solutions ***
+
+Building HTTP GET query with PHP.  Use this to help build your queries.
+
+```php
+    echo http_build_query(
+        array(
+            '_query' => array(
+                array('field' => '_DatasetID', 'where' => 'and', 'type' => 'eq' , 'value' => 1),
+                array('field' =>'Cycle_number', 'where' => 'and', 'type'=>'between', 'from' => 10, 'to'=>100),
+                array('field'=>'Cycle_number', 'where' => 'and', 'type' => 'decimation', 'value' => 10)
+            ),
+            '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+        )
+    );
+```
+
+Available Query Types
+---------------------
+
+Equals
+
+```php
+    array('type' => 'eq', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Not Equals
+
+```php
+    array('type' => 'neq', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Less Than
+
+```
+    array('type' => 'lt', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Less Than or Equals
+
+```
+    array('type' => 'lte', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Greater Than
+
+```
+    array('type' => 'gt', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Less Than or Equals
+
+```
+    array('type' => 'gte', 'field' => 'fieldName', 'value' => 'matchValue')
+```
+
+Is Null
+
+```
+    array('type' => 'isnull', 'field' => 'fieldName')
+```
+
+Is Not Null
+
+```
+    array('type' => 'isnotnull', 'field' => 'fieldName')
+```
+
+In
+
+```
+    array('type' => 'in', 'field' => 'fieldName', 'values' => array(1, 2, 3))
+```
+
+NotIn
+
+```
+    array('type' => 'notin', 'field' => 'fieldName', 'values' => array(1, 2, 3))
+```
+
+Like
+
+```
+    array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
+```
+
+Not Like
+
+```
+    array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
+```
+
+Between
+
+```php
+    array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
+````
+
+Decimation
+
+```php
+    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
+```
+
+
+Client uses the same Doctrine Entities
+--------------------------------------------------------
+
+Your API client must have a copy of the same Entity code base as the server 
+and as the Admin module used to build the Apigility-enabled module, if you
+choose to use the Client.
+
+This is best accomplished by creating a distinct module for your entities and 
+repositories then requiring this repository from composer.
+
+
+Client uses proxy objects for lazy loading
+----------------------------------------------
+
+The ```ocramius/proxy-manager``` library is used to make all api interactivity lazy load,
+including individual find() calls and collections.
 
 
 Client Configuration
@@ -193,93 +352,6 @@ foreach ($artifacts as $a) {
 }
 ```
 
-Collections 
-===========
-
-The API created with this library implements full featured and paginated 
-collection resources.
-
-Direct API Calls 
-----------------
-
-Reserved Words
-
-```
-    _page
-    _limit
-    _orderBy
-    _query
-```
-
-Return a page of the first five results
-
-```
-    /api/user_data?_page=0&_limit=5
-```
-
-Return results six through ten
-
-```
-    /api/user_data?_page=1&_limit=5
-```
-
-Sort by columnOne ascending
-
-```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
-```
-
-Sort by columnOne ascending then columnTwo decending
-
-```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
-```
-
-
-Querying Data
--------------
-
-Queries are not simple key=value pairs.  The _query parameter is a key-less array of query 
-definitions.  Each query definition is an array and the values vary for each query type.
-
-***The goal of querying data is to mirror the doctrine query builder plus custom query solutions**
-
-Building HTTP GET query with PHP
-
-```php
-    echo http_build_query(
-        array(
-            '_query' => array(
-                array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
-                array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
-                array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
-            ),
-            '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
-        )
-    );
-```
-
-Available Query Types
----------------------
-
-Equals
-
-```php
-    array('type' => 'eq', 'field' => 'fieldName', 'value' => 'matchValue')
-```
-
-Between
-
-```php
-    array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
-````
-
-Decimation
-
-```php
-    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
-```
-
 
 Client Collection
 =================
@@ -350,24 +422,6 @@ echos 50 results.
             echo $entity->getName();    
         }
     }
-```
-
-
-TODO Short Term
-===============
-
-Add update and delete to the object manager.
-
-TODO: Complex Query - Find a format which supports doctrine query builder more completely.
-
-```
-    user = array(
-        'comparator' => 'EQ, LT, GT', // See Doctrine Query Builder documentation
-        and
-        'values' => array(1,2,3),
-        or
-        'rangeStart' => 3,
-        'rangeEnd' => 5,
 ```
 
 
