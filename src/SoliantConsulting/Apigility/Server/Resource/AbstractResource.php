@@ -49,6 +49,24 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
     }
 
     /**
+     * Error handling to catch E_RECOVERABLE_ERROR
+     */
+    public function pushErrorHandler() {
+        set_error_handler(array($this, 'errorHandler'));
+    }
+
+    public function popErrorHandler() {
+        restore_error_handler();
+    }
+
+    public function errorHandler($errno, $errstr, $errfile, $errline) {
+        if ( E_RECOVERABLE_ERROR === $errno ) {
+            throw new \ErrorException($errstr, $errno, 0, $errfile, $errline);
+        }
+        return false;
+    }
+
+    /**
      * Create a resource
      *
      * @param  mixed $data
@@ -56,12 +74,19 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function create($data)
     {
-        $entity = new $this->getEntityClass();
-        $entity->exchangeArray($this->populateReferences((array)$data));
+        $this->pushErrorHandler();
+        $entityClass = $this->getEntityClass();
+        $entity = new $entityClass;
 
-        $this->getObjectManager()->persist($entity);
-        $this->getObjectManager()->flush();
+        try {
+            $entity->exchangeArray($this->populateReferences((array)$data));
+            $this->getObjectManager()->persist($entity);
+            $this->getObjectManager()->flush();
+        } catch (\Exception $e) {
+            return new ApiProblem(400, $e->getMessage());
+        }
 
+        $this->popErrorHandler();
         return $entity;
     }
 
@@ -73,6 +98,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function delete($id)
     {
+        $this->pushErrorHandler();
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -82,9 +108,11 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             $this->getObjectManager()->remove($entity);
             $this->getObjectManager()->flush();
 
+            $this->popErrorHandler();
             return true;
         }
 
+        $this->popErrorHandler();
         return new ApiProblem(403, 'Cannot delete entity with id ' . $id);
     }
 
@@ -107,7 +135,11 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function fetch($id)
     {
-        return $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $this->pushErrorHandler();
+        $return = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $this->popErrorHandler();
+
+        return $return;
     }
 
     /**
@@ -118,7 +150,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function fetchAll($params = array())
     {
-        die('ok');
+        $this->pushErrorHandler();
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
         $queryBuilder->select('row')
@@ -197,8 +229,10 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         //print_r($queryBuilder->getDql());
         //die();
         $collectionClass = $this->getCollectionClass();
+        $return = new $collectionClass($queryBuilder->getQuery(), false);
 
-        return new $collectionClass($queryBuilder->getQuery(), false);
+        $this->popErrorHandler();
+        return $return;
     }
 
     /**
@@ -210,6 +244,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function patch($id, $data)
     {
+        $this->pushErrorHandler();
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -220,6 +255,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $entity->exchangeArray(array_merge($entity->getArrayCopy(), (array)$data));
         $this->getObjectManager()->flush();
 
+        $this->popErrorHandler();
         return $entity;
     }
 
@@ -243,13 +279,22 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
      */
     public function update($id, $data)
     {
+        $this->pushErrorHandler();
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
 
-        $entity->exchangeArray($this->populateReferences((array)$data));
+        $newValues = $entity->getArrayCopy();
+        foreach ($newValues as $key => $value) {
+            if (isset($data->$key)) {
+                $newValues[$key] = $data->$key;
+            }
+        }
+
+        $entity->exchangeArray($this->populateReferences($newValues));
         $this->getObjectManager()->flush();
+        $this->popErrorHandler();
 
         return $entity;
     }
@@ -262,7 +307,9 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         foreach($entityMetadata->getAssociationMappings() as $map) {
             switch($map['type']) {
                 case 2:
-                    $data[$map['fieldName']] = $this->getObjectManager()->find($map['targetEntity'], $data[$map['fieldName']]);
+                    if (isset($data[$map['fieldName']])) {
+                        $data[$map['fieldName']] = $this->getObjectManager()->find($map['targetEntity'], $data[$map['fieldName']]);
+                    }
                     break;
                 default:
                     break;
