@@ -159,49 +159,49 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $parameters = $this->getEvent()->getQueryParams();
 
         // Defaults
-        if (!isset($parameters['_page'])) {
-            $parameters['_page'] = 0;
+        if (!isset($parameters['page'])) {
+            $parameters['page'] = 0;
         }
-        if (!isset($parameters['_limit'])) {
-            $parameters['_limit'] = 25;
+        if (!isset($parameters['limit'])) {
+            $parameters['limit'] = 25;
         }
-        if ($parameters['_limit'] > 100) {
-            $parameters['_limit'] = 100;
+        if ($parameters['limit'] > 100) {
+            $parameters['limit'] = 100;
         }
 
         // Limits
-        $queryBuilder->setFirstResult($parameters['_page'] * $parameters['_limit']);
-        $queryBuilder->setMaxResults($parameters['_limit']);
+        $queryBuilder->setFirstResult($parameters['page'] * $parameters['limit']);
+        $queryBuilder->setMaxResults($parameters['limit']);
 
         // Orderby
-        if (!isset($parameters['_orderBy'])) {
-            $parameters['_orderBy'] = array('id' => 'asc');
+        if (!isset($parameters['orderBy'])) {
+            $parameters['orderBy'] = array('id' => 'asc');
         }
-        foreach($parameters['_orderBy'] as $fieldName => $sort) {
+        foreach($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
 
-        unset($parameters['_limit'], $parameters['_page'], $parameters['_orderBy']);
+        unset($parameters['limit'], $parameters['page'], $parameters['orderBy']);
 
         /*
         // Testing GET request builder
 
-        echo http_build_query(
+        echo http_buildquery(
             array(
-                '_query' => array(
+                'query' => array(
                     array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
                     array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
                     array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
                 ),
-                '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+                'orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
             )
         );
 
         */
 
         // Add query parameters
-        if (isset($parameters['_query'])) {
-            foreach ($parameters['_query'] as $option) {
+        if (isset($parameters['query'])) {
+            foreach ($parameters['query'] as $option) {
                 // Allow and/or queries
                 if (isset($option['where'])) {
                     if ($option['where'] == 'and') $queryType = 'andWhere';

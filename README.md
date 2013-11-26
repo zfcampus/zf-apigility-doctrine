@@ -133,41 +133,41 @@ Direct API Calls
 Reserved Words
 
 ```
-    _page
-    _limit
-    _orderBy
-    _query
+    page
+    limit
+    orderBy
+    query
 ```
 
 Return a page of the first five results
 
 ```
-    /api/user_data?_page=0&_limit=5
+    /api/user_data?page=0&limit=5
 ```
 
 Return results six through ten
 
 ```
-    /api/user_data?_page=1&_limit=5
+    /api/user_data?page=1&limit=5
 ```
 
 Sort by columnOne ascending
 
 ```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
+    /api/user_data?orderBy%5BcolumnOne%5D=ASC
 ```
 
 Sort by columnOne ascending then columnTwo decending
 
 ```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
+    /api/user_data?orderBy%5BcolumnOne%5D=ASC&orderBy%5BcolumnTwo%5D=DESC
 ```
 
 
 Querying Collections
 --------------------
 
-Queries are not simple key=value pairs.  The _query parameter is a key-less array of query 
+Queries are not simple key=value pairs.  The query parameter is a key-less array of query 
 definitions.  Each query definition is an array and the array values vary for each query type.
 
 Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
@@ -177,13 +177,13 @@ Building HTTP GET query with PHP.  Use this to help build your queries.
 
 PHP Example
 ```php
-    echo http_build_query(
+    echo http_buildquery(
         array(
-            '_query' => array(
+            'query' => array(
                 array('field' =>'cycle', 'where' => 'and', 'type'=>'between', 'from' => 1, 'to'=>100),
                 array('field'=>'cycle', 'where' => 'and', 'type' => 'decimation', 'value' => 10)
             ),
-            '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+            'orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
         )
     );
 ```
@@ -195,7 +195,7 @@ $(function() {
         url: "http://localhost:8081/api/db/entity/user_data",
         type: "GET",
         data: {
-            '_query': [
+            'query': [
             {
                 'field': 'cycle',
                 'where': 'and',
