@@ -6,7 +6,9 @@
 
 namespace SoliantConsulting\Apigility;
 
+use SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorManager;
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 use ZF\Configuration\ConfigResource;
@@ -16,6 +18,7 @@ use ZF\Hal\Resource;
 use ZF\Hal\View\HalJsonModel;
 
 class Module
+    implements BootstrapListenerInterface
 {
     /**
      * @var \Closure
@@ -27,12 +30,28 @@ class Module
      */
     protected $sm;
 
-    public function onBootstrap(MvcEvent $e)
+    /**
+     * Listen to the bootstrap event
+     *
+     * @param EventInterface $e
+     *
+     * @return array
+     */
+    public function onBootstrap(EventInterface $e)
     {
-        $app      = $e->getApplication();
-#        print_r($app->getServiceManager()->get('Config'));die();
-#        $events   = $app->getEventManager();
-#        $events->attach('render', array($this, 'onRender'), 100);
+        $app      = $e->getTarget();
+        $services = $app->getServiceManager();
+
+        if ($services->has('HydratorManager')) {
+            // Create doctrine hydrator manager
+            $doctrineHydratorManager = new DoctrineHydratorManager();
+            $doctrineHydratorManager->setServiceLocator($services);
+
+            // Add as peering service
+            $hydratorManager = $services->get('HydratorManager');
+            $hydratorManager->addPeeringServiceManager($doctrineHydratorManager);
+            $hydratorManager->setRetrieveFromPeeringManagerFirst(true);
+        }
     }
 
     public function getAutoloaderConfig()

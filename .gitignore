@@ -9,3 +9,4 @@ composer.phar
 *.zip
 local.php
 test/code-coverage
+atlassian-ide-plugin.xml

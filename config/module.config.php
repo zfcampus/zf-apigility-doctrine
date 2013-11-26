@@ -5,6 +5,13 @@
  */
 
 return array(
+    'service_manager' => array(
+        'abstract_factories' => array(
+            'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
+            'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+        ),
+    ),
+
     'asset_manager' => array(
         'resolver_configs' => array(
             'paths' => array(
