@@ -268,7 +268,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
                     case 'decimation':
                         // field, value
                         $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
-                        $queryBuilder->$queryType("mod( row." . $option['field'] . ", :$md5)= 0")
+                        $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$md5) = 0")
                                      ->setParameter($md5, $option['value']);
                         break;
 
