@@ -260,7 +260,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 #            'total' => sizeof($collection),
         ));
         $halCollection->setCollectionRouteOptions(array(
-            'query' => $parameters,
+            'query' => $parameters
         ));
 
         $this->popErrorHandler();
