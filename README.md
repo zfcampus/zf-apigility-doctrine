@@ -126,10 +126,6 @@ The API created with this library implements full featured and paginated
 collection resources.  A collection is returned from a GET call to a entity endpoint without
 specifying the id.  e.g. ```GET /api/data_module/entity/user_data```
 
-
-Collections
-===========
-
 Reserved GET variables
 
 ```
