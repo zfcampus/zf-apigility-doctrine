@@ -162,7 +162,7 @@ Building HTTP GET query with PHP.  Use this to help build your queries.
 
 PHP Example
 ```php
-    echo http_buildquery(
+    echo http_build_query(
         array(
             'query' => array(
                 array('field' =>'cycle', 'where' => 'and', 'type'=>'between', 'from' => 1, 'to'=>100),

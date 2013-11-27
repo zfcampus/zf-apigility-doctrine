@@ -159,6 +159,8 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $queryBuilder->select('row')
             ->from($this->getEntityClass(), 'row');
 
+        $totalCountQueryBuilder = clone $queryBuilder;
+
         $parameters = $this->getEvent()->getQueryParams()->toArray();
 
         // Orderby
@@ -174,10 +176,15 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             foreach ($parameters['query'] as $option) {
                 // Allow and/or queries
                 if (isset($option['where'])) {
-                    if ($option['where'] == 'and') $queryType = 'andWhere';
-                    if ($option['where'] == 'or') $queryType = 'orWhere';
-                } else {
-                    $queryType == 'andWhere';
+                    if ($option['where'] == 'and') {
+                        $queryType = 'andWhere';
+                    } elseif ($option['where'] == 'or') {
+                        $queryType = 'orWhere';
+                    }
+                }
+
+                if (!isset($queryType)) {
+                    $queryType = 'andWhere';
                 }
 
                 switch (strtolower($option['type'])) {
@@ -253,11 +260,14 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $collection = new $collectionClass($queryBuilder->getQuery(), false);
         $paginator = new Paginator($collection);
 
+        // Total count collection (is this the right use of total?)
+        $totalCountCollection = new $collectionClass($totalCountQueryBuilder->getQuery(), false);
+
         // Setup HAL collection
         $halCollection = new Collection($paginator);
         $halCollection->setAttributes(array(
-#            'count' => sizeof($paginator),
-#            'total' => sizeof($collection),
+            'count' => sizeof($collection),
+            'total' => sizeof($totalCountCollection),
         ));
         $halCollection->setCollectionRouteOptions(array(
             'query' => $parameters
