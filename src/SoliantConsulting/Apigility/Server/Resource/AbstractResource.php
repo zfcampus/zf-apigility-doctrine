@@ -259,7 +259,9 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 #            'count' => sizeof($paginator),
 #            'total' => sizeof($collection),
         ));
-        $halCollection->setCollectionRouteOptions(array('query' => $parameters));
+        $halCollection->setCollectionRouteOptions(array(
+            'query' => $parameters,
+        ));
 
         $this->popErrorHandler();
 
