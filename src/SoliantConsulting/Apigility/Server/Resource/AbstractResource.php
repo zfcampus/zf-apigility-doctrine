@@ -184,22 +184,6 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
 
-        /*
-        // Testing GET request builder
-
-        echo http_buildquery(
-            array(
-                'query' => array(
-                    array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
-                    array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
-                    array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
-                ),
-                'orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
-            )
-        );
-
-        */
-
         // Add query parameters
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
@@ -292,21 +276,16 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $collectionClass = $this->getCollectionClass();
         $return = new $collectionClass($queryBuilder->getQuery(), false);
 
-
-        $this->popErrorHandler();
-
+asdf
         $halCollection = new Collection($return);
         $links = $halCollection->getLinks();
 
-#print_r(get_class_methods($halCollection));die();
-        # needed?
-#        $halCollection->setPageSize($parameters['limit']);
-#        $halCollection->setPage($parameters['page']);
-
+        // Fetch route based on collection class
         $config = $this->getServiceManager()->get('Config');
         $route = $config['zf-hal']['metadata_map'][$this->getCollectionClass()]['route_name'];
 
 
+        // Build links
         // Self
         $link = new Link('self');
         $link->setRoute(
@@ -397,6 +376,8 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         if (ceil($count / $linkParameters['limit']) + 1 > $linkParameters['page']) {
             $links->add($link);
         }
+
+        $this->popErrorHandler();
 
         return $halCollection;
     }
