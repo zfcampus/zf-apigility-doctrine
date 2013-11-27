@@ -8,6 +8,7 @@ use Zend\ServiceManager\ServiceManager as ZendServiceManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use ZF\Hal\Collection;
 use ZF\Hal\Link\Link;
+use Zend\Paginator\Paginator;
 
 class AbstractResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
@@ -279,124 +280,20 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
             }
         }
 
-
-        // Get total count
-        $countQuery = clone($queryBuilder);
-        $countQuery->select('count(row.id)');
-        $count = $countQuery->getQuery()->getSingleScalarResult();
-
-        // Set result limit
-        $queryBuilder->setFirstResult(($parameters['page'] - 1) * $parameters['limit']);
-        $queryBuilder->setMaxResults($parameters['limit']);
-
+        // Build collection and paginator
         $collectionClass = $this->getCollectionClass();
-        $return = new $collectionClass($queryBuilder->getQuery(), false);
+        $collection = new $collectionClass($queryBuilder->getQuery(), false);
+        $paginator = new Paginator($collection);
 
+        // Setup HAL collection
+        $halCollection = new Collection($paginator);
+        $halCollection->setAttributes(array(
+            'count' => sizeof($paginator),
+            'total' => sizeof($collection),
+        ));
+        $halCollection->setCollectionRouteOptions(array('query' => $parameters));
 
         $this->popErrorHandler();
-
-        $halCollection = new Collection($return);
-        $links = $halCollection->getLinks();
-
-#print_r(get_class_methods($halCollection));die();
-        # needed?
-#        $halCollection->setPageSize($parameters['limit']);
-#        $halCollection->setPage($parameters['page']);
-
-        $config = $this->getServiceManager()->get('Config');
-        $route = $config['zf-hal']['metadata_map'][$this->getCollectionClass()]['route_name'];
-
-
-        // Self
-        $link = new Link('self');
-        $link->setRoute(
-            $route,
-            array(),
-            $parameters
-        );
-
-        $linkParameters = $parameters;
-
-        $link->setRouteOptions(array(
-            'query' => $linkParameters
-        ));
-        $links->add($link);
-
-
-        // First
-        $link = new Link('first');
-        $link->setRoute(
-            $route,
-            array(),
-            $parameters
-        );
-
-        $linkParameters = $parameters;
-        $linkParameters['page'] = 1;
-
-        $link->setRouteOptions(array(
-            'query' => $linkParameters
-        ));
-        $links->add($link);
-
-
-        // Last
-        $link = new Link('last');
-        $link->setRoute(
-            $route,
-            array(),
-            $parameters
-        );
-
-        $linkParameters = $parameters;
-        $linkParameters['page'] = ceil($count / $linkParameters['limit']);
-
-        $link->setRouteOptions(array(
-            'query' => $linkParameters
-        ));
-        if ($parameters['page'] != $linkParameters['page']) {
-            $links->add($link);
-        }
-
-
-        // Prev
-        $link = new Link('prev');
-        $link->setRoute(
-            $route,
-            array(),
-            $parameters
-        );
-
-        $linkParameters = $parameters;
-        $linkParameters['page'] --;
-
-        $link->setRouteOptions(array(
-            'query' => $linkParameters
-        ));
-
-        if (ceil($count / $linkParameters['limit']) + 1 > $linkParameters['page'] and $linkParameters['page'] > 1) {
-            $links->add($link);
-        }
-
-
-        // Next
-        $link = new Link('next');
-        $link->setRoute(
-            $route,
-            array(),
-            $parameters
-        );
-
-        $linkParameters = $parameters;
-        $linkParameters['page'] ++;
-
-        $link->setRouteOptions(array(
-            'query' => $linkParameters
-        ));
-
-        if (ceil($count / $linkParameters['limit']) + 1 > $linkParameters['page']) {
-            $links->add($link);
-        }
 
         return $halCollection;
     }
