@@ -8,6 +8,7 @@ namespace SoliantConsulting\Apigility;
 
 use SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorManager;
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
+use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
