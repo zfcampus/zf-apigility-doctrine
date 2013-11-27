@@ -24,8 +24,12 @@
         "zfcampus/zf-apigility": "*",
         "zfcampus/zf-rpc": "*",
         "doctrine/common": ">=2.4.x-dev",
-        "doctrine/doctrine-orm-module": "*",
         "ocramius/proxy-manager": "*"
+    },
+    "require-dev": {
+        "doctrine/doctrine-orm-module": "*",
+        "doctrine/doctrine-mongo-odm-module": "*",
+        "doctrine/mongodb-odm": "*"
     },
     "autoload": {
         "psr-0": {
