@@ -16,7 +16,7 @@ created with the Admin tool.
 (https://en.wikipedia.org/wiki/Object-relational_mapping) based on the 
 [Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
 project library which works in tandem with a Doctrine ORM class to make interacting
-with your entities seemless across the API.
+with your entities seemless across the API.  See the README.CLIENT.md
 
 
 Installation
