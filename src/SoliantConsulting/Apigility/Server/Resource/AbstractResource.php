@@ -161,22 +161,6 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
 
         $parameters = $this->getEvent()->getQueryParams()->toArray();
 
-        // Defaults page to 1 or greater
-        if (!isset($parameters['page']) or !$parameters['page']) {
-            $parameters['page'] = 1;
-        }
-
-        if ($parameters['page'] < 1) {
-            $parameters['page'] = 1;
-        }
-
-        // Default limit is 25
-        if (!isset($parameters['limit']) or !$parameters['limit']) {
-            $parameters['limit'] = 25;
-        }
-
-        // Limits added at time count query is created
-
         // Orderby
         if (!isset($parameters['orderBy'])) {
             $parameters['orderBy'] = array('id' => 'asc');
@@ -184,22 +168,6 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         foreach($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
-
-        /*
-        // Testing GET request builder
-
-        echo http_buildquery(
-            array(
-                'query' => array(
-                    array('field' => '_DatasetID','type' => 'eq' , 'value' => 1),
-                    array('field' =>'Cycle_number','type'=>'between', 'from' => 10, 'to'=>100),
-                    array('field'=>'Cycle_number', 'type' => 'decimation', 'value' => 10)
-                ),
-                'orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
-            )
-        );
-
-        */
 
         // Add query parameters
         if (isset($parameters['query'])) {
@@ -288,8 +256,8 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         // Setup HAL collection
         $halCollection = new Collection($paginator);
         $halCollection->setAttributes(array(
-            'count' => sizeof($paginator),
-            'total' => sizeof($collection),
+#            'count' => sizeof($paginator),
+#            'total' => sizeof($collection),
         ));
         $halCollection->setCollectionRouteOptions(array('query' => $parameters));
 
