@@ -54,7 +54,8 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        $entity = new $this->getEntityClass();
+        $entityClass = $this->getEntityClass();
+        $entity = new $entityClass;
         $hydrator = $this->getHydrator();
         $hydrator->hydrate($data, $entity);
 
