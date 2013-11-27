@@ -276,7 +276,6 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $collectionClass = $this->getCollectionClass();
         $return = new $collectionClass($queryBuilder->getQuery(), false);
 
-asdf
         $halCollection = new Collection($return);
         $links = $halCollection->getLinks();
 
