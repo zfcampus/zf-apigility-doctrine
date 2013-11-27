@@ -57,7 +57,7 @@ class DoctrineResource extends AbstractResourceListener
         $entityClass = $this->getEntityClass();
         $entity = new $entityClass;
         $hydrator = $this->getHydrator();
-        $hydrator->hydrate($data, $entity);
+        $hydrator->hydrate((array)$data, $entity);
 
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
