@@ -306,6 +306,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         $config = $this->getServiceManager()->get('Config');
         $route = $config['zf-hal']['metadata_map'][$this->getCollectionClass()]['route_name'];
 
+
         // Self
         $link = new Link('self');
         $link->setRoute(
@@ -338,6 +339,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         ));
         $links->add($link);
 
+
         // Last
         $link = new Link('last');
         $link->setRoute(
@@ -355,6 +357,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         if ($parameters['page'] != $linkParameters['page']) {
             $links->add($link);
         }
+
 
         // Prev
         $link = new Link('prev');
@@ -374,6 +377,7 @@ class AbstractResource extends AbstractResourceListener implements ServiceManage
         if (ceil($count / $linkParameters['limit']) + 1 > $linkParameters['page'] and $linkParameters['page'] > 1) {
             $links->add($link);
         }
+
 
         // Next
         $link = new Link('next');
