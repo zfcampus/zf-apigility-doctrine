@@ -127,29 +127,18 @@ collection resources.  A collection is returned from a GET call to a entity endp
 specifying the id.  e.g. ```GET /api/data_module/entity/user_data```
 
 
-Direct API Calls 
-----------------
+Collections
+===========
 
-Reserved Words
+Reserved GET variables
 
 ```
-    page
-    limit
     orderBy
     query
 ```
 
-Return a page of the first five results
-
-```
-    /api/user_data?page=0&limit=5
-```
-
-Return results six through ten
-
-```
-    /api/user_data?page=1&limit=5
-```
+Sorting Collections
+-------------------
 
 Sort by columnOne ascending
 
