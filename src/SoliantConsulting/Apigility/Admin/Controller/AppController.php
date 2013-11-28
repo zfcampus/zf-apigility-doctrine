@@ -47,7 +47,13 @@ class AppController extends AbstractActionController
                   'default_hydrator' => 'ArraySerializable',
                   'render_embedded_resources' => false,
                 ),
-            )
+            ),
+            'service_manager' => array(
+                'abstract_factories' => array(
+                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
+                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+                ),
+            ),
         );
 
         $config = $this->getServiceLocator()->get('Config');
@@ -106,8 +112,7 @@ class AppController extends AbstractActionController
         // Get the route prefix and remove any / from ends of string
         $routePrefix = $this->params()->fromPost('routePrefix');
         if (!$routePrefix) {
-            $routePrefix = 'api';
-            die('no post');
+            $routePrefix = '';
         } else {
             while(substr($routePrefix, 0, 1) == '/') {
                 $routePrefix = substr($routePrefix, 1);
@@ -148,6 +153,10 @@ class AppController extends AbstractActionController
                 $route = '/' . $routePrefix . '/' . $filter($resourceName);
             }
 
+            $hydratorName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
+
+            $hydratorName = $moduleName . '\\V1\\Rest\\' . $resourceName . '\\' . $resourceName . 'Hydrator';
+
             $serviceResource->setModuleName($moduleName);
             $serviceResource->create(array(
                 'objectManager' => $objectManagerAlias,
@@ -156,6 +165,7 @@ class AppController extends AbstractActionController
                 'pageSizeParam' => 'page',
                 'identifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => $route,
+                'hydratorName' => $hydratorName,
             ));
 
             $_SESSION[$results][$entityMetadata->name] = $route;

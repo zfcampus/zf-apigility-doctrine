@@ -292,6 +292,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         $this->createRestConfig($entity, $controllerService, $resourceClass, $routeName);
         $this->createContentNegotiationConfig($entity, $controllerService);
         $this->createHalConfig($entity, $entityClass, $collectionClass, $routeName);
+        $this->createDoctrineConfig($entity, $entityClass, $collectionClass, $routeName);
 
         return $entity;
     }
@@ -619,6 +620,40 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             $config['content-type-whitelist'] = array($controllerService => $whitelist);
         }
         $config = array('zf-content-negotiation' => $config);
+        $this->configResource->patch($config, true);
+    }
+
+    /**
+     * Create Doctrine configuration
+     *
+     * @param  RestServiceEntity $details
+     * @param  string $entityClass
+     * @param  string $collectionClass
+     * @param  string $routeName
+     */
+    public function createDoctrineConfig(RestServiceEntity $details, $entityClass, $collectionClass, $routeName)
+    {
+        $config = array(
+            'zf-rest-doctrine-hydrator' => array(
+                $details->hydratorName => array(
+                    'entity_class' => $entityClass,
+                    'doctrine_hydrator' => 'DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity',
+                    'object_manager' => $details->objectManager
+                ),
+            ),
+            'zf-rest-doctrine-resource' => array(
+                $details->resourceClass => array(
+                    'object_manager' => $details->objectManager,
+                    'hydrator' => $details->hydratorName,
+                ),
+            ),
+            'hydrators' => array(
+                'invokables' => array(
+                    $details->hydratorName => $details->hydratorName
+                ),
+            ),
+        );
+
         $this->configResource->patch($config, true);
     }
 

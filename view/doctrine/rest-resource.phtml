@@ -1,9 +1,8 @@
 namespace <?php echo $module ?>\V<?php echo $version ?>\Rest\<?php echo $resource ?>;
 
-use ZF\ApiProblem\ApiProblem;
-use SoliantConsulting\Apigility\Server\Resource\AbstractResource;
+use SoliantConsulting\Apigility\Server\Resource\DoctrineResource;
 
-class <?php echo $classname ?> extends AbstractResource
+class <?php echo $classname ?> extends DoctrineResource
 {
     protected $objectManagerAlias = '<?= $details->objectManager; ?>';
 }
