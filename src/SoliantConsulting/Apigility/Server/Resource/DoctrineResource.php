@@ -5,7 +5,7 @@ namespace SoliantConsulting\Apigility\Server\Resource;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
-use Zend\Paginator\Adapter\ArrayAdapter;
+use SoliantConsulting\Apigility\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
@@ -116,38 +116,23 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function fetchAll($params = array())
     {
-        $parameters = $this->getEvent()->getQueryParams();
+        // Load parameters
+        $parameters = $this->getEvent()->getQueryParams()->toArray();
 
-        // Pagination
-        $limit = 25;
-        if (isset($parameters['_limit'])) {
-            $limit = ($parameters['_limit'] <= 100) ? $parameters['_limit'] : 100;
-        }
-        $offset = 0;
-        if (isset($parameters['_page'])) {
-            $offset = ($parameters['_page'] * $limit);
-        }
-
-        // Order by
-        $orderBy = array();
-        if (isset($parameters['_orderBy'])) {
-            foreach($parameters['_orderBy'] as $fieldName => $sort) {
-                $orderBy[$fieldName] = $sort;
-            }
+        // Load the correct queryFactory:
+        $objectManager = $this->getObjectManager();
+        /** @var Query\ApigilityFetchAllQuery $queryBuilder */
+        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            $queryBuilder = new Query\FetchAllOrmQuery();
+        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+            $queryBuilder = new Query\FetchAllOdmQuery();
+        } else {
+            return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
 
-        // Filters
-        $criteria = array();
-        if (isset($parameters['_query'])) {
-            foreach ($parameters['_query'] as $fieldName => $filter) {
-                $criteria[$fieldName] = $filter;
-            }
-        }
-
-        // Run query
-        $repository = $this->getObjectManager()->getRepository($this->getEntityClass());
-        $results =  $repository->findBy($criteria, $orderBy, $limit, $offset);
-        $adapter = new ArrayAdapter($results->toArray());
+        // Build query:
+        $queryBuilder->setObjectManager($objectManager);
+        $adapter = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
 
         // Return collection:
         $collectionClass = $this->getCollectionClass();
