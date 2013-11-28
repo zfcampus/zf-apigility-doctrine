@@ -15,22 +15,22 @@
         }
     ],
     "require-dev": {
-        "zfcampus/zf-apigility-admin": "*",
-        "phpunit/phpunit": "3.7.*"
+        "zfcampus/zf-apigility-admin": "dev-master",
+        "phpunit/phpunit": "3.7.*",
+        "doctrine/doctrine-orm-module": "*",
+        "doctrine/doctrine-mongo-odm-module": "*",
+        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
     },
     "require": {
         "php": ">=5.3.3",
-        "zendframework/zendframework": ">=2.2",
-        "zfcampus/zf-apigility": "*",
-        "zfcampus/zf-rpc": "*",
+        "zendframework/zendframework": "dev-develop",
+        "zfcampus/zf-apigility": "dev-master",
+        "zfcampus/zf-configuration": "dev-master",
         "doctrine/common": ">=2.4.x-dev",
         "ocramius/proxy-manager": "*"
     },
-    "require-dev": {
-        "doctrine/doctrine-orm-module": "*",
-        "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "*"
-    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-0": {
             "SoliantConsulting\\Apigility": "src/",
