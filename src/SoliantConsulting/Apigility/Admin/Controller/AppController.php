@@ -44,7 +44,6 @@ class AppController extends AbstractActionController
         $patchConfig = array(
             'zf-hal' => array(
                 'renderer' => array (
-                  'default_hydrator' => 'ArraySerializable',
                   'render_embedded_resources' => false,
                 ),
             ),

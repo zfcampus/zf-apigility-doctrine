@@ -101,6 +101,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         try {
             $service = $model->createService($creationData);
         } catch (\Exception $e) {
+            die($e->getMessage());
             throw new CreationException('Unable to create REST service', $e->getCode(), $e);
         }
 

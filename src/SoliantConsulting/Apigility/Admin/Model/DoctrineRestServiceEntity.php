@@ -51,6 +51,10 @@ class DoctrineRestServiceEntity
 
     protected $selector = 'HalJson';
 
+    protected $hydratorName;
+
+    protected $objectManager;
+
     public function __get($name)
     {
         if ($name === 'filter') {
@@ -135,6 +139,12 @@ class DoctrineRestServiceEntity
                 case 'selector':
                     $this->selector = $value;
                     break;
+                case 'hydratorname':
+                    $this->hydratorName = $value;
+                    break;
+                case 'objectmanager':
+                    $this->objectManager = $value;
+                    break;
             }
         }
     }
@@ -159,6 +169,7 @@ class DoctrineRestServiceEntity
             'route_match'                => $this->routeMatch,
             'route_name'                 => $this->routeName,
             'selector'                   => $this->selector,
+            'hydrator_name'              => $this->hydratorName,
         );
     }
 
