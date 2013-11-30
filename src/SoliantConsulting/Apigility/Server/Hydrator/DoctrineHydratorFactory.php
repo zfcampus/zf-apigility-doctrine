@@ -142,16 +142,29 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             return null;
         }
 
-        // Load hydrator data:
-        $unitOfWork = $objectManager->getUnitOfWork();
-        $flags = $objectManager->getClassMetadata($config['entity_class']);
+         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
+         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            // Create hydrator
+            $className = $this->normalizeClassname($config['doctrine_hydrator']);
+            $reflection = new \ReflectionClass($className);
+            $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $byValue = true);
 
-        // Create hydrator
-        $className = $this->normalizeClassname($config['doctrine_hydrator']);
-        $reflection = new \ReflectionClass($className);
-        $hydrator = $reflection->newInstance($objectManager, $unitOfWork, $flags);
+            return $hydrator;
+         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+            # ODM is different hydration constructor if the below code works @veewee
+            // Load hydrator data:
+            $unitOfWork = $objectManager->getUnitOfWork();
+            $flags = $objectManager->getClassMetadata($config['entity_class']);
 
-        return $hydrator;
+            // Create hydrator
+            $className = $this->normalizeClassname($config['doctrine_hydrator']);
+            $reflection = new \ReflectionClass($className);
+            $hydrator = $reflection->newInstance($objectManager, $unitOfWork, $flags);
+
+            return $hydrator;
+         } else {
+             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
+         }
     }
 
     /**

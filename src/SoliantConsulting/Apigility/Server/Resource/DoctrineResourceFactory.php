@@ -90,7 +90,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        die('create service with name');
         $config   = $serviceLocator->get('Config');
         $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
 
@@ -128,7 +127,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         } else {
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
-        die('load object manager ' . $config['object_manager']);
         return $objectManager;
     }
 
