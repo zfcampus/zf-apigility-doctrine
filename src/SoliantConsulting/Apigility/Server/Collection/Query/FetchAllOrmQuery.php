@@ -2,26 +2,44 @@
 
 namespace SoliantConsulting\Apigility\Server\Collection\Query;
 
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
-use SoliantConsulting\Apigility\Server\Paginator\Adapter\DoctrineOrmAdapter;
-use Zend\Paginator\Adapter\AdapterInterface;
+use Zend\Paginator\Paginator;
+use ZF\Hal\Collection;
 
-class FetchAllOrmQuery implements ApigilityFetchAllQuery
 
+/**
+ * Class FetchAllOrmQuery
+ *
+ * @package SoliantConsulting\Apigility\Server\Resource\Query
+ */
+class FetchAllOrmQuery
+    implements ObjectManagerAwareInterface
 {
 
     use ProvidesObjectManager;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function createQuery($entityClass, array $parameters)
+    protected $collectionClass;
+
+    public function getCollectionClass()
     {
-        /** @var \Doctrine\Orm\Query\Builder $queryBuilder */
+        return $this->collectionClass;
+    }
+
+    public function setCollectionClass($value)
+    {
+        $this->collectionClass = $value;
+        return $this;
+    }
+
+    public function getPaginatedQuery($entityClass, $parameters)
+    {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
         $queryBuilder->select('row')
-            ->from($this->getEntityClass(), 'row');
+            ->from($entityClass, 'row');
+
+        $totalCountQueryBuilder = clone $queryBuilder;
 
         // Orderby
         if (!isset($parameters['orderBy'])) {
@@ -106,7 +124,7 @@ class FetchAllOrmQuery implements ApigilityFetchAllQuery
                         // field, value
                         $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
                         $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$md5) = 0")
-                            ->setParameter($md5, $option['value']);
+                                     ->setParameter($md5, $option['value']);
                         break;
 
                     default:
@@ -115,20 +133,24 @@ class FetchAllOrmQuery implements ApigilityFetchAllQuery
             }
         }
 
-        return $queryBuilder;
-    }
+        // Build collection and paginator
+        $collectionClass = $this->getCollectionClass();
+        $collection = new $collectionClass($queryBuilder->getQuery(), false);
+        $paginator = new Paginator($collection);
 
-    /**
-     * @param       $entityClass
-     * @param array $parameters
-     *
-     * @return AdapterInterface
-     */
-    public function getPaginatedQuery($entityClass, array $parameters)
-    {
-        $queryBuilder = $this->createQuery($entityClass, $parameters);
-        $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
-        return $adapter;
-    }
+        // Total count collection (is this the right use of total?)
+        $totalCountCollection = new $collectionClass($totalCountQueryBuilder->getQuery(), false);
 
+        // Setup HAL collection
+        $halCollection = new Collection($paginator);
+        $halCollection->setAttributes(array(
+            'count' => sizeof($collection),
+            'total' => sizeof($totalCountCollection),
+        ));
+        $halCollection->setCollectionRouteOptions(array(
+            'query' => $parameters
+        ));
+
+        return $halCollection;
+    }
 }

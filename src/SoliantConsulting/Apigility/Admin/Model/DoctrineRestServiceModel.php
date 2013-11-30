@@ -406,14 +406,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             $className
         );
 
-        $this->configResource->patch(array(
-            'service_manager' => array(
-                'invokables' => array(
-                    $fullClassName => $fullClassName,
-                ),
-            ),
-        ), true);
-
         return $fullClassName;
     }
 

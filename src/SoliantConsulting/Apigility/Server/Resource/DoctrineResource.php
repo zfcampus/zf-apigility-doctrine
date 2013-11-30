@@ -12,7 +12,7 @@ use ZF\Rest\AbstractResourceListener;
 use Zend\Paginator\Paginator;
 
 /**
- * Class DoctrineResourceListener
+ * Class DoctrineResource
  *
  * @package SoliantConsulting\Apigility\Server\Resource
  */
@@ -133,11 +133,10 @@ class DoctrineResource extends AbstractResourceListener
 
          // Build query:
          $queryBuilder->setObjectManager($objectManager);
-         $adapter = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+         $queryBuilder->setCollectionClass($this->getCollectionClass());
+         $halCollection = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
 
-         // Return collection:
-         $collectionClass = $this->getCollectionClass();
-         return new $collectionClass($adapter);
+        return $halCollection;
     }
 
     /**
