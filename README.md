@@ -16,7 +16,7 @@ created with the Admin tool.
 (https://en.wikipedia.org/wiki/Object-relational_mapping) based on the 
 [Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
 project library which works in tandem with a Doctrine ORM class to make interacting
-with your entities seemless across the API.
+with your entities seemless across the API.  See the README.CLIENT.md
 
 
 Installation
@@ -104,6 +104,21 @@ The route for an entity named DataModule\Entity\UserData is
 After going through the above process your API should be working.
 
 
+Handling Embedded Resources
+---------------------------
+
+The Apigility-enabled module sets the zf-hal renderer configuration variable ```render_embedded_resources```
+to false.  This supresses all embedded resource details and only returns their _links[self][href].  This
+is used in the Client for lazy loading and may be turned on based on your needs.
+
+```php
+    'zf-hal' => array(
+        'renderer' => array(
+            'default_hydrator' => 'ArraySerializable',
+            'render_embedded_resources' => '',
+        ),
+```
+
 Collections 
 ===========
 
@@ -111,69 +126,81 @@ The API created with this library implements full featured and paginated
 collection resources.  A collection is returned from a GET call to a entity endpoint without
 specifying the id.  e.g. ```GET /api/data_module/entity/user_data```
 
-
-Direct API Calls 
-----------------
-
-Reserved Words
+Reserved GET variables
 
 ```
-    _page
-    _limit
-    _orderBy
-    _query
+    orderBy
+    query
 ```
 
-Return a page of the first five results
-
-```
-    /api/user_data?_page=0&_limit=5
-```
-
-Return results six through ten
-
-```
-    /api/user_data?_page=1&_limit=5
-```
+Sorting Collections
+-------------------
 
 Sort by columnOne ascending
 
 ```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC
+    /api/user_data?orderBy%5BcolumnOne%5D=ASC
 ```
 
 Sort by columnOne ascending then columnTwo decending
 
 ```
-    /api/user_data?_orderBy%5BcolumnOne%5D=ASC&_orderBy%5BcolumnTwo%5D=DESC
+    /api/user_data?orderBy%5BcolumnOne%5D=ASC&orderBy%5BcolumnTwo%5D=DESC
 ```
 
 
 Querying Collections
 --------------------
 
-Queries are not simple key=value pairs.  The _query parameter is a key-less array of query 
-definitions.  Each query definition is an array and the values vary for each query type.
+Queries are not simple key=value pairs.  The query parameter is a key-less array of query 
+definitions.  Each query definition is an array and the array values vary for each query type.
 
-Each query type requires at a minimum the 'type' and a 'field'.  Each query may also specify
-a 'where' which can be either 'and' or 'or'.  
-
-*** The goal of querying data is to mirror the doctrine query builder plus custom query solutions ***
+Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
+a 'where' which can be either 'and' or 'or'.  Embedded logic such as and(x or y) is not supported.
 
 Building HTTP GET query with PHP.  Use this to help build your queries.
 
+PHP Example
 ```php
     echo http_build_query(
         array(
-            '_query' => array(
-                array('field' => '_DatasetID', 'where' => 'and', 'type' => 'eq' , 'value' => 1),
-                array('field' =>'Cycle_number', 'where' => 'and', 'type'=>'between', 'from' => 10, 'to'=>100),
-                array('field'=>'Cycle_number', 'where' => 'and', 'type' => 'decimation', 'value' => 10)
+            'query' => array(
+                array('field' =>'cycle', 'where' => 'and', 'type'=>'between', 'from' => 1, 'to'=>100),
+                array('field'=>'cycle', 'where' => 'and', 'type' => 'decimation', 'value' => 10)
             ),
-            '_orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
+            'orderBy' => array('columnOne' => 'ASC', 'columnTwo' => 'DESC')
         )
     );
 ```
+
+Javascript Example
+```js
+$(function() {
+    $.ajax({
+        url: "http://localhost:8081/api/db/entity/user_data",
+        type: "GET",
+        data: {
+            'query': [
+            {
+                'field': 'cycle',
+                'where': 'and',
+                'type': 'between',
+                'from': '1',
+                'to': '100'
+            },
+            {
+                'field': 'cycle',
+                'where': 'and',
+                'type': 'decimation',
+                'value': '10'
+            }
+        ]
+        },
+        dataType: "json"
+    });
+});
+```
+    
 
 Available Query Types
 ---------------------
@@ -192,61 +219,61 @@ Not Equals
 
 Less Than
 
-```
+```php
     array('type' => 'lt', 'field' => 'fieldName', 'value' => 'matchValue')
 ```
 
 Less Than or Equals
 
-```
+```php
     array('type' => 'lte', 'field' => 'fieldName', 'value' => 'matchValue')
 ```
 
 Greater Than
 
-```
+```php
     array('type' => 'gt', 'field' => 'fieldName', 'value' => 'matchValue')
 ```
 
 Greater Than or Equals
 
-```
+```php
     array('type' => 'gte', 'field' => 'fieldName', 'value' => 'matchValue')
 ```
 
 Is Null
 
-```
+```php
     array('type' => 'isnull', 'field' => 'fieldName')
 ```
 
 Is Not Null
 
-```
+```php
     array('type' => 'isnotnull', 'field' => 'fieldName')
 ```
 
 In
 
-```
+```php
     array('type' => 'in', 'field' => 'fieldName', 'values' => array(1, 2, 3))
 ```
 
 NotIn
 
-```
+```php
     array('type' => 'notin', 'field' => 'fieldName', 'values' => array(1, 2, 3))
 ```
 
-Like
+Like (% is used as a wildcard)
 
-```
+```php
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
-Not Like
+Not Like (% is used as a wildcard)
 
-```
+```php
     array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
 ```
 
@@ -256,181 +283,8 @@ Between
     array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
 ````
 
-Decimation
+Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
 
 ```php
     array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
 ```
-
-
-Client uses the same Doctrine Entities
---------------------------------------------------------
-
-Your API client must have a copy of the same Entity code base as the server 
-and as the Admin module used to build the Apigility-enabled module, if you
-choose to use the Client.
-
-This is best accomplished by creating a distinct module for your entities and 
-repositories then requiring this repository from composer.
-
-
-Client uses proxy objects for lazy loading
-----------------------------------------------
-
-The ```ocramius/proxy-manager``` library is used to make all api interactivity lazy load,
-including individual find() calls and collections.
-
-
-Client Configuration
---------------------
-
-Add a service factory for the client to the Application module's setServiceConfig
-
-```
-    public function getServiceConfig()
-    {
-        return array(
-            'factories' => array(
-                'apigility_client' => function($serviceManager) {
-                    $objectManager = new ObjectManager;
-
-                    # no trailing slash
-                    $objectManager->setBaseUrl('http://localhost:8079/api');  
-                    
-                    // The entity manager you set here should not connect 
-                    // to your database.  It is used by the objectManager 
-                    // to introspect entities at run time.  Because the 
-                    // client is not an Doctrine Entity Manager it doesn't 
-                    // have the entity metadata available to it.
-                    $objectManager->setEntityManager(
-                        $serviceManager->get('doctrine.entitymanager.orm_default')
-                    );
-                    
-                    $objectManager->setHttpClient(new HttpClient(null, array('keepalive' => true)));
-                    $objectManager->setCache(StorageFactory::adapterFactory('memory'));
-
-                    return $objectManager;
-                },
-```
-
-To fetch the object manager in a controller:
-```
-namespace Application\Controller;
-
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-
-class IndexController extends AbstractActionController
-{
-    public function testingAction()
-    {
-        $objectManager = $this->getServiceLocator()->get('apigility_client');
-        $artifact = $objectManager->find('EntityModule\Entity\Artifact', 36);
-
-        return array(
-            'artifact' => $artifact,
-        );
-    }
-}
-```
-
-Use the $artifact in a view as you would a local Doctrine entity
-
-```
-The artifact id is <?= $artifact->getId(); ?><br>
-Name: <?= $this->escapeHtml($artifact->getName()); ?><br>
-Artifact Type Name: <?= $this->escapeHtml($artifact->getArtifactType()->getName()); ?><br>
-Vendor Name: <?= $this->escapeHtml($artifact->getVendor()->getName()); ?>
-
-<BR><BR>
-
-<?php
-
-$artifacts = $artifact->getVendor()->getArtifacts();
-foreach ($artifacts as $a) {
-    echo "<BR><BR> Artifact Name:" . $a->getName();
-}
-```
-
-
-Client Collection
-=================
-
-A collection is returned from the object manager any time a collection is requested such 
-as ```$artifact->getReferencedData();```
-
-To query for a collection directly create a collection as:
-
-```
-use SoliantConsulting\Apigility\Client\Collections\RelationCollection as Collection;
-
-$collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
-```
-
-When you first receive a collection as a result of an artifact function the entities will be populated.
-When you create a collection from scratch entities will not be populated.
-
-These functions will reset the collection
-
-```php
-    $collection->setPage(0);
-    $collection->setLimit(10);
-    $collection->addFilter('id', 100);
-    $collection->setQuery(array());
-    $collection->setOrderBy(array(
-        'name' => 'ASC'
-    ));
-```
-
-```
-    setPage(#)
-``` 
-
-sets the page of results to return based on ```setLimit(#)``` 
-so if yo call setLimit(10) and setPage(2) the collection will return results 31-40.
-
-```
-    addFilter(field, value)
-``` 
-
-is used internally to set persistant filters.  Filters are not
-reset between collection api calls and cannot be modified.
-
-```
-    setQuery(array(field => value))
-``` 
-
-can be modified and are not reset between api calls
-
-```
-    setOrderBy(array(field => sort))
-``` 
-
-sets the order to return results.
-
-After any of these calls are made the collection resets itself.  This allows loooping.  This example 
-echos 50 results.
-
-```
-    $collection = new Collection($objectManager, 'DbLoadCd\Entity\DataCaptureType');
-
-    $collection->setLimit(10);
-    for ($page = 0; $page <= 4; $page++) {
-        $collection->setPage($page); 
-
-        foreach ($collection as $entity) {
-            echo $entity->getName();    
-        }
-    }
-```
-
-
-TODO Medium Term
-================
-Fix the client to work with the changes we've made in the server
-
-
-TODO Long Term
-==============
-
-Add optional support for DoctrineEntity hydrator.
