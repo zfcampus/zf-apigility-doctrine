@@ -14,7 +14,7 @@ use ZF\Hal\Collection;
  * @package SoliantConsulting\Apigility\Server\Resource\Query
  */
 class FetchAllOrmQuery
-    implements ObjectManagerAwareInterface
+    implements ObjectManagerAwareInterface, ApigilityFetchAllQuery
 {
 
     use ProvidesObjectManager;
@@ -32,7 +32,13 @@ class FetchAllOrmQuery
         return $this;
     }
 
-    public function getPaginatedQuery($entityClass, $parameters)
+    /**
+     * @param string $entityClass
+     * @param array $parameters
+     *
+     * @return mixed This will return an ORM or ODM Query\Builder
+     */
+    public function createQuery($entityClass, array $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
@@ -133,10 +139,27 @@ class FetchAllOrmQuery
             }
         }
 
+        return $queryBuilder;
+    }
+
+    /**
+     * @param       $entityClass
+     * @param array $parameters
+     *
+     * @return HalCollection
+     */
+    public function getPaginatedQuery($entityClass, array $parameters)
+    {
+        $queryBuilder = $this->createQuery($entityClass, $parameters);
+
         // Build collection and paginator
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass($queryBuilder->getQuery(), false);
         $paginator = new Paginator($collection);
+
+        $totalCountQueryBuilder = $this->getObjectManager()->createQueryBuilder();
+        $totalCountQueryBuilder->select('row')
+            ->from($entityClass, 'row');
 
         // Total count collection (is this the right use of total?)
         $totalCountCollection = new $collectionClass($totalCountQueryBuilder->getQuery(), false);
