@@ -42,11 +42,6 @@ class AppController extends AbstractActionController
 
         // Set renderer defaults
         $patchConfig = array(
-            'zf-hal' => array(
-                'renderer' => array (
-                  'render_embedded_resources' => false,
-                ),
-            ),
             'service_manager' => array(
                 'abstract_factories' => array(
                     'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',

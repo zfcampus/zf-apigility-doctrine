@@ -42,41 +42,7 @@ Installation
 Doctrine Entity Configuration
 -----------------------
 
-This documents the reqiurements of your entities to work with this library.  
-The ArraySerializable hydrator is used by default.
-
-```
-public function getArrayCopy() 
-{
-    return array(
-        'id' => $this->getId(),
-        'anotherField' => $this->getAnotherField(),
-        'referenceToAnotherEntity' => $this->getReferenceToAnotherEntity(),
-    );
-}
-
-public function exchangeArray($data) 
-{
-    $this->setAnotherField(isset($data['anotherField']) ? $data['anotherField']: null);
-    $this->setReferenceToAnotherEntity(isset($data['referenceToAnotherEntity']) ? $data['referenceToAnotherEntity']: null);
-}
-
-public function setId($value) 
-{
-    $this->id = $value;
-}
-```
-
-It is important the id is not in exchangeArray and is in getArrayCopy.  
-All fields and references need to be in both functions.  Collections
-such as many to one relationships are in neither function.  
-
-```setId($value)``` is generally not implemented by traditional Doctrine entity design
-but if using the Client and because ArraySerializable hydration is used and becuase 
-setting the id in exchangeArray() is not advised, this setter is required.
-
-At the time of this writing Doctrine many-to-many relationships are not supported by this
-library.
+Doctrine entities are hydrated with the DoctrineEntity hydrator so no special configuration of your entities is needed to use this tool.
 
 
 Creating the Apigility-enabled module
@@ -107,17 +73,11 @@ After going through the above process your API should be working.
 Handling Embedded Resources
 ---------------------------
 
-The Apigility-enabled module sets the zf-hal renderer configuration variable ```render_embedded_resources```
-to false.  This supresses all embedded resource details and only returns their _links[self][href].  This
-is used in the Client for lazy loading and may be turned on based on your needs.
+If you choose you my supress embedded resources by setting
+$config[zf-hal][render_embedded_resources] to false.  Doing so
+returns only links to embedded resources instead of their full details.
+This setting is useful for avoiding circular references.
 
-```php
-    'zf-hal' => array(
-        'renderer' => array(
-            'default_hydrator' => 'ArraySerializable',
-            'render_embedded_resources' => '',
-        ),
-```
 
 Collections 
 ===========
