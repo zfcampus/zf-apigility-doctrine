@@ -4,19 +4,7 @@ Soliant Consulting
 Apigility for Doctrine
 ----------------------
 
-This library has three parts.  
-
-1. An Admin tool to create an Apigility-enabled module with support for all 
-Doctrine Entities in scope.
-
-2. An API server AbstractService class to handle API interactions from resources
-created with the Admin tool.
-
-3. An API client [Object Relational Mapper]
-(https://en.wikipedia.org/wiki/Object-relational_mapping) based on the 
-[Doctrine Common](http://www.doctrine-project.org/projects/common.html) 
-project library which works in tandem with a Doctrine ORM class to make interacting
-with your entities seemless across the API.  See the README.CLIENT.md
+This provides Apigility Module creation for Doctrine ORM and ODM.  API Modules created with this library's Admin code are supported by this library's Server code.  With this library you can turn a set of Doctrine entities into a full featured API.
 
 
 Installation
@@ -24,12 +12,6 @@ Installation
   1. edit `composer.json` file with following contents:
 
      ```json
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/TomHAnderson/soliantconsulting-apigility"
-        }
-    ],
     "require": {
         "soliantconsulting/soliantconsulting-apigility": "dev-master"
     }
@@ -42,7 +24,7 @@ Installation
 Doctrine Entity Configuration
 -----------------------
 
-Doctrine entities are hydrated with the DoctrineEntity hydrator so no special configuration of your entities is needed to use this tool.
+No special configuration of your entities is needed to use this tool.
 
 
 Creating the Apigility-enabled module
@@ -52,7 +34,7 @@ The Admin tool can create an Apigility-enabled module with the Doctrine entities
 To enable the Admin include ```'SoliantConsulting\Apigility',``` in your 
 development.config.php configuration.
 
-All entities managed by the object manager will be available to build into a resource.  
+All entities managed by the object manager will be available to build into apigility resources.  
 
 Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter 
 the name of a new module which does not already exist.  When the form is submitted
@@ -67,13 +49,12 @@ requests.
 
 The route for an entity named DataModule\Entity\UserData is
 ```/api/user_data``` or, if using namespaced routes, ```/api/data_module/entity/user_data``` 
-After going through the above process your API should be working.
 
 
 Handling Embedded Resources
 ---------------------------
 
-If you choose you my supress embedded resources by setting
+You may choose to supress embedded resources by setting
 $config[zf-hal][render_embedded_resources] to false.  Doing so
 returns only links to embedded resources instead of their full details.
 This setting is useful for avoiding circular references.
