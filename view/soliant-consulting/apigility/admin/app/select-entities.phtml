@@ -12,54 +12,90 @@ $(function() {
 });
 </script>
 
-<h1>Soliant Consulting</h1>
-<h2>Apigility for Doctrine</h2>
+<?php
 
-<form method="post" action="<?= $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)); ?>">
+use Zend\Form\Form;
+use Zend\Form\Element;
 
-<h3>Doctrine</h3>
-Object Manager Alias
-<input id="objectManagerAlias" type="text" size="50" name="objectManagerAlias"
-    value="<?= $this->escapeHtml($this->objectManagerAlias); ?>">
+$form = new Form('select-entities');
+$form->setAttributes(array(
+    'action' => $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)),
+    'method' => 'post',
+    'class' => 'form-horizontal'
+));
+
+$objectManagerAlias = new Element('objectManagerAlias');
+$objectManagerAlias->setAttributes(array(
+    'type' => 'text',
+    'size' => 80,
+    'id' => 'objectManagerAlias',
+));
+$objectManagerAlias->setLabel('Object Manager Alias');
+$objectManagerAlias->setValue(($this->objectManagerAlias) ?: 'doctrine.entitymanager.orm_default');
+
+$doctrineHydrator = new Element('doctrineHydrator');
+$doctrineHydrator->setAttributes(array(
+    'type' => 'text',
+    'size' => 80,
+));
+$doctrineHydrator->setLabel('Doctrine Hydrator (ODM Only)');
+$doctrineHydrator->setValue('DoctrineMongoODMModule\Hydrator\TenantEntityAssetHydrator');
+
+$routePrefix = new Element('routePrefix');
+$routePrefix->setAttributes(array(
+    'type' => 'text'
+));
+$routePrefix->setLabel('Route Prefix');
+$routePrefix->setValue('api');
+
+$useEntityNamespacesForRoute = new Element\Checkbox('useEntityNamespacesForRoute');
+$useEntityNamespacesForRoute->setAttributes(array(
+    'type' => 'checkbox',
+    'description' => 'Should entity namespaces be used in route names?',
+));
+$useEntityNamespacesForRoute->setCheckedValue(1);
+$useEntityNamespacesForRoute->setUncheckedValue(false);
+$useEntityNamespacesForRoute->setLabel('Use Entity Namespaces for Route?');
+
+$form->add($objectManagerAlias);
+$form->add($doctrineHydrator);
+$form->add($routePrefix);
+$form->add($useEntityNamespacesForRoute);
+?>
+
+<div class="lead">
+
+<?= $this->form()->openTag($form); ?>
+<fieldset>
+<legend>Apigility for Doctrine</legend>
+
+<?= $this->formRow($form->get('objectManagerAlias')); ?>
+
 <?php
 if ($this->invalidObjectManager) {
 ?>
 <p style="color: red">Invalid Object Manager Alias</p>
-
 <?php
 }
 ?>
+<br>
 <button id="loadObjectManager" class="btn btn-default">
-Refresh Entity List
+    Refresh Entity List
 </button>
-
+<br>
 <?php
 if (!$this->invalidObjectManager) {
 ?>
-<h3>Doctrine Hydrator (ODM Only)</h3>
-<input type="text" size="80" name="doctrineHydrator" value="DoctrineMongoODMModule\Hydrator\TenantEntityAssetHydrator">
 
-<h3>Route Options</h3>
-
-Route Prefix
-<input type="text" name="routePrefix" value="api">
-
+<?= $this->formRow($form->get('doctrineHydrator')); ?>
 <br>
+<?= $this->formRow($form->get('routePrefix')); ?>
 <br>
+<?= $this->formRow($form->get('useEntityNamespacesForRoute')); ?>
 
+</div>
 
-Use Entity Namespaces for Route
-<input type="checkbox" name="useEntityNamespacesForRoute" value="1">
-<br>
-<br>
-Should entity namespaces be used in route names?  e.g. entity name EtreeDb\Db\Entity\UserMeta would route to
-<b>{route prefix} . /etree_db/db/entity/user_meta</b>
-
-If you do not select this option the same route would be <b>{route prefix} . /user_meta</b>
-
-<hr>
-
-<h3>Select Entities</h3>
+<legend >Select Entities</legend>
 
 <table class="table table-striped table-hover">
 <tr>
@@ -88,4 +124,5 @@ If you do not select this option the same route would be <b>{route prefix} . /us
 <?php
 }
 ?>
+</fieldset>
 </form>

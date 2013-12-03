@@ -1,7 +1,7 @@
 {
     "name": "soliantconsulting/soliantconsulting-apigility",
     "type": "library",
-    "description": "An ORM Apigility Client based on Doctrine Common",
+    "description": "A Doctrine Apigility Admin and Server",
     "keywords": [
         "apigility",
         "api client"
@@ -22,12 +22,10 @@
         "doctrine/mongodb-odm": "1.0.0-beta9@dev"
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "zendframework/zendframework": "dev-develop",
         "zfcampus/zf-apigility": "dev-master",
-        "zfcampus/zf-configuration": "dev-master",
-        "doctrine/common": ">=2.4.x-dev",
-        "ocramius/proxy-manager": "*"
+        "zfcampus/zf-configuration": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -35,8 +33,7 @@
         "psr-0": {
             "SoliantConsulting\\Apigility": "src/",
             "SoliantConsulting\\Apigility\\Admin": "src/",
-            "SoliantConsulting\\Apigility\\Server": "src/",
-            "SoliantConsulting\\Apigility\\Client": "src/"
+            "SoliantConsulting\\Apigility\\Server": "src/"
         }
     }
 }
