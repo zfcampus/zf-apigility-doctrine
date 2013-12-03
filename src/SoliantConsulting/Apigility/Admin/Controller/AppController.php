@@ -122,6 +122,17 @@ class AppController extends AbstractActionController
         $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
         $metadataFactory = $objectManager->getMetadataFactory();
 
+         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            $doctrineHydrator = 'DoctrineORMModule\\Stdlib\\Hydrator\\DoctrineEntity';
+         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+            $doctrineHydrator = $this->params()->fromPost('doctrineEntity');
+            if (!class_exists($doctrineHydrator)) {
+                return new ApiProblem(500, "Invalid doctrine entity");
+            }
+         } else {
+             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
+         }
+
         $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
 
         // Generate a session id for results on next page
@@ -160,6 +171,7 @@ class AppController extends AbstractActionController
                 'identifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => $route,
                 'hydratorName' => $hydratorName,
+                'doctrineHydrator' => $doctrineHydrator,
             ));
 
             $_SESSION[$results][$entityMetadata->name] = $route;

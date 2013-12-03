@@ -55,6 +55,8 @@ class DoctrineRestServiceEntity
 
     protected $objectManager;
 
+    protected $doctrineHydrator;
+
     public function __get($name)
     {
         if ($name === 'filter') {
@@ -145,6 +147,9 @@ class DoctrineRestServiceEntity
                 case 'objectmanager':
                     $this->objectManager = $value;
                     break;
+                case 'doctrinehydrator':
+                    $this->doctrineHydrator = $value;
+                    break;
             }
         }
     }
@@ -170,6 +175,8 @@ class DoctrineRestServiceEntity
             'route_name'                 => $this->routeName,
             'selector'                   => $this->selector,
             'hydrator_name'              => $this->hydratorName,
+            'object_manager'             => $this->objectManager,
+            'doctrine_hydrator'          => $this->doctrineHydrator,
         );
     }
 
