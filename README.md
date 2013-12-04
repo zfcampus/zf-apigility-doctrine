@@ -4,8 +4,7 @@ Soliant Consulting
 Apigility for Doctrine
 ----------------------
 
-This provides Apigility Module creation for Doctrine ORM and ODM.  API Modules created with this library's Admin code are supported by this library's Server code.  With this library you can turn a set of Doctrine entities into a full featured API.
-
+This provides Apigility Module creation for Doctrine ORM and ODM.  API Modules created with this library's Admin code are supported by this library's Server code.  With this library you can turn a set of Doctrine entities into a full featured API.  No special configuration of your entities is needed.
 
 Installation
 ------------
@@ -21,12 +20,6 @@ Installation
   3. run `php composer.phar install`
 
 
-Doctrine Entity Configuration
------------------------
-
-No special configuration of your entities is needed to use this tool.
-
-
 Creating the Apigility-enabled module
 -------------------------------------
 
@@ -36,19 +29,12 @@ development.config.php configuration.
 
 All entities managed by the object manager will be available to build into apigility resources.  
 
-Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter 
-the name of a new module which does not already exist.  When the form is submitted
+Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter the name of a new module which does not already exist.  When the form is submitted
 the module will be created.
 
 The next page allows you to select entities from the object manager to build into 
 resources.  You may change your object manager and refresh entities for that object
-manager.  Check the entities you want then submit the form.
-
-Done.  Your new module is enabled in your application and you can start making API 
-requests.  
-
-The route for an entity named DataModule\Entity\UserData is
-```/api/user_data``` or, if using namespaced routes, ```/api/data_module/entity/user_data``` 
+manager.  Check the entities you want then submit the form and you're done.  Your new module is enabled in your application and you can start making API requests.  
 
 
 Handling Embedded Resources
@@ -57,7 +43,7 @@ Handling Embedded Resources
 You may choose to supress embedded resources by setting
 $config[zf-hal][render_embedded_resources] to false.  Doing so
 returns only links to embedded resources instead of their full details.
-This setting is useful for avoiding circular references.
+This setting is useful to avoid circular references.
 
 
 Collections 
