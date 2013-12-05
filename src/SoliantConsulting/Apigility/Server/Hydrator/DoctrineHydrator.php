@@ -77,7 +77,7 @@ class DoctrineHydrator
      */
     public function hydrate(array $data, $object)
     {
-        return $this->hydrateService->extract($object);
+        return $this->hydrateService->hydrate($data, $object);
     }
 
 }
