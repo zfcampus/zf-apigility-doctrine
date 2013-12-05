@@ -10,6 +10,7 @@ use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\Paginator\Paginator;
+use ZF\Hal\Collection;
 
 /**
  * Class DoctrineResource
@@ -131,10 +132,21 @@ class DoctrineResource extends AbstractResourceListener
              return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
          }
 
-         // Build query:
+         // Create collection:
          $queryBuilder->setObjectManager($objectManager);
-         $queryBuilder->setCollectionClass($this->getCollectionClass());
-         $halCollection = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+         $adapter = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+         $reflection = new \ReflectionClass($this->getCollectionClass());
+         $collection = $reflection->newInstance($adapter);
+
+         // Transform to Hal\Collection and add some params
+         $halCollection = new Collection($collection);
+         $halCollection->setAttributes(array(
+            'count' => $collection->getCurrentItemCount(),
+            'total' => $collection->getTotalItemCount()
+         ));
+         $halCollection->setCollectionRouteOptions(array(
+            'query' => $parameters
+        ));
 
         return $halCollection;
     }

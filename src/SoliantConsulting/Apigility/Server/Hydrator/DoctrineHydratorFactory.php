@@ -138,33 +138,27 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     protected function loadEntityHydrator(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        if (!$config['doctrine_hydrator']) {
-            return null;
-        }
+        /** @var Query\ApigilityFetchAllQuery $queryBuilder */
+        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
 
-         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
-         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            if (!$config['doctrine_hydrator']) {
+                return null;
+            }
             // Create hydrator
             $className = $this->normalizeClassname($config['doctrine_hydrator']);
             $reflection = new \ReflectionClass($className);
             $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $byValue = true);
 
             return $hydrator;
-         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
-            # ODM is different hydration constructor if the below code works @veewee
-            // Load hydrator data:
-            $unitOfWork = $objectManager->getUnitOfWork();
-            $flags = $objectManager->getClassMetadata($config['entity_class']);
 
-            // Create hydrator
-            $className = $this->normalizeClassname($config['doctrine_hydrator']);
-            $reflection = new \ReflectionClass($className);
-            $hydrator = $reflection->newInstance($objectManager, $unitOfWork, $flags);
-
+        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+            $hydratorFactory = $objectManager->getHydratorFactory();
+            $hydrator = $hydratorFactory->getHydratorFor($config['entity_class']);
             return $hydrator;
-         } else {
-             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
-         }
+
+        } else {
+            return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
+        }
     }
 
     /**
