@@ -28,9 +28,6 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
                 case 'hydratorname':
                     $this->hydratorName = $value;
                     break;
-                case 'doctrinehydrator':
-                    $this->doctrineHydrator = $value;
-                    break;
                 default:
                     break;
             }
@@ -42,7 +39,6 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
         $return = parent::getArrayCopy();
         $return['object_manager'] = $this->objectManager;
         $return['hydrator_name'] = $this->hydratorName;
-        $return['doctrine_hydrator'] = $this->doctrineHydrator;
         return $return;
     }
 }

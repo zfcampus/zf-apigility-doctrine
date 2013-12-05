@@ -629,7 +629,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             'zf-rest-doctrine-hydrator' => array(
                 $details->hydratorName => array(
                     'entity_class' => $entityClass,
-                    'doctrine_hydrator' => $details->doctrineHydrator,
                     'object_manager' => $details->objectManager
                 ),
             ),

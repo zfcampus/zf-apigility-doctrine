@@ -141,11 +141,8 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
 
-            if (!$config['doctrine_hydrator']) {
-                return null;
-            }
             // Create hydrator
-            $className = $this->normalizeClassname($config['doctrine_hydrator']);
+            $className = 'DoctrineORMModule\\Stdlib\\Hydrator\\DoctrineEntity';
             $reflection = new \ReflectionClass($className);
             $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $byValue = true);
 
