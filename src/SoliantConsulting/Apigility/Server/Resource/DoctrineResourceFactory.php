@@ -142,7 +142,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             return null;
         }
 
-        if ($serviceLocator->has($config['hydrator'])) {
+        if (!$serviceLocator->has($config['hydrator'])) {
             return null;
         }
 
