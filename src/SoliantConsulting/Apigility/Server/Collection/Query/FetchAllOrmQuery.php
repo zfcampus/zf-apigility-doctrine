@@ -160,6 +160,6 @@ class FetchAllOrmQuery
         $queryBuilder->select('count(row.id)')
             ->from($entityClass, 'row');
 
-        return $queryBuilder->getQuery()->getSingleScalarResult();
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }
