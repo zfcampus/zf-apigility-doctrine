@@ -45,8 +45,6 @@ class FetchAllOrmQuery
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
 
-        $totalCountQueryBuilder = clone $queryBuilder;
-
         // Orderby
         if (!isset($parameters['orderBy'])) {
             $parameters['orderBy'] = array('id' => 'asc');
@@ -153,5 +151,15 @@ class FetchAllOrmQuery
         $queryBuilder = $this->createQuery($entityClass, $parameters);
         $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
         return $adapter;
+    }
+
+    public function getCollectionTotal($entityClass, array $parameters)
+    {
+        $queryBuilder = $this->getObjectManager()->createQueryBuilder();
+
+        $queryBuilder->select('count(row.id)')
+            ->from($entityClass, 'row');
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }
