@@ -127,7 +127,44 @@ $(function() {
     });
 });
 ```
-    
+
+Querying relations
+---------------------
+It is possible to query collections by relations - just supply the relation name as `fieldName` and
+identifier as `value`.
+
+For example, assuming we have defined 2 entities, `User` and `UserGroup`...
+
+````php
+/**
+ * @Entity
+ */
+class User {
+    /**
+     * @ManyToOne(targetEntity="UserGroup")
+     * @var UserGroup
+     */
+    protected $group;
+}
+````
+
+````php
+/**
+ * @Entity
+ */
+class UserGroup {}
+````
+
+... we can find all users that belong to UserGroup id #1 with the following query:
+
+````php
+    $url = 'http://localhost:8081/api/db/entity/user';
+    $query = http_build_query(array(
+        array('type' => 'eq', 'field' => 'group', 'value' => '1')
+    ));
+````
+
+
 
 Available Query Types
 ---------------------
