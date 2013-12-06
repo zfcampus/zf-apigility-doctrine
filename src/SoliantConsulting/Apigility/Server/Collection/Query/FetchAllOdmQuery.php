@@ -107,4 +107,18 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         return $adapter;
     }
 
+    /**
+     * @param       $entityClass
+     *
+     * @return int
+     */
+    public function getCollectionTotal($entityClass)
+    {
+        $queryBuilder = $this->getObjectManager()->createQueryBuilder();
+        $queryBuilder->find($entityClass);
+        $count = $queryBuilder->getQuery()->execute()->count();
+
+        return $count;
+    }
+
 }

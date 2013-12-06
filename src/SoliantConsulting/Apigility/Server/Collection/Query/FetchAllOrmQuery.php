@@ -153,7 +153,12 @@ class FetchAllOrmQuery
         return $adapter;
     }
 
-    public function getCollectionTotal($entityClass, array $parameters)
+    /**
+     * @param       $entityClass
+     *
+     * @return int
+     */
+    public function getCollectionTotal($entityClass)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
