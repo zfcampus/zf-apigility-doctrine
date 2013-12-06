@@ -10,6 +10,8 @@ use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\Paginator\Paginator;
+use ZF\Hal\Collection;
+use Zend\EventManager\StaticEventManager;
 
 /**
  * Class DoctrineResource
@@ -115,26 +117,50 @@ class DoctrineResource extends AbstractResourceListener
      * @param  array $params
      * @return ApiProblem|mixed
      */
-     public function fetchAll($params = array())
-     {
-         // Load parameters
-         $parameters = $this->getEvent()->getQueryParams()->toArray();
+    public function fetchAll($params = array())
+    {
+        // Load parameters
+        $parameters = $this->getEvent()->getQueryParams()->toArray();
 
-         // Load the correct queryFactory:
-         $objectManager = $this->getObjectManager();
-         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
-         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-             $queryBuilder = new Query\FetchAllOrmQuery();
-         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
-             $queryBuilder = new Query\FetchAllOdmQuery();
-         } else {
-             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
-         }
+        // Load the correct queryFactory:
+        $objectManager = $this->getObjectManager();
+        /** @var Query\ApigilityFetchAllQuery $queryBuilder */
+        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            $queryBuilder = new Query\FetchAllOrmQuery();
+        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+            $queryBuilder = new Query\FetchAllOdmQuery();
+        } else {
+            return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
+        }
 
-         // Build query:
-         $queryBuilder->setObjectManager($objectManager);
-         $queryBuilder->setCollectionClass($this->getCollectionClass());
-         $halCollection = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+        // Create collection
+        $queryBuilder->setObjectManager($objectManager);
+        $adapter = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+        $reflection = new \ReflectionClass($this->getCollectionClass());
+        $collection = $reflection->newInstance($adapter);
+
+        // Add event to populate totals
+        $entityClass = $this->getEntityClass();
+        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
+            function($e) use ($queryBuilder, $entityClass, $parameters) {
+                $halCollection = $e->getParam('collection');
+
+                $halCollection->collection->setItemCountPerPage($halCollection->pageSize);
+                $halCollection->collection->setCurrentPageNumber($halCollection->page);
+
+                $halCollection->setAttributes(array(
+                   'count' => $halCollection->collection->getCurrentItemCount(),
+                   'total' => $halCollection->collection->getTotalItemCount(),
+                   'collectionTotal' => $queryBuilder->getCollectionTotal($entityClass, $parameters),
+                ));
+            }
+        );
+
+         // Transform to Hal\Collection and add some params
+         $halCollection = new Collection($collection);
+         $halCollection->setCollectionRouteOptions(array(
+            'query' => $parameters
+        ));
 
         return $halCollection;
     }

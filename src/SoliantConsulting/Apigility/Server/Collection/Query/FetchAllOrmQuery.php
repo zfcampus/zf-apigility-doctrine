@@ -4,8 +4,8 @@ namespace SoliantConsulting\Apigility\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
-use Zend\Paginator\Paginator;
-use ZF\Hal\Collection;
+use SoliantConsulting\Apigility\Server\Paginator\Adapter\DoctrineOrmAdapter;
+use Zend\Paginator\Adapter\AdapterInterface;
 
 
 /**
@@ -44,8 +44,6 @@ class FetchAllOrmQuery
 
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
-
-        $totalCountQueryBuilder = clone $queryBuilder;
 
         // Orderby
         if (!isset($parameters['orderBy'])) {
@@ -146,34 +144,22 @@ class FetchAllOrmQuery
      * @param       $entityClass
      * @param array $parameters
      *
-     * @return HalCollection
+     * @return AdapterInterface
      */
     public function getPaginatedQuery($entityClass, array $parameters)
     {
         $queryBuilder = $this->createQuery($entityClass, $parameters);
+        $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
+        return $adapter;
+    }
 
-        // Build collection and paginator
-        $collectionClass = $this->getCollectionClass();
-        $collection = new $collectionClass($queryBuilder->getQuery(), false);
-        $paginator = new Paginator($collection);
+    public function getCollectionTotal($entityClass, array $parameters)
+    {
+        $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 
-        $totalCountQueryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $totalCountQueryBuilder->select('row')
+        $queryBuilder->select('count(row.id)')
             ->from($entityClass, 'row');
 
-        // Total count collection (is this the right use of total?)
-        $totalCountCollection = new $collectionClass($totalCountQueryBuilder->getQuery(), false);
-
-        // Setup HAL collection
-        $halCollection = new Collection($paginator);
-        $halCollection->setAttributes(array(
-            'count' => sizeof($collection),
-            'total' => sizeof($totalCountCollection),
-        ));
-        $halCollection->setCollectionRouteOptions(array(
-            'query' => $parameters
-        ));
-
-        return $halCollection;
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }

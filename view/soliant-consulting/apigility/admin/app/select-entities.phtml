@@ -33,14 +33,6 @@ $objectManagerAlias->setAttributes(array(
 $objectManagerAlias->setLabel('Object Manager Alias');
 $objectManagerAlias->setValue(($this->objectManagerAlias) ?: 'doctrine.entitymanager.orm_default');
 
-$doctrineHydrator = new Element('doctrineHydrator');
-$doctrineHydrator->setAttributes(array(
-    'type' => 'text',
-    'size' => 80,
-));
-$doctrineHydrator->setLabel('Doctrine Hydrator (ODM Only)');
-$doctrineHydrator->setValue('DoctrineMongoODMModule\Hydrator\TenantEntityAssetHydrator');
-
 $routePrefix = new Element('routePrefix');
 $routePrefix->setAttributes(array(
     'type' => 'text'
@@ -58,7 +50,6 @@ $useEntityNamespacesForRoute->setUncheckedValue(false);
 $useEntityNamespacesForRoute->setLabel('Use Entity Namespaces for Route?');
 
 $form->add($objectManagerAlias);
-$form->add($doctrineHydrator);
 $form->add($routePrefix);
 $form->add($useEntityNamespacesForRoute);
 ?>
@@ -87,8 +78,6 @@ if ($this->invalidObjectManager) {
 if (!$this->invalidObjectManager) {
 ?>
 
-<?= $this->formRow($form->get('doctrineHydrator')); ?>
-<br>
 <?= $this->formRow($form->get('routePrefix')); ?>
 <br>
 <?= $this->formRow($form->get('useEntityNamespacesForRoute')); ?>

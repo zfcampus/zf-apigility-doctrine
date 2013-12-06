@@ -22,6 +22,6 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
         $this->getQuery()->setFirstResult($offset);
         $this->getQuery()->setMaxResults($itemCountPerPage);
 
-        return $this->getQuery()->getResult()->toArray();
+        return $this->getQuery()->getResult();
     }
 }
