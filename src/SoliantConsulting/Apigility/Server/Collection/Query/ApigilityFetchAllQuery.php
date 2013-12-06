@@ -25,4 +25,11 @@ interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
      */
     public function getPaginatedQuery($entityClass, array $parameters);
 
+    /**
+     * @param       $entityClass
+     *
+     * @return int
+     */
+    public function getCollectionTotal($entityClass);
+
 } 

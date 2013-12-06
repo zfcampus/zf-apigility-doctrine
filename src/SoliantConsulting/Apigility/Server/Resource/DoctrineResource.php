@@ -9,7 +9,6 @@ use SoliantConsulting\Apigility\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use Zend\Paginator\Paginator;
 use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
 
@@ -139,30 +138,27 @@ class DoctrineResource extends AbstractResourceListener
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        // Add event to populate totals
+        // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
-        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
+        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.postfetchAll',
             function($e) use ($queryBuilder, $entityClass, $parameters) {
                 $halCollection = $e->getParam('collection');
-
                 $halCollection->collection->setItemCountPerPage($halCollection->pageSize);
                 $halCollection->collection->setCurrentPageNumber($halCollection->page);
 
                 $halCollection->setAttributes(array(
                    'count' => $halCollection->collection->getCurrentItemCount(),
                    'total' => $halCollection->collection->getTotalItemCount(),
-                   'collectionTotal' => $queryBuilder->getCollectionTotal($entityClass, $parameters),
+                   'collectionTotal' => $queryBuilder->getCollectionTotal($entityClass),
+                ));
+
+                $halCollection->setCollectionRouteOptions(array(
+                    'query' => $parameters
                 ));
             }
         );
 
-         // Transform to Hal\Collection and add some params
-         $halCollection = new Collection($collection);
-         $halCollection->setCollectionRouteOptions(array(
-            'query' => $parameters
-        ));
-
-        return $halCollection;
+        return $collection;
     }
 
     /**
