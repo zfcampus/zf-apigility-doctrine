@@ -131,9 +131,9 @@ $(function() {
 Querying relations
 ---------------------
 It is possible to query collections by relations - just supply the relation name as `fieldName` and
-identifier as `value`, for example.
+identifier as `value`.
 
-Assuming we have defined 2 entities, `User` and `UserGroup`
+For example, assuming we have defined 2 entities, `User` and `UserGroup`...
 
 ````php
 /**
@@ -155,7 +155,7 @@ class User {
 class UserGroup {}
 ````
 
-We can find all users that belong to UserGroup id #1 with the following query:
+... we can find all users that belong to UserGroup id #1 with the following query:
 
 ````php
     $url = 'http://localhost:8081/api/db/entity/user';
