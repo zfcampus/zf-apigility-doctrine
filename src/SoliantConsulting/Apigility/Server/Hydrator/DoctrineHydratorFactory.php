@@ -152,7 +152,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             // Create hydrator
             $className = 'DoctrineORMModule\\Stdlib\\Hydrator\\DoctrineEntity';
             $reflection = new \ReflectionClass($className);
-            $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], false);
+            $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $config['by_value']);
 
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $hydratorFactory = $objectManager->getHydratorFactory();
