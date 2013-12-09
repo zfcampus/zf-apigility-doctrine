@@ -98,8 +98,14 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($serviceLocator, $config, $objectManager);
 
         $hydrator = new DoctrineHydrator();
-        $hydrator->setHydrateService($entityHydrator ? $entityHydrator : $doctrineModuleHydrator);
-        $hydrator->setExtractService($doctrineModuleHydrator);
+
+        if ($entityHydrator) {
+            $hydrator->setHydrateService($entityHydrator);
+            $hydrator->setExtractService($entityHydrator);
+        } else {
+            $hydrator->setHydrateService($doctrineModuleHydrator);
+            $hydrator->setExtractService($doctrineModuleHydrator);
+        }
 
         return $hydrator;
     }
@@ -146,7 +152,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             // Create hydrator
             $className = 'DoctrineORMModule\\Stdlib\\Hydrator\\DoctrineEntity';
             $reflection = new \ReflectionClass($className);
-            $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $byValue = true);
+            $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], false);
 
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $hydratorFactory = $objectManager->getHydratorFactory();
@@ -158,6 +164,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
 
         // Configure hydrator:
         $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
+
         return $hydrator;
     }
 
