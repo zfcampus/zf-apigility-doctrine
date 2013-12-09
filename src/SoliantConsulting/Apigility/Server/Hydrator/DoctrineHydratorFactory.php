@@ -3,13 +3,15 @@
 namespace SoliantConsulting\Apigility\Server\Hydrator;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
-
+use Zend\Stdlib\Hydrator\Strategy\StrategyInterface;
+use Zend\Stdlib\Hydrator\StrategyEnabledInterface;
 /**
  * Class AbstractDoctrineResourceFactory
  *
@@ -146,16 +148,17 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             $reflection = new \ReflectionClass($className);
             $hydrator = $reflection->newInstance($objectManager, $config['entity_class'], $byValue = true);
 
-            return $hydrator;
-
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $hydratorFactory = $objectManager->getHydratorFactory();
             $hydrator = $hydratorFactory->getHydratorFor($config['entity_class']);
-            return $hydrator;
 
         } else {
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
+
+        // Configure hydrator:
+        $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
+        return $hydrator;
     }
 
     /**
@@ -167,7 +170,42 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     protected function loadDoctrineModuleHydrator(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        return new Hydrator\DoctrineObject($objectManager, $config['entity_class']);
+        $hydrator = new Hydrator\DoctrineObject($objectManager, $config['entity_class']);
+        $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
+        return $hydrator;
     }
 
+    /**
+     * @param                         $hydrator
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param                         $config
+     * @param                         $objectManager
+     *
+     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
+     * @return void
+     */
+    protected function configureHydratorStrategies($hydrator, ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    {
+        if (!($hydrator instanceof StrategyEnabledInterface) || !isset($config['strategies'])) {
+            return;
+        }
+
+        foreach ($config['strategies'] as $field => $strategyKey) {
+            if (!$serviceLocator->has($strategyKey)) {
+                throw new ServiceNotCreatedException(sprintf('Invalid strategy %s for field %s', $strategyKey, $field));
+            }
+
+            $strategy = $serviceLocator->get($strategyKey);
+            if (!$strategy instanceof StrategyInterface) {
+                throw new ServiceNotCreatedException(sprintf('Invalid strategy class %s for field %s', get_class($strategy), $field));
+            }
+
+            // Attach object manager:
+            if ($strategy instanceof ObjectManagerAwareInterface) {
+                $strategy->setObjectManager($objectManager);
+            }
+
+            $hydrator->addStrategy($field, $strategy);
+        }
+    }
 }
