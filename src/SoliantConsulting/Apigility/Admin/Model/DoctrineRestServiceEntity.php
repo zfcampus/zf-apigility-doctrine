@@ -55,6 +55,8 @@ class DoctrineRestServiceEntity
 
     protected $objectManager;
 
+    protected $hydrateByValue;
+
     public function __get($name)
     {
         if ($name === 'filter') {
@@ -145,6 +147,9 @@ class DoctrineRestServiceEntity
                 case 'objectmanager':
                     $this->objectManager = $value;
                     break;
+                case 'hydratebyvalue':
+                    $this->hydrateByValue = $value;
+                    break;
             }
         }
     }
@@ -171,6 +176,7 @@ class DoctrineRestServiceEntity
             'selector'                   => $this->selector,
             'hydrator_name'              => $this->hydratorName,
             'object_manager'             => $this->objectManager,
+            'hydrate_by_value'           => $this->hydrateByValue,
         );
     }
 

@@ -15,6 +15,8 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
 
     protected $hydratorName;
 
+    protected $hydrateByValue = false;
+
     public function exchangeArray(array $data)
     {
         parent::exchangeArray($data);
@@ -28,6 +30,9 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
                 case 'hydratorname':
                     $this->hydratorName = $value;
                     break;
+                case 'hydratebyvalue':
+                    $this->hydrateByValue = $value;
+                    break;
                 default:
                     break;
             }
@@ -39,6 +44,7 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
         $return = parent::getArrayCopy();
         $return['object_manager'] = $this->objectManager;
         $return['hydrator_name'] = $this->hydratorName;
+        $return['hydrate_by_value'] = $this->hydrateByValue;
         return $return;
     }
 }

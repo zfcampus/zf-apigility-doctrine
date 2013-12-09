@@ -625,11 +625,14 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function createDoctrineConfig(RestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
+        $entityValue = $details->getArrayCopy();
+
         $config = array(
             'zf-rest-doctrine-hydrator' => array(
                 $details->hydratorName => array(
                     'entity_class' => $entityClass,
-                    'object_manager' => $details->objectManager
+                    'object_manager' => $details->objectManager,
+                    'by_value' => $entityValue['hydrate_by_value'],
                 ),
             ),
             'zf-rest-doctrine-resource' => array(
