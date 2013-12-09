@@ -8,40 +8,47 @@ use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator\Strategy\AbstractCollectionStrategy;
 use ZF\Hal\Collection as HalCollection;
 use ZF\Hal\Link\Link;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class Collection extends AbstractCollectionStrategy
-    implements StrategyInterface, ObjectManagerAwareInterface
+    implements StrategyInterface, ServiceManagerAwareInterface //, ObjectManagerAwareInterface
 {
     use ProvidesObjectManager;
 
+    protected $serviceManager;
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
     public function extract($value)
     {
+        $config = $this->getServiceManager()->get('Config');
+        $config = $config['zf-hal']['metadata_map'][$value->getTypeClass()->name];
+
         $link = new Link($this->getCollectionName());
+        $link->setRoute($config['route_name']);
+        $link->setRouteParams(array('id' => null));
+
+        $mapping = $value->getMapping();
+
+        $link->setRouteOptions(array(
+            'query' => array(
+                'query' => array(
+                    array('field' =>$mapping['mappedBy'], 'type'=>'eq', 'value' => $value->getOwner()->getId()),
+                ),
+            ),
+        ));
 
         return $link;
-#        $self->setRoute($route);
-
-#        $self->setRouteParams($routeParams);
-#        $resource->getLinks()->add($self, true);
-
-
-
-#        print_r(get_class_methods($value));
-
-#        print_r(($value->count() . ' count'));
-#die();
-die($this->getCollectionName());
-        return new HalCollection($this->getObject());
-
-        return array(
-            '_links' => array(
-                'asdf' => 'fdas',
-                'asdfasdf' => 'fdasfdas',
-            ),
-        );
-        // extract
-        print_r(get_class($value));
-        die('extract apigility collection');
     }
 
     public function hydrate($value)
