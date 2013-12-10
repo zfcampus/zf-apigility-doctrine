@@ -40,16 +40,6 @@ class AppController extends AbstractActionController
             'name' =>  $moduleName,
         ));
 
-        // Set renderer defaults
-        $patchConfig = array(
-            'service_manager' => array(
-                'abstract_factories' => array(
-                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
-                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
-                ),
-            ),
-        );
-
         $config = $this->getServiceLocator()->get('Config');
         $writer = new PhpArrayWriter();
         $moduleConfig = new ConfigResource($config, 'module/' . $moduleName . '/config/module.config.php', $writer);

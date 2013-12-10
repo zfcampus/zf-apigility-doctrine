@@ -20,8 +20,10 @@ use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
 use SoliantConsulting\Apigility\Admin\Model\NewRestServiceEntity;
 use SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-class DoctrineRestServiceModel implements EventManagerAwareInterface
+class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceManagerAwareInterface
 {
     /**
      * @var ConfigResource
@@ -116,6 +118,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             ));
         }
         return $this->{$name};
+    }
+
+    protected $serviceManager;
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
     }
 
     /**
@@ -626,13 +641,42 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
     public function createDoctrineConfig(RestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
         $entityValue = $details->getArrayCopy();
+        $objectManager = $this->getServiceManager()->get($details->objectManager);
+        $hydratorStrategies = array();
+
+        // Add all ORM collections to Hydrator Strategies
+        if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
+            $collectionStrategyName = 'SoliantConsulting\Apigility\Server\Hydrator\Strategy\Collection';
+            $metadataFactory = $objectManager->getMetadataFactory();
+            $metadata = $metadataFactory->getMetadataFor($entityClass);
+
+            foreach ($metadata->associationMappings as $relationName => $relationMapping) {
+                switch ($relationMapping['type']) {
+                    case 4:
+                        $hydratorStrategies[$relationName] = $collectionStrategyName;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
 
         $config = array(
+            'service_manager' => array(
+                'abstract_factories' => array(
+                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
+                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+                ),
+                'invokables' => array(
+                    'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\Collection' => 'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\Collection',
+                ),
+            ),
             'zf-rest-doctrine-hydrator' => array(
                 $details->hydratorName => array(
                     'entity_class' => $entityClass,
                     'object_manager' => $details->objectManager,
                     'by_value' => $entityValue['hydrate_by_value'],
+                    'strategies' => $hydratorStrategies,
                 ),
             ),
             'zf-rest-doctrine-resource' => array(

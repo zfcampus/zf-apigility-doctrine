@@ -32,6 +32,10 @@ class Collection extends AbstractCollectionStrategy
     public function extract($value)
     {
         $config = $this->getServiceManager()->get('Config');
+        if (!method_exists($value, 'getTypeClass') or !isset($config['zf-hal']['metadata_map'][$value->getTypeClass()->name])) {
+            return;
+        }
+
         $config = $config['zf-hal']['metadata_map'][$value->getTypeClass()->name];
 
         $link = new Link($this->getCollectionName());

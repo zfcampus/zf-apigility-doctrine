@@ -8,8 +8,10 @@ namespace SoliantConsulting\Apigility\Admin\Model;
 
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
+class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements ServiceManagerAwareInterface
 {
     const TYPE_DEFAULT      = 'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModel';
 
@@ -31,6 +33,7 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
 
         $restModel = new DoctrineRestServiceModel($moduleEntity, $this->modules, $config);
         $restModel->getEventManager()->setSharedManager($this->sharedEventManager);
+        $restModel->setServiceManager($this->getServiceManager());
 
         switch ($type) {
             case self::TYPE_DEFAULT:
@@ -42,5 +45,18 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
                     $type
                 ));
         }
+    }
+
+    protected $serviceManager;
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
     }
 }
