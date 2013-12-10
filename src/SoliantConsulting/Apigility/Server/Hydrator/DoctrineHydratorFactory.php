@@ -101,8 +101,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
 
         if ($entityHydrator) {
             $hydrator->setHydrateService($entityHydrator);
-            // Doctrine Hydrators only have hydrate() method, so add fallback to Doctrine Module Hydrator.
-            $hydrator->setExtractService($doctrineModuleHydrator);
+            $hydrator->setExtractService($entityHydrator);
         } else {
             $hydrator->setHydrateService($doctrineModuleHydrator);
             $hydrator->setExtractService($doctrineModuleHydrator);
