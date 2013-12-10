@@ -3,19 +3,20 @@
 namespace SoliantConsulting\Apigility\Server\Hydrator\Strategy;
 
 use Zend\Stdlib\Hydrator\Strategy\StrategyInterface;
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
-use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator\Strategy\AbstractCollectionStrategy;
 use ZF\Hal\Collection as HalCollection;
 use ZF\Hal\Link\Link;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-class Collection extends AbstractCollectionStrategy
-    implements StrategyInterface, ServiceManagerAwareInterface //, ObjectManagerAwareInterface
+/**
+ * A field-specific hydrator for collecitons
+ *
+ * @returns Hal\Link
+ */
+class CollectionLink extends AbstractCollectionStrategy
+    implements StrategyInterface, ServiceManagerAwareInterface
 {
-    use ProvidesObjectManager;
-
     protected $serviceManager;
 
     public function setServiceManager(ServiceManager $serviceManager)
@@ -57,7 +58,6 @@ class Collection extends AbstractCollectionStrategy
 
     public function hydrate($value)
     {
-        // hydrate
-        die('hydrate apigility collection');
+        throw new \Exception('Hydration of collection ' . $this->getCollectionName() . ' is not supported');
     }
 }

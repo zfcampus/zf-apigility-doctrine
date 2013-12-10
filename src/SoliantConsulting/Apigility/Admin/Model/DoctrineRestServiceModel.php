@@ -646,7 +646,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Add all ORM collections to Hydrator Strategies
         if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $collectionStrategyName = 'SoliantConsulting\Apigility\Server\Hydrator\Strategy\Collection';
+            $collectionStrategyName = 'SoliantConsulting\Apigility\Server\Hydrator\Strategy\CollectionLink';
             $metadataFactory = $objectManager->getMetadataFactory();
             $metadata = $metadataFactory->getMetadataFor($entityClass);
 
@@ -661,14 +661,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             }
         }
 
+        // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
             'service_manager' => array(
                 'abstract_factories' => array(
-                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
-                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory' => 'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
+                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory' => 'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
                 ),
                 'invokables' => array(
-                    'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\Collection' => 'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\Collection',
+                    'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\CollectionLink' => 'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\CollectionLink',
                 ),
             ),
             'zf-rest-doctrine-hydrator' => array(
