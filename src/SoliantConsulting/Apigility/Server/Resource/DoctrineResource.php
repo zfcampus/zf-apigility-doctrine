@@ -140,7 +140,7 @@ class DoctrineResource extends AbstractResourceListener
 
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
-        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.postfetchAll',
+        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
             function($e) use ($queryBuilder, $entityClass, $parameters) {
                 $halCollection = $e->getParam('collection');
                 $halCollection->collection->setItemCountPerPage($halCollection->pageSize);
