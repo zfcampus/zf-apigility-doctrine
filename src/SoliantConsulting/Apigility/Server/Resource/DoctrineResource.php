@@ -178,7 +178,7 @@ class DoctrineResource extends AbstractResourceListener
         // Load full data:
         $hydrator = $this->getHydrator();
         $originalData = $hydrator->extract($entity);
-        $patchedData = array_merge($originalData, (array)$data);
+        $patchedData = array_merge_recursive($originalData, (array)$data);
 
         // Hydrate entity
         $hydrator->hydrate($patchedData, $entity);
