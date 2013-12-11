@@ -38,12 +38,11 @@ class CollectionLink extends AbstractCollectionStrategy
         }
 
         $config = $config['zf-hal']['metadata_map'][$value->getTypeClass()->name];
+        $mapping = $value->getMapping();
 
-        $link = new Link($this->getCollectionName());
+        $link = new Link($mapping['fieldName']);
         $link->setRoute($config['route_name']);
         $link->setRouteParams(array('id' => null));
-
-        $mapping = $value->getMapping();
 
         $link->setRouteOptions(array(
             'query' => array(

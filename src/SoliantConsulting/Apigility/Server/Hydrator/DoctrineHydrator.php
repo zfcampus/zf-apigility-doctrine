@@ -75,9 +75,14 @@ class DoctrineHydrator
      *
      * @return object
      */
-    public function hydrate(array $data, $object)
-    {
-        $this->hydrateService->hydrate($data, $object);
-    }
+     public function hydrate(array $data, $object)
+     {
+        // Zend hydrator:
+        if ($this->hydrateService instanceof HydratorInterface) {
+            $this->hydrateService->hydrate($data, $object);
+        }
 
+        // Doctrine hydrator: (parameters switched)
+        return $this->hydrateService->hydrate($object, $data);
+     }
 }
