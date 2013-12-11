@@ -44,7 +44,7 @@ class AppController extends AbstractActionController
         $writer = new PhpArrayWriter();
         $moduleConfig = new ConfigResource($config, 'module/' . $moduleName . '/config/module.config.php', $writer);
 
-        $moduleConfig->patch($patchConfig, true);
+        $moduleConfig->patch(array(), true);
 
         $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-select-entities',
             array(
