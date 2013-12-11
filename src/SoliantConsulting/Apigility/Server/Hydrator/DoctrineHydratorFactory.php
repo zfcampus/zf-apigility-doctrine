@@ -102,6 +102,11 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         if ($entityHydrator) {
             $hydrator->setHydrateService($entityHydrator);
             $hydrator->setExtractService($entityHydrator);
+
+            // Doctrine ODM Hydrators only have hydrate() method, so add fallback to Doctrine Module Hydrator.
+            if ($entityHydrator instanceof \Doctrine\ODM\MongoDB\Hydrator\HydratorInterface) {
+                $hydrator->setExtractService($doctrineModuleHydrator);
+            }
         } else {
             $hydrator->setHydrateService($doctrineModuleHydrator);
             $hydrator->setExtractService($doctrineModuleHydrator);
