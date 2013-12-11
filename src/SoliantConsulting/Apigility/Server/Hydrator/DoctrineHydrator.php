@@ -79,7 +79,7 @@ class DoctrineHydrator
      {
         // Zend hydrator:
         if ($this->hydrateService instanceof HydratorInterface) {
-            $this->hydrateService->hydrate($data, $object);
+            return $this->hydrateService->hydrate($data, $object);
         }
 
         // Doctrine hydrator: (parameters switched)
