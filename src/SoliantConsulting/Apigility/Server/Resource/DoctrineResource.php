@@ -121,6 +121,14 @@ class DoctrineResource extends AbstractResourceListener
         // Load parameters
         $parameters = $this->getEvent()->getQueryParams()->toArray();
 
+        if ($this->getEvent()->getRouteParam('query')) {
+            $parameters['query'] = $this->getEvent()->getRouteParam('query');
+        }
+
+        if ($this->getEvent()->getRouteParam('orderBy')) {
+            $parameters['orderBy'] = $this->getEvent()->getRouteParam('orderBy');
+        }
+
         // Load the correct queryFactory:
         $objectManager = $this->getObjectManager();
         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
