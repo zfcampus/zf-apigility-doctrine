@@ -150,7 +150,7 @@ class AppController extends AbstractActionController
                 'identifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => $route,
                 'hydratorName' => $hydratorName,
-                'hydrateByValue' => true,
+                'hydrateByValue' => false,
             ));
 
             $_SESSION[$results][$entityMetadata->name] = $route;
