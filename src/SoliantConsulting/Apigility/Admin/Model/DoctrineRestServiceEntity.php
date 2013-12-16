@@ -35,6 +35,8 @@ class DoctrineRestServiceEntity
 
     protected $identifierName;
 
+    protected $entityIdentifierName;
+
     protected $module;
 
     protected $pageSize = 25;
@@ -150,6 +152,9 @@ class DoctrineRestServiceEntity
                 case 'hydratebyvalue':
                     $this->hydrateByValue = $value;
                     break;
+                case 'entityidentifiername':
+                    $this->entityIdentifierName = $value;
+                    break;
             }
         }
     }
@@ -177,6 +182,7 @@ class DoctrineRestServiceEntity
             'hydrator_name'              => $this->hydratorName,
             'object_manager'             => $this->objectManager,
             'hydrate_by_value'           => $this->hydrateByValue,
+            'entity_identifier_name'     => $this->entityIdentifierName,
         );
     }
 
