@@ -37,6 +37,12 @@ resources.  You may change your object manager and refresh entities for that obj
 manager.  Check the entities you want then submit the form and you're done.  Your new module is enabled in your application and you can start making API requests.  
 
 
+Hydrating Entities by Value or Reference
+----------------------------------------
+
+By default the admin tool hydrates entities by reference by setting $config[zf-rest-doctrine-hydrator][hydrator_class][by_value] to false.  
+
+
 Handling Embedded Resources
 ---------------------------
 
