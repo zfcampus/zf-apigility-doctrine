@@ -708,11 +708,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $config = array('zf-hal' => array('metadata_map' => array(
             $entityClass => array(
-                'identifier_name' => $details->identifierName,
+                'identifier_name' => 'id',
                 'route_name'      => $routeName,
             ),
             $collectionClass => array(
-                'identifier_name' => $details->identifierName,
+                'identifier_name' => 'id',
                 'route_name'      => $routeName,
                 'is_collection'   => true,
             ),

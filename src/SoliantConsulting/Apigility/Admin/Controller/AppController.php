@@ -147,7 +147,7 @@ class AppController extends AbstractActionController
                 'resourcename' => $resourceName,
                 'entityClass' => $entityMetadata->name,
                 'pageSizeParam' => 'limit',
-                'identifierName' => array_pop($entityMetadata->identifier),
+                'identifierName' => $filter($resourceName) . '_id',
                 'routeMatch' => $route,
                 'hydratorName' => $hydratorName,
                 'hydrateByValue' => true,
