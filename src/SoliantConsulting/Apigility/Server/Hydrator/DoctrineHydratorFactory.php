@@ -182,7 +182,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     protected function loadDoctrineModuleHydrator(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        $hydrator = new Hydrator\DoctrineObject($objectManager, $config['entity_class']);
+        $hydrator = new Hydrator\DoctrineObject($objectManager, $config['entity_class'], $config['by_value']);
         $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
         return $hydrator;
     }
