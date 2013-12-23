@@ -103,6 +103,46 @@ class Module
                 $factory = $services->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory');
                 return new Admin\Model\DoctrineRestServiceResource($factory);
             },
+
+
+            'SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
+                if (!$services->has('ZF\Configuration\ModuleUtils')
+                    || !$services->has('ZF\Configuration\ConfigResourceFactory')
+                    || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
+                    || !$services->has('SharedEventManager')
+                ) {
+                    throw new ServiceNotCreatedException(
+                        'ZF\Apigility\Admin\Model\RpcServiceModelFactory is missing one or more dependencies from ZF\Configuration'
+                    );
+                }
+                $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
+                $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
+                $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
+                $sharedEvents  = $services->get('SharedEventManager');
+                return new Admin\Model\DoctrineRpcServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
+            },
+
+            'SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
+                if (!$services->has('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory')) {
+                    throw new ServiceNotCreatedException(
+                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing RpcServiceModelFactory dependency'
+                    );
+                }
+                if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
+                    throw new ServiceNotCreatedException(
+                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing InputFilterModel dependency'
+                    );
+                }
+                if (!$services->has('ControllerManager')) {
+                    throw new ServiceNotCreatedException(
+                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing ControllerManager dependency'
+                    );
+                }
+                $factory = $services->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory');
+                $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
+                $controllerManager = $services->get('ControllerManager');
+                return new Admin\Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
+            },
         ));
     }
 }

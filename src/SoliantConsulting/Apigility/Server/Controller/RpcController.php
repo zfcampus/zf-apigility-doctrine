@@ -1,0 +1,79 @@
+<?php
+
+namespace SoliantConsulting\Apigility\Server\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+abstract class RpcController extends AbstractActionController
+{
+    public function indexAction()
+    {
+        $config = $this->getServiceLocator()->get('Config');
+        $zfRpcDoctrineControllerArrayKey = array_search(get_class($this), $config['controllers']['invokables']);
+
+        $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
+
+        $parentId = $this->params()->fromRoute('parent_id');
+        if (!$parentId) {
+            return new ApiProblemResponse(
+                new ApiProblem(400, "Parent ID is required")
+            );
+        }
+        $childId = $this->params()->fromRoute('child_id');
+
+        $metadataConfig = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
+        $hydratorConfig = $config['zf-rest-doctrine-hydrator'][$metadataConfig['hydrator']];
+
+        $objectManager = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
+
+        // Find target entity controller to dispatch
+        foreach ($config['zf-rest'] as $controllerName => $controllerConfig) {
+            if ($associationConfig['target_entity'] == $controllerConfig['entity_class']) {
+                $targetRouteParam = $controllerConfig['identifier_name'];
+                break;
+            }
+        }
+
+        // Find source entity field name for target
+        $metadataFactory = $objectManager->getMetadataFactory();
+        $sourceMetadata = $metadataFactory->getMetadataFor($associationConfig['source_entity']);
+
+        foreach ($sourceMetadata->associationMappings as $mapping) {
+            if ($mapping['sourceEntity'] == $associationConfig['source_entity']
+                and $mapping['targetEntity'] == $associationConfig['target_entity']) {
+                $sourceField = $mapping['mappedBy'];
+                break;
+            }
+        }
+
+        $query = (array)$this->getRequest()->getQuery()->get('query');
+        $orderBy = $this->getRequest()->getQuery()->get('orderBy');
+
+        if ($childId) {
+            $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
+
+            $this->getRequest()->setMethod('GET');
+            $hal = $this->forward()->dispatch($controllerName, array(
+                $targetRouteParam => $childId,
+                'query' => $query,
+            ));
+            $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
+            $data = json_decode($renderer->render($hal), true);
+
+            return $data;
+
+        } else {
+            $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
+
+            $this->getRequest()->setMethod('GET');
+            $hal = $this->forward()->dispatch($controllerName, array(
+                'query' => $query,
+                'orderBy' => $orderBy,
+            ));
+            $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
+            $data = json_decode($renderer->render($hal), true);
+
+            return $data;
+        }
+    }
+}
