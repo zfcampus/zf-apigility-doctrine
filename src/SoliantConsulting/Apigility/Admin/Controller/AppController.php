@@ -155,6 +155,32 @@ class AppController extends AbstractActionController
             ));
 
             $_SESSION[$results][$entityMetadata->name] = $route;
+
+
+            foreach ($entityMetadata->associationMappings as $mapping) {
+                switch ($mapping['type']) {
+                    case 4:
+                        $rpcServiceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceResource');
+                        $rpcServiceResource->setModuleName($moduleName);
+                        $rpcServiceResource->create(array(
+                            'service_name' => $resourceName . '' . $mapping['fieldName'],
+                            'route' => $mappingRoute = $route . '[/:parent_id]/' . $mapping['fieldName'] . '[/:child_id]',
+                            'http_methods' => array(
+                                'GET',
+                            ),
+                            'options' => array(
+                                'target_entity' => $mapping['targetEntity'],
+                                'source_entity' => $mapping['sourceEntity'],
+                            ),
+                        ));
+
+                        $_SESSION[$results][$entityMetadata->name . $mapping['fieldName']] = $mappingRoute;
+
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
 #print_r($_SESSION[$results]);die('asdf');
