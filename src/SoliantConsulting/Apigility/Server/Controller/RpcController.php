@@ -3,6 +3,8 @@
 namespace SoliantConsulting\Apigility\Server\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 abstract class RpcController extends AbstractActionController
 {
@@ -55,7 +57,6 @@ abstract class RpcController extends AbstractActionController
                 $sourceField => $parentId,
             ));
 
-            $data = array();
             if ($child) {
                 $this->getRequest()->setMethod('GET');
                 $hal = $this->forward()->dispatch($controllerName, array(
@@ -63,9 +64,13 @@ abstract class RpcController extends AbstractActionController
                 ));
                 $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
                 $data = json_decode($renderer->render($hal), true);
-            }
 
-            return $data;
+                return $data;
+            } else {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Resource not found.')
+                );
+            }
 
         } else {
             $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
