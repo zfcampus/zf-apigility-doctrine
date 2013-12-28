@@ -49,15 +49,21 @@ abstract class RpcController extends AbstractActionController
         $orderBy = $this->getRequest()->getQuery()->get('orderBy');
 
         if ($childId) {
-            $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
-
-            $this->getRequest()->setMethod('GET');
-            $hal = $this->forward()->dispatch($controllerName, array(
-                $targetRouteParam => $childId,
-                'query' => $query,
+            // Verify child is a child of parent
+            $child = $objectManager->getRepository($associationConfig['target_entity'])->findOneBy(array(
+                'id' => $childId,
+                $sourceField => $parentId,
             ));
-            $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
-            $data = json_decode($renderer->render($hal), true);
+
+            $data = array();
+            if ($child) {
+                $this->getRequest()->setMethod('GET');
+                $hal = $this->forward()->dispatch($controllerName, array(
+                    $targetRouteParam => $childId,
+                ));
+                $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
+                $data = json_decode($renderer->render($hal), true);
+            }
 
             return $data;
 
