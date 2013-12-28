@@ -40,14 +40,14 @@ manager.  Check the entities you want then submit the form and you're done.  You
 Hydrating Entities by Value or Reference
 ----------------------------------------
 
-By default the admin tool hydrates entities by reference by setting $config[zf-rest-doctrine-hydrator][hydrator_class][by_value] to false.  
+By default the admin tool hydrates entities by reference by setting `$config['zf-rest-doctrine-hydrator']['hydrator_class']['by_value']` to false.  
 
 
 Handling Embedded Resources
 ---------------------------
 
 You may choose to supress embedded resources by setting
-$config[zf-hal][render_embedded_resources] to false.  Doing so
+`$config['zf-hal']['renderer']['render_embedded_resources']` to false.  Doing so
 returns only links to embedded resources instead of their full details.
 This setting is useful to avoid circular references.
 
