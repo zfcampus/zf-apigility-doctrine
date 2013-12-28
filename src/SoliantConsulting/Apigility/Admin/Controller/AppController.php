@@ -107,7 +107,12 @@ class AppController extends AbstractActionController
             }
         }
 
+        if ($routePrefix) {
+            $routePrefix = '/' . $routePrefix;
+        }
+
         $useEntityNamespacesForRoute = (boolean)$this->params()->fromPost('useEntityNamespacesForRoute');
+        $hydrateByValue = (boolean)$this->params()->fromPost('hydrateByValue');
 
         $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
         $metadataFactory = $objectManager->getMetadataFactory();
@@ -132,13 +137,12 @@ class AppController extends AbstractActionController
                    ->attachByName('StringToLower');
 
             if ($useEntityNamespacesForRoute) {
-                $route = '/' . $routePrefix . '/' . $filter(str_replace('\\', '/', $entityMetadata->name));
+                $route = $routePrefix . '/' . $filter(str_replace('\\', '/', $entityMetadata->name));
             } else {
-                $route = '/' . $routePrefix . '/' . $filter($resourceName);
+                $route = $routePrefix . '/' . $filter($resourceName);
             }
 
             $hydratorName = substr($entityMetadata->name, strlen($entityMetadata->namespace) + 1);
-
             $hydratorName = $moduleName . '\\V1\\Rest\\' . $resourceName . '\\' . $resourceName . 'Hydrator';
 
             $serviceResource->setModuleName($moduleName);
@@ -151,7 +155,7 @@ class AppController extends AbstractActionController
                 'entityIdentifierName' => array_pop($entityMetadata->identifier),
                 'routeMatch' => $route,
                 'hydratorName' => $hydratorName,
-                'hydrateByValue' => false,
+                'hydrateByValue' => $hydrateByValue,
             ));
 
             $_SESSION[$results][$entityMetadata->name] = $route;
@@ -164,13 +168,14 @@ class AppController extends AbstractActionController
                         $rpcServiceResource->setModuleName($moduleName);
                         $rpcServiceResource->create(array(
                             'service_name' => $resourceName . '' . $mapping['fieldName'],
-                            'route' => $mappingRoute = $route . '[/:parent_id]/' . $mapping['fieldName'] . '[/:child_id]',
+                            'route' => $mappingRoute = $route . '[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
                             'http_methods' => array(
                                 'GET',
                             ),
                             'options' => array(
                                 'target_entity' => $mapping['targetEntity'],
                                 'source_entity' => $mapping['sourceEntity'],
+                                'field_name' => $mapping['fieldName'],
                             ),
                         ));
 

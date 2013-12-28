@@ -8,11 +8,6 @@ abstract class RpcController extends AbstractActionController
 {
     public function indexAction()
     {
-        $config = $this->getServiceLocator()->get('Config');
-        $zfRpcDoctrineControllerArrayKey = array_search(get_class($this), $config['controllers']['invokables']);
-
-        $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
-
         $parentId = $this->params()->fromRoute('parent_id');
         if (!$parentId) {
             return new ApiProblemResponse(
@@ -21,10 +16,15 @@ abstract class RpcController extends AbstractActionController
         }
         $childId = $this->params()->fromRoute('child_id');
 
+        $config = $this->getServiceLocator()->get('Config');
+        $zfRpcDoctrineControllerArrayKey = array_search(get_class($this), $config['controllers']['invokables']);
+
+        $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
         $metadataConfig = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
         $hydratorConfig = $config['zf-rest-doctrine-hydrator'][$metadataConfig['hydrator']];
 
         $objectManager = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
+        $metadataFactory = $objectManager->getMetadataFactory();
 
         // Find target entity controller to dispatch
         foreach ($config['zf-rest'] as $controllerName => $controllerConfig) {
@@ -35,12 +35,11 @@ abstract class RpcController extends AbstractActionController
         }
 
         // Find source entity field name for target
-        $metadataFactory = $objectManager->getMetadataFactory();
         $sourceMetadata = $metadataFactory->getMetadataFor($associationConfig['source_entity']);
-
         foreach ($sourceMetadata->associationMappings as $mapping) {
             if ($mapping['sourceEntity'] == $associationConfig['source_entity']
-                and $mapping['targetEntity'] == $associationConfig['target_entity']) {
+                and $mapping['targetEntity'] == $associationConfig['target_entity']
+                and $mapping['fieldName'] == $associationConfig['field_name']) {
                 $sourceField = $mapping['mappedBy'];
                 break;
             }

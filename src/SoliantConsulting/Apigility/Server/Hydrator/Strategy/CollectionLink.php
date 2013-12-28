@@ -8,6 +8,7 @@ use ZF\Hal\Collection as HalCollection;
 use ZF\Hal\Link\Link;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\Filter\FilterChain;
 
 /**
  * A field-specific hydrator for collecitons
@@ -40,18 +41,22 @@ class CollectionLink extends AbstractCollectionStrategy
         $config = $config['zf-hal']['metadata_map'][$value->getTypeClass()->name];
         $mapping = $value->getMapping();
 
-        $link = new Link($mapping['fieldName']);
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
+
+        $link = new Link($filter($mapping['fieldName']));
         $link->setRoute($config['route_name']);
         $link->setRouteParams(array('id' => null));
 
         $link->setRouteOptions(array(
             'query' => array(
                 'query' => array(
-                    array('field' =>$mapping['mappedBy'], 'type'=>'eq', 'value' => $value->getOwner()->getId()),
+                    array('field' => $mapping['mappedBy'], 'type'=>'eq', 'value' => $value->getOwner()->getId()),
                 ),
             ),
         ));
-
+#print_r($link);#die();
         return $link;
     }
 
