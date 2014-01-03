@@ -151,12 +151,12 @@ class DoctrineResource extends AbstractResourceListener
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
             function($e) use ($queryBuilder, $entityClass, $parameters) {
                 $halCollection = $e->getParam('collection');
-                $halCollection->collection->setItemCountPerPage($halCollection->pageSize);
-                $halCollection->collection->setCurrentPageNumber($halCollection->page);
+                $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
+                $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
 
                 $halCollection->setAttributes(array(
-                   'count' => $halCollection->collection->getCurrentItemCount(),
-                   'total' => $halCollection->collection->getTotalItemCount(),
+                   'count' => $halCollection->getCollection()->getCurrentItemCount(),
+                   'total' => $halCollection->getCollection()->getTotalItemCount(),
                    'collectionTotal' => $queryBuilder->getCollectionTotal($entityClass),
                 ));
 

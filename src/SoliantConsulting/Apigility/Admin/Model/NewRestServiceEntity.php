@@ -17,8 +17,6 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
 
     protected $hydrateByValue = false;
 
-    protected $entityIdentifierName;
-
     public function exchangeArray(array $data)
     {
         parent::exchangeArray($data);
@@ -34,9 +32,6 @@ class NewRestServiceEntity extends ZFNewRestServiceEntity
                     break;
                 case 'hydratebyvalue':
                     $this->hydrateByValue = $value;
-                    break;
-                case 'entityidentifiername':
-                    $this->entityIdentifierName = $value;
                     break;
                 default:
                     break;

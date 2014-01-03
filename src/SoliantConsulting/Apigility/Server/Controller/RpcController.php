@@ -31,7 +31,7 @@ abstract class RpcController extends AbstractActionController
         // Find target entity controller to dispatch
         foreach ($config['zf-rest'] as $controllerName => $controllerConfig) {
             if ($associationConfig['target_entity'] == $controllerConfig['entity_class']) {
-                $targetRouteParam = $controllerConfig['identifier_name'];
+                $targetRouteParam = $controllerConfig['route_identifier_name'];
                 break;
             }
         }

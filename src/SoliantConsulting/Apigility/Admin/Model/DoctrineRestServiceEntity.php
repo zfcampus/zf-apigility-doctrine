@@ -33,7 +33,7 @@ class DoctrineRestServiceEntity
 
     protected $entityClass;
 
-    protected $identifierName;
+    protected $routeIdentifierName;
 
     protected $entityIdentifierName;
 
@@ -116,8 +116,8 @@ class DoctrineRestServiceEntity
                 case 'entityclass':
                     $this->entityClass = $value;
                     break;
-                case 'identifiername':
-                    $this->identifierName = $value;
+                case 'routeidentifiername':
+                    $this->routeIdentifierName = $value;
                     break;
                 case 'module':
                     $this->module = $value;
@@ -170,7 +170,8 @@ class DoctrineRestServiceEntity
             'content_type_whitelist'     => $this->contentTypeWhitelist,
             'controller_service_name'    => $this->controllerServiceName,
             'entity_class'               => $this->entityClass,
-            'identifier_name'            => $this->identifierName,
+            'route_identifier_name'      => $this->routeIdentifierName,
+            'entity_identifier_name'     => $this->entityIdentifierName,
             'module'                     => $this->module,
             'page_size'                  => $this->pageSize,
             'page_size_param'            => $this->pageSizeParam,
@@ -182,7 +183,6 @@ class DoctrineRestServiceEntity
             'hydrator_name'              => $this->hydratorName,
             'object_manager'             => $this->objectManager,
             'hydrate_by_value'           => $this->hydrateByValue,
-            'entity_identifier_name'     => $this->entityIdentifierName,
         );
     }
 
