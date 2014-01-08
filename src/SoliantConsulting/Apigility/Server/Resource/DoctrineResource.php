@@ -11,6 +11,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
+use SoliantConsulting\Apigility\Server\Hydrator\Strategy\CollectionExtract;
 
 /**
  * Class DoctrineResource
@@ -100,11 +101,32 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Fetch a resource
      *
+     * If the extractCollections array contains a collection for this resource
+     * expand that collection instead of returning a link to the collection
+     *
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
     public function fetch($id)
     {
+        $parameters = $this->getEvent()->getQueryParams()->toArray();
+
+        if ($this->getEvent()->getRouteParam('extractCollections')) {
+            $parameters['extractCollections'] = $this->getEvent()->getRouteParam('extractCollections');
+        }
+
+        if (isset($parameters['extractCollections'])) {
+            foreach ($parameters['extractCollections'] as $collectionName) {
+                if ($this->getHydrator()->getExtractService()->hasStrategy($collectionName)) {
+                    $oldStrategy = $this->getHydrator()->getExtractService()->getStrategy($collectionName);
+                    $this->getHydrator()->getExtractService()->removeStrategy($collectionName);
+                    $newStrategy = new CollectionExtract;
+                    $newStrategy->setServiceManager($oldStrategy->getServiceManager());
+                    $this->getHydrator()->getExtractService()->addStrategy($collectionName, $newStrategy);
+                }
+            }
+        }
+
         return $this->getObjectManager()->find($this->getEntityClass(), $id);
     }
 
