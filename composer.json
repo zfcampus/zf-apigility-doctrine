@@ -32,9 +32,9 @@
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
-            "Apigility\\Doctrine": "src/",
-            "Apigility\\Doctrine\\Admin": "src/",
-            "Apigility\\Doctrine\\Server": "src/"
+            "ZF\\Apigility\\Doctrine": "src/",
+            "ZF\\Apigility\\Doctrine\\Admin": "src/",
+            "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }
 }

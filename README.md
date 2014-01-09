@@ -9,7 +9,7 @@ Installation
 
      ```json
     "require": {
-        "zfcampus/zf-doctrine": "dev-master"
+        "zfcampus/zf-apigility-doctrine": "dev-master"
     }
      ```
   2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
@@ -21,7 +21,7 @@ Creating the Apigility-enabled module
 -------------------------------------
 
 The Admin tool can create an Apigility-enabled module with the Doctrine entities in scope.
-To enable the Admin include ```'Apigility\Doctrine',``` in your 
+To enable the Admin include ```'Zf\Apigility\Doctrine',``` in your 
 development.config.php configuration.
 
 All entities managed by the object manager will be available to build into apigility resources.  

@@ -7,8 +7,8 @@
 return array(
     'service_manager' => array(
         'abstract_factories' => array(
-            'Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-            'Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
+            'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
+            'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
         ),
     ),
 
@@ -28,7 +28,7 @@ return array(
 
     'controllers' => array(
         'invokables' => array(
-            'Apigility\Doctrine\Admin\Controller\App' => 'Apigility\Doctrine\Admin\Controller\AppController',
+            'ZF\Apigility\Doctrine\Admin\Controller\App' => 'ZF\Apigility\Doctrine\Admin\Controller\AppController',
         ),
     ),
 
@@ -39,7 +39,7 @@ return array(
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin',
                     'defaults' => array(
-                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'index',
                     ),
                 ),
@@ -49,7 +49,7 @@ return array(
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/create-module',
                     'defaults' => array(
-                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'createModule',
                     ),
                 ),
@@ -59,7 +59,7 @@ return array(
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName][/:objectManagerAlias]',
                     'defaults' => array(
-                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'selectEntities',
                     ),
                 ),
@@ -69,7 +69,7 @@ return array(
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/create-resources[/:moduleName]',
                     'defaults' => array(
-                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'createResources',
                     ),
                 ),
@@ -80,7 +80,7 @@ return array(
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/done[/:moduleName][/:results]',
                     'defaults' => array(
-                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'done',
                     ),
                 ),
