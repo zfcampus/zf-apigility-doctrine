@@ -174,11 +174,11 @@ class UserGroup {}
 Expanding Collections * in development *
 ---------------------
 
-You may include in the _GET[extractCollections] an array of field names which are collections 
+You may include in the _GET[zoom] an array of field names which are collections 
 to return instead of a link to the collection.
 
 ```
-    /api/user_data?extractCollections%5B0%5D=UserGroup
+    /api/user_data?zoom%5B0%5D=UserGroup
 ```
 
 

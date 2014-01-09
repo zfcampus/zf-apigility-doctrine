@@ -111,12 +111,12 @@ class DoctrineResource extends AbstractResourceListener
     {
         $parameters = $this->getEvent()->getQueryParams()->toArray();
 
-        if ($this->getEvent()->getRouteParam('extractCollections')) {
-            $parameters['extractCollections'] = $this->getEvent()->getRouteParam('extractCollections');
+        if ($this->getEvent()->getRouteParam('zoom')) {
+            $parameters['zoom'] = $this->getEvent()->getRouteParam('zoom');
         }
 
-        if (isset($parameters['extractCollections'])) {
-            foreach ($parameters['extractCollections'] as $collectionName) {
+        if (isset($parameters['zoom'])) {
+            foreach ($parameters['zoom'] as $collectionName) {
                 if ($this->getHydrator()->getExtractService()->hasStrategy($collectionName)) {
                     $this->getHydrator()->getExtractService()->removeStrategy($collectionName);
                     $this->getHydrator()->getExtractService()->addStrategy($collectionName, new CollectionExtract());
