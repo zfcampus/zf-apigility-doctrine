@@ -119,10 +119,8 @@ class DoctrineResource extends AbstractResourceListener
             foreach ($parameters['extractCollections'] as $collectionName) {
                 if ($this->getHydrator()->getExtractService()->hasStrategy($collectionName)) {
                     $oldStrategy = $this->getHydrator()->getExtractService()->getStrategy($collectionName);
+                    $this->getHydrator()->getExtractService()->addStrategy($collectionName, new CollectionExtract());
                     $this->getHydrator()->getExtractService()->removeStrategy($collectionName);
-                    $newStrategy = new CollectionExtract;
-                    $newStrategy->setServiceManager($oldStrategy->getServiceManager());
-                    $this->getHydrator()->getExtractService()->addStrategy($collectionName, $newStrategy);
                 }
             }
         }
