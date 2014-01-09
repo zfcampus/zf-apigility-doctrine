@@ -1,12 +1,13 @@
 {
-    "name": "soliantconsulting/soliantconsulting-apigility",
+    "name": "zfcampus/zf-doctrine",
     "type": "library",
-    "description": "A Doctrine Apigility Admin and Server",
+    "description": "Doctrine Apigility Admin and Server",
     "keywords": [
         "apigility",
+        "doctrine",
         "api client"
     ],
-    "homepage": "http://www.soliantconsulting.com/",
+    "homepage": "http://www.apigility.com/",
     "license": "Apache-2.0",
     "authors": [
         {
