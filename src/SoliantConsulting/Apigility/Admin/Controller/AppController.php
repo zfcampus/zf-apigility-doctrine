@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility\Admin\Controller;
+namespace Apigility\Doctrine\Admin\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -17,7 +17,7 @@ class AppController extends AbstractActionController
     public function indexAction()
     {
         $viewModel = new ViewModel;
-        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/index.phtml');
+        $viewModel->setTemplate('apigility/doctrine/admin/app/index.phtml');
 
         return $viewModel;
     }
@@ -25,7 +25,7 @@ class AppController extends AbstractActionController
     public function createModuleAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin');
+            return $this->plugin('redirect')->toRoute('apigility-doctrine-admin');
         }
 
         $moduleName = $this->getRequest()->getPost()->get('moduleName');
@@ -46,7 +46,7 @@ class AppController extends AbstractActionController
 
         $moduleConfig->patch(array(), true);
 
-        $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-select-entities',
+        $this->plugin('redirect')->toRoute('apigility-doctrine-admin-select-entities',
             array(
                 'moduleName' => $moduleName,
                 'objectManagerAlias' => 'doctrine.entitymanager.orm_default'
@@ -63,7 +63,7 @@ class AppController extends AbstractActionController
         }
 
         $viewModel = new ViewModel;
-        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/select-entities.phtml');
+        $viewModel->setTemplate('apigility/doctrine/admin/app/select-entities.phtml');
 
         try {
             $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
@@ -117,7 +117,7 @@ class AppController extends AbstractActionController
         $objectManager = $this->getServiceLocator()->get($objectManagerAlias);
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        $serviceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource');
+        $serviceResource = $this->getServiceLocator()->get('Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
 
         // Generate a session id for results on next page
         session_start();
@@ -164,7 +164,7 @@ class AppController extends AbstractActionController
             foreach ($entityMetadata->associationMappings as $mapping) {
                 switch ($mapping['type']) {
                     case 4:
-                        $rpcServiceResource = $this->getServiceLocator()->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceResource');
+                        $rpcServiceResource = $this->getServiceLocator()->get('Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
                         $rpcServiceResource->setModuleName($moduleName);
                         $rpcServiceResource->create(array(
                             'service_name' => $resourceName . '' . $mapping['fieldName'],
@@ -189,7 +189,7 @@ class AppController extends AbstractActionController
         }
 
 #print_r($_SESSION[$results]);die('asdf');
-        return $this->plugin('redirect')->toRoute('soliantconsulting-apigility-admin-done', array('moduleName' => $moduleName, 'results' => $results));
+        return $this->plugin('redirect')->toRoute('apigility-doctrine-admin-done', array('moduleName' => $moduleName, 'results' => $results));
     }
 
     public function doneAction() {
@@ -202,7 +202,7 @@ class AppController extends AbstractActionController
         $results = $this->params()->fromRoute('results');
 
         $viewModel = new ViewModel;
-        $viewModel->setTemplate('soliant-consulting/apigility/admin/app/done.phtml');
+        $viewModel->setTemplate('apigility/doctrine/admin/app/done.phtml');
         $viewModel->setVariable('moduleName', $moduleName);
 
         $viewModel->setVariable('results', $_SESSION[$results]);

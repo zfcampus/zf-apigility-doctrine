@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility\Admin\Model;
+namespace Apigility\Doctrine\Admin\Model;
 
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -18,8 +18,8 @@ use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
-use SoliantConsulting\Apigility\Admin\Model\NewRestServiceEntity;
-use SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
+use Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
+use Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
@@ -647,7 +647,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Add all ORM collections to Hydrator Strategies
         if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $collectionStrategyName = 'SoliantConsulting\Apigility\Server\Hydrator\Strategy\CollectionLink';
+            $collectionStrategyName = 'Apigility\Doctrine\Server\Hydrator\Strategy\CollectionLink';
             $metadataFactory = $objectManager->getMetadataFactory();
             $metadata = $metadataFactory->getMetadataFor($entityClass);
 
@@ -666,11 +666,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $config = array(
             'service_manager' => array(
                 'abstract_factories' => array(
-                    'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory' => 'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
-                    'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory' => 'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+                    'Apigility\Doctrine\Server\Resource\DoctrineResourceFactory' => 'Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
+                    'Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory' => 'Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
                 ),
                 'invokables' => array(
-                    'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\CollectionLink' => 'SoliantConsulting\\Apigility\\Server\\Hydrator\\Strategy\\CollectionLink',
+                    'Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
                 ),
             ),
             'zf-rest-doctrine-hydrator' => array(

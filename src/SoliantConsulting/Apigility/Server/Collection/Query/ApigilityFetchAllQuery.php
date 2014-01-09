@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Collection\Query;
+namespace Apigility\Doctrine\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\Paginator\Adapter\AdapterInterface;
@@ -32,4 +32,4 @@ interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
      */
     public function getCollectionTotal($entityClass);
 
-} 
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Hydrator\Strategy;
+namespace Apigility\Doctrine\Server\Hydrator\Strategy;
 
 use Zend\Stdlib\Hydrator\Strategy\StrategyInterface;
 use DoctrineModule\Stdlib\Hydrator\Strategy\AbstractCollectionStrategy;

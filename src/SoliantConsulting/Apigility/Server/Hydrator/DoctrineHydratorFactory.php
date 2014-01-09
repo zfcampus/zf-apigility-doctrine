@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Hydrator;
+namespace Apigility\Doctrine\Server\Hydrator;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
@@ -15,7 +15,7 @@ use Zend\Stdlib\Hydrator\StrategyEnabledInterface;
 /**
  * Class AbstractDoctrineResourceFactory
  *
- * @package SoliantConsulting\Apigility\Server\Resource
+ * @package Apigility\Doctrine\Server\Resource
  */
 class DoctrineHydratorFactory implements AbstractFactoryInterface
 {

@@ -1,22 +1,22 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Resource;
+namespace Apigility\Doctrine\Server\Resource;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
-use SoliantConsulting\Apigility\Server\Collection\Query;
+use Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
-use SoliantConsulting\Apigility\Server\Hydrator\Strategy\CollectionExtract;
+use Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
 
 /**
  * Class DoctrineResource
  *
- * @package SoliantConsulting\Apigility\Server\Resource
+ * @package Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener
     implements ObjectManagerAwareInterface
@@ -131,7 +131,7 @@ class DoctrineResource extends AbstractResourceListener
      * Fetch all or a subset of resources
      *
      *
-     * @see https://github.com/TomHAnderson/soliantconsulting-apigility/blob/master/src/SoliantConsulting/Apigility/Server/Resource/AbstractResource.php
+     * @see Apigility/Doctrine/Server/Resource/AbstractResource.php
      * @param  array $params
      * @return ApiProblem|mixed
      */

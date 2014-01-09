@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility\Admin\Model;
+namespace Apigility\Doctrine\Admin\Model;
 
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
@@ -13,7 +13,7 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements ServiceManagerAwareInterface
 {
-    const TYPE_DEFAULT      = 'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModel';
+    const TYPE_DEFAULT      = 'Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 
     /**
      * @param  string $module

@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility\Admin\Model;
+namespace Apigility\Doctrine\Admin\Model;
 
 use Zend\Filter\FilterChain;
 

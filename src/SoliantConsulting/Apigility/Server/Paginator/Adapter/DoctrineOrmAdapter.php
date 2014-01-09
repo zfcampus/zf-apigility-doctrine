@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Paginator\Adapter;
+namespace Apigility\Doctrine\Server\Paginator\Adapter;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Zend\Paginator\Adapter\AdapterInterface;
@@ -8,7 +8,7 @@ use Zend\Paginator\Adapter\AdapterInterface;
 /**
  * Class DoctrineOrmAdapter
  *
- * @package SoliantConsulting\Apigility\Server\Paginator\Adapter
+ * @package Apigility\Doctrine\Server\Paginator\Adapter
  */
 class DoctrineOrmAdapter extends Paginator implements AdapterInterface
 {

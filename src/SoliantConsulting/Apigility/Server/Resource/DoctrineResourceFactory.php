@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Resource;
+namespace Apigility\Doctrine\Server\Resource;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\Hydrator\HydratorInterface;
@@ -12,7 +12,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 /**
  * Class AbstractDoctrineResourceFactory
  *
- * @package SoliantConsulting\Apigility\Server\Resource
+ * @package Apigility\Doctrine\Server\Resource
  */
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
@@ -57,7 +57,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $className = isset($config['class']) ? $config['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
         $reflection = new \ReflectionClass($className);
-        if (!$reflection->isSubclassOf('\SoliantConsulting\Apigility\Server\Resource\DoctrineResource')) {
+        if (!$reflection->isSubclassOf('\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
             throw new ServiceNotFoundException(sprintf(
                 '%s requires that a valid DoctrineResource "class" is specified for listener %s; no service found',
                 __METHOD__,

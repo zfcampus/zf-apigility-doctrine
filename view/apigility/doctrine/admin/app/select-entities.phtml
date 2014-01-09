@@ -5,7 +5,7 @@ $(function() {
     });
 
     $('#loadObjectManager').on('click', function(event) {
-        window.location = '<?= $this->url('soliantconsulting-apigility-admin-select-entities', array('moduleName' => $this->moduleName)); ?>'
+        window.location = '<?= $this->url('apigility-doctrine-admin-select-entities', array('moduleName' => $this->moduleName)); ?>'
             + '/' + $('#objectManagerAlias').first().val();
         return false;
     });
@@ -25,7 +25,7 @@ use Zend\Form\Element;
 
 $form = new Form('select-entities');
 $form->setAttributes(array(
-    'action' => $this->url('soliantconsulting-apigility-admin-create-resources', array('moduleName' => $this->moduleName)),
+    'action' => $this->url('apigility-doctrine-admin-create-resources', array('moduleName' => $this->moduleName)),
     'method' => 'post',
     'class' => 'form-horizontal'
 ));

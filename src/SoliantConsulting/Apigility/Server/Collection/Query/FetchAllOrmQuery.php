@@ -1,17 +1,17 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Collection\Query;
+namespace Apigility\Doctrine\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
-use SoliantConsulting\Apigility\Server\Paginator\Adapter\DoctrineOrmAdapter;
+use Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
 use Zend\Paginator\Adapter\AdapterInterface;
 
 
 /**
  * Class FetchAllOrmQuery
  *
- * @package SoliantConsulting\Apigility\Server\Resource\Query
+ * @package Apigility\Doctrine\Server\Resource\Query
  */
 class FetchAllOrmQuery
     implements ObjectManagerAwareInterface, ApigilityFetchAllQuery

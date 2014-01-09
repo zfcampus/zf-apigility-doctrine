@@ -1,9 +1,9 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Collection\Query;
+namespace Apigility\Doctrine\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ProvidesObjectManager;
-use SoliantConsulting\Apigility\Server\Paginator\Adapter\DoctrineOdmAdapter;
+use Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
 
 class FetchAllOdmQuery implements ApigilityFetchAllQuery
 {

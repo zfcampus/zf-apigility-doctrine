@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Hydrator;
+namespace Apigility\Doctrine\Server\Hydrator;
 
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\Exception;
@@ -9,7 +9,7 @@ use Zend\Stdlib\Hydrator\HydratorInterface;
 /**
  * Class DoctrineHydratorManager
  *
- * @package SoliantConsulting\Apigility\Server\Hydrator
+ * @package Apigility\Doctrine\Server\Hydrator
  */
 class DoctrineHydratorManager extends AbstractPluginManager
 {
@@ -65,4 +65,4 @@ class DoctrineHydratorManager extends AbstractPluginManager
         ));
     }
 
-} 
+}

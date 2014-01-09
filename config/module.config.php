@@ -7,8 +7,8 @@
 return array(
     'service_manager' => array(
         'abstract_factories' => array(
-            'SoliantConsulting\Apigility\Server\Resource\DoctrineResourceFactory',
-            'SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorFactory',
+            'Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
+            'Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
         ),
     ),
 
@@ -28,59 +28,59 @@ return array(
 
     'controllers' => array(
         'invokables' => array(
-            'SoliantConsulting\Apigility\Admin\Controller\App' => 'SoliantConsulting\Apigility\Admin\Controller\AppController',
+            'Apigility\Doctrine\Admin\Controller\App' => 'Apigility\Doctrine\Admin\Controller\AppController',
         ),
     ),
 
     'router' => array(
         'routes' => array(
-            'soliantconsulting-apigility-admin' => array(
+            'apigility-doctrine-admin' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin',
                     'defaults' => array(
-                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'index',
                     ),
                 ),
             ),
-            'soliantconsulting-apigility-admin-create-module' => array(
+            'apigility-doctrine-admin-create-module' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/create-module',
                     'defaults' => array(
-                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'createModule',
                     ),
                 ),
             ),
-            'soliantconsulting-apigility-admin-select-entities' => array(
+            'apigility-doctrine-admin-select-entities' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName][/:objectManagerAlias]',
                     'defaults' => array(
-                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'selectEntities',
                     ),
                 ),
             ),
-            'soliantconsulting-apigility-admin-create-resources' => array(
+            'apigility-doctrine-admin-create-resources' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/create-resources[/:moduleName]',
                     'defaults' => array(
-                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'createResources',
                     ),
                 ),
             ),
 
-            'soliantconsulting-apigility-admin-done' => array(
+            'apigility-doctrine-admin-done' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
                     'route' => '/soliant-consulting/apigility/admin/done[/:moduleName][/:results]',
                     'defaults' => array(
-                        'controller' => 'SoliantConsulting\Apigility\Admin\Controller\App',
+                        'controller' => 'Apigility\Doctrine\Admin\Controller\App',
                         'action'     => 'done',
                     ),
                 ),

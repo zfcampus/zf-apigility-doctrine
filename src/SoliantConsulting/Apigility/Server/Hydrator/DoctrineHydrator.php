@@ -1,13 +1,13 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Hydrator;
+namespace Apigility\Doctrine\Server\Hydrator;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
 
 /**
  * Class DoctrineHydrator
  *
- * @package SoliantConsulting\Apigility\Server\Hydrator
+ * @package Apigility\Doctrine\Server\Hydrator
  */
 class DoctrineHydrator
     implements HydratorInterface

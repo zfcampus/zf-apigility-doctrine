@@ -32,9 +32,9 @@
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
-            "SoliantConsulting\\Apigility": "src/",
-            "SoliantConsulting\\Apigility\\Admin": "src/",
-            "SoliantConsulting\\Apigility\\Server": "src/"
+            "Apigility\\Doctrine": "src/",
+            "Apigility\\Doctrine\\Admin": "src/",
+            "Apigility\\Doctrine\\Server": "src/"
         }
     }
 }

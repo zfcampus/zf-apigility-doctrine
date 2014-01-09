@@ -4,9 +4,9 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility;
+namespace Apigility\Doctrine;
 
-use SoliantConsulting\Apigility\Server\Hydrator\DoctrineHydratorManager;
+use Apigility\Doctrine\Server\Hydrator\DoctrineHydratorManager;
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
@@ -75,14 +75,14 @@ class Module
     public function getServiceConfig()
     {
         return array('factories' => array(
-            'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
+            'Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
                 if (!$services->has('ZF\Configuration\ModuleUtils')
                     || !$services->has('ZF\Configuration\ConfigResourceFactory')
                     || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
                     || !$services->has('SharedEventManager')
                 ) {
                     throw new ServiceNotCreatedException(
-                        'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory is missing one or more dependencies from ZF\Configuration'
+                        'Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory is missing one or more dependencies from ZF\Configuration'
                     );
                 }
                 $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
@@ -95,18 +95,18 @@ class Module
 
                 return new Admin\Model\DoctrineRestServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
             },
-            'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource' => function ($services) {
-                if (!$services->has('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory')) {
+            'Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function ($services) {
+                if (!$services->has('Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory')) {
                     throw new ServiceNotCreatedException(
-                        'SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceResource is missing one or more dependencies'
+                        'Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource is missing one or more dependencies'
                     );
                 }
-                $factory = $services->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRestServiceModelFactory');
+                $factory = $services->get('Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
                 return new Admin\Model\DoctrineRestServiceResource($factory);
             },
 
 
-            'SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
+            'Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
                 if (!$services->has('ZF\Configuration\ModuleUtils')
                     || !$services->has('ZF\Configuration\ConfigResourceFactory')
                     || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
@@ -123,8 +123,8 @@ class Module
                 return new Admin\Model\DoctrineRpcServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
             },
 
-            'SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
-                if (!$services->has('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory')) {
+            'Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
+                if (!$services->has('Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory')) {
                     throw new ServiceNotCreatedException(
                         'ZF\Apigility\Admin\Model\RpcServiceResource is missing RpcServiceModelFactory dependency'
                     );
@@ -139,7 +139,7 @@ class Module
                         'ZF\Apigility\Admin\Model\RpcServiceResource is missing ControllerManager dependency'
                     );
                 }
-                $factory = $services->get('SoliantConsulting\Apigility\Admin\Model\DoctrineRpcServiceModelFactory');
+                $factory = $services->get('Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory');
                 $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                 $controllerManager = $services->get('ControllerManager');
                 return new Admin\Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);

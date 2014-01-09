@@ -4,14 +4,14 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace SoliantConsulting\Apigility\Admin\Model;
+namespace Apigility\Doctrine\Admin\Model;
 
 use RuntimeException;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
-use SoliantConsulting\Apigility\Admin\Model\NewRestServiceEntity;
+use Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
 
 class DoctrineRestServiceResource extends AbstractResourceListener
 {

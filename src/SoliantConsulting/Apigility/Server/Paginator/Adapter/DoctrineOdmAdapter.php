@@ -1,6 +1,6 @@
 <?php
 
-namespace SoliantConsulting\Apigility\Server\Paginator\Adapter;
+namespace Apigility\Doctrine\Server\Paginator\Adapter;
 
 use Doctrine\Odm\MongoDB\Query\Builder;
 use Zend\Paginator\Adapter\AdapterInterface;
@@ -9,7 +9,7 @@ use Zend\Paginator\Adapter\AdapterInterface;
 /**
  * Class DoctrineOdmAdapter
  *
- * @package SoliantConsulting\Apigility\Server\Paginator\Adapter
+ * @package Apigility\Doctrine\Server\Paginator\Adapter
  */
 class DoctrineOdmAdapter implements AdapterInterface
 {
@@ -69,4 +69,4 @@ class DoctrineOdmAdapter implements AdapterInterface
 
         return $queryBuilder->getQuery()->execute()->count();
     }
-} 
+}
