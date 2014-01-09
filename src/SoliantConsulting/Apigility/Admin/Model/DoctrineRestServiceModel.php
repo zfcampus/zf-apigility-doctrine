@@ -281,7 +281,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $module            = ($details->module) ? $details->module: $this->module;
 
         $controllerService = ($details->controllerServiceName) ? $details->controllerServiceName: $this->createControllerServiceName($resourceName);
-        $routeName         = ($details->routeName) ? $details->routeName: $this->createRoute($resourceName, $details->routeMatch, $details->identifierName, $controllerService);
+        $routeName         = ($details->routeName) ? $details->routeName: $this->createRoute($resourceName, $details->routeMatch, $details->routeIdentifierName, $controllerService);
 
         $objectManager     = ($details->objectManager) ? $details->objectManager: 'doctrine.entitymanager.orm_default';
 
@@ -590,7 +590,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $controllerService => array(
                 'listener'                   => $resourceClass,
                 'route_name'                 => $routeName,
-                'identifier_name'            => $details->identifierName,
+                'route_identifier_name'      => $details->routeIdentifierName,
+                'entity_identifier_name'     => $details->entityIdentifierName,
                 'collection_name'            => $details->collectionName,
                 'resource_http_methods'      => $details->resourceHttpMethods,
                 'collection_http_methods'    => $details->collectionHttpMethods,
@@ -708,11 +709,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $config = array('zf-hal' => array('metadata_map' => array(
             $entityClass => array(
-                'identifier_name' => $details->entityIdentifierName,
+                'entity_identifier_name' => $details->entityIdentifierName,
                 'route_name'      => $routeName,
             ),
             $collectionClass => array(
-                'identifier_name' => $details->entityIdentifierName,
+                'entity_identifier_name' => $details->entityIdentifierName,
                 'route_name'      => $routeName,
                 'is_collection'   => true,
             ),
