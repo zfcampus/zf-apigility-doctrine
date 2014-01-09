@@ -204,6 +204,10 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
 
         foreach ($config['strategies'] as $field => $strategyKey) {
             if (!$serviceLocator->has($strategyKey)) {
+                if (!class_exists($strategyKey)) {
+                    die('no class');
+                }
+                die('servicce does not have strategy');
                 throw new ServiceNotCreatedException(sprintf('Invalid strategy %s for field %s', $strategyKey, $field));
             }
 

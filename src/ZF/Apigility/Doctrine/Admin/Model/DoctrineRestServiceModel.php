@@ -670,7 +670,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory' => 'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
                 ),
                 'invokables' => array(
-                    'Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
+                    'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
                 ),
             ),
             'zf-rest-doctrine-hydrator' => array(
@@ -895,7 +895,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     protected function injectResolver(PhpRenderer $renderer, $type)
     {
         $template = sprintf('doctrine/rest-', $type);
-        $path     = sprintf('%s/../../../../../view/doctrine/rest-%s.phtml', __DIR__, $type);
+        $path     = sprintf('%s/../../../../../../view/doctrine/rest-%s.phtml', __DIR__, $type);
         $resolver = new Resolver\TemplateMapResolver(array(
             $template => $path,
         ));
