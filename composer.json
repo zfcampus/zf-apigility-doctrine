@@ -1,7 +1,7 @@
 {
-    "name": "zfcampus/zf-doctrine",
+    "name": "zfcampus/zf-apigility-doctrine",
     "type": "library",
-    "description": "Doctrine Apigility Admin and Server",
+    "description": "Doctrine for Apigility Admin and Server",
     "keywords": [
         "apigility",
         "doctrine",
