@@ -34,7 +34,7 @@ class AppController extends AbstractActionController
         }
 
         $moduleResource = $this->getServiceLocator()->get('ZF\Apigility\Admin\Model\ModuleResource');
-        $moduleResource->setModulePath(realpath(__DIR__ . '/../../../../../../../../'));
+        $moduleResource->setModulePath(realpath(__DIR__ . '/../../../../../../../../../'));
 
         $metadata = $moduleResource->create(array(
             'name' =>  $moduleName,
