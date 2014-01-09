@@ -1,8 +1,5 @@
-Soliant Consulting 
-==================
-
 Apigility for Doctrine
-----------------------
+======================
 
 This provides Apigility Module creation for Doctrine ORM and ODM.  API Modules created with this library's Admin code are supported by this library's Server code.  With this library you can turn a set of Doctrine entities into a full featured API.  No special configuration of your entities is needed.
 
@@ -12,7 +9,7 @@ Installation
 
      ```json
     "require": {
-        "soliantconsulting/soliantconsulting-apigility": "dev-master"
+        "zfcampus/zf-doctrine": "dev-master"
     }
      ```
   2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
@@ -24,11 +21,13 @@ Creating the Apigility-enabled module
 -------------------------------------
 
 The Admin tool can create an Apigility-enabled module with the Doctrine entities in scope.
-To enable the Admin include ```'SoliantConsulting\Apigility',``` in your 
+To enable the Admin include ```'Apigility\Doctrine',``` in your 
 development.config.php configuration.
 
 All entities managed by the object manager will be available to build into apigility resources.  
 
+
+*** deprecated ***
 Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter the name of a new module which does not already exist.  When the form is submitted
 the module will be created.
 
