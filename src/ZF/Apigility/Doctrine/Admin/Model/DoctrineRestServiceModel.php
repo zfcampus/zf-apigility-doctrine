@@ -709,6 +709,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $config = array('zf-hal' => array('metadata_map' => array(
             $entityClass => array(
+                'route_identifier_name' => $details->routeIdentifierName,
                 'entity_identifier_name' => $details->entityIdentifierName,
                 'route_name'      => $routeName,
             ),
