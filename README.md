@@ -1,8 +1,6 @@
 Apigility for Doctrine
 ======================
 
-This provides Apigility Module creation for Doctrine ORM and ODM.  API Modules created with this library's Admin code are supported by this library's Server code.  With this library you can turn a set of Doctrine entities into a full featured API.  No special configuration of your entities is needed.
-
 Installation
 ------------
   1. edit `composer.json` file with following contents:
