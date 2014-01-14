@@ -28,38 +28,39 @@ return array(
 
     'controllers' => array(
         'invokables' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\App' => 'ZF\Apigility\Doctrine\Admin\Controller\AppController',
+            'ZF\Apigility\Doctrine\Admin\Controller\Application' => 'ZF\Apigility\Doctrine\Admin\Controller\ApplicationController',
         ),
     ),
 
     'router' => array(
         'routes' => array(
-            'apigility-doctrine-admin' => array(
+/*
+            'zf-apigility-doctrine-admin' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin',
+                    'route' => '/admin/doctrine-controller',
                     'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
                         'action'     => 'index',
                     ),
                 ),
             ),
-            'apigility-doctrine-admin-create-module' => array(
+            'zf-apigility-doctrine-admin-create-module' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/create-module',
+                    'route' => '/admin/doctrine-controller/create-module',
                     'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
                         'action'     => 'createModule',
                     ),
                 ),
             ),
-            'apigility-doctrine-admin-select-entities' => array(
+            'zf-apigility-doctrine-admin-select-entities' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/select-entities[/:moduleName][/:objectManagerAlias]',
+                    'route' => '/admin/doctrine-controller/select-entities[/:moduleName][/:objectManagerAlias]',
                     'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
                         'action'     => 'selectEntities',
                     ),
                 ),
@@ -67,9 +68,9 @@ return array(
             'apigility-doctrine-admin-create-resources' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/create-resources[/:moduleName]',
+                    'route' => '/admin/doctrine-controller/create-resources[/:moduleName]',
                     'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
                         'action'     => 'createResources',
                     ),
                 ),
@@ -78,13 +79,67 @@ return array(
             'apigility-doctrine-admin-done' => array(
                 'type'  => 'Zend\Mvc\Router\Http\Segment',
                 'options' => array(
-                    'route' => '/soliant-consulting/apigility/admin/done[/:moduleName][/:results]',
+                    'route' => '/admin/doctrine-controller/done[/:moduleName][/:results]',
                     'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\App',
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
                         'action'     => 'done',
                     ),
                 ),
             ),
+*/
+
+            'zf-apigility-doctrine-service' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/admin/api/module[/:name]/doctrine[/:controller_service_name]',
+                    'defaults' => array(
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService',
+                    ),
+                ),
+                'may_terminate' => true,
+            ),
+
+        ),
+    ),
+
+    'zf-content-negotiation' => array(
+        'controllers' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => 'HalJson',
+        ),
+        'accept-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
+                'application/json',
+                'application/*+json',
+            ),
+        ),
+        'content-type-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
+                'application/json',
+                'application/*+json',
+            ),
+        ),
+    ),
+
+    'zf-hal' => array(
+        'metadata_map' => array(
+            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity' => array(
+                'hydrator'        => 'ArraySerializable',
+                'route_identifier_name' => 'controller_service_name',
+                'route_name'      => 'zf-apigility-doctrine-service',
+            ),
+        ),
+    ),
+
+    'zf-rest' => array(
+        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
+            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource',
+            'route_name'                 => 'zf-apigility-doctrine-service',
+            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
+            'route_identifier_name'      => 'controller_service_name',
+            'resource_http_methods'      => array('GET', 'PATCH', 'DELETE'),
+            'collection_http_methods'    => array('GET', 'POST'),
+            'collection_name'            => 'rest',
+            'collection_query_whitelist' => array('version'),
         ),
     ),
 );

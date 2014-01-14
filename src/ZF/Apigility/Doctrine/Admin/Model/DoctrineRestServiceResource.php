@@ -12,6 +12,7 @@ use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
 use ZF\Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
+use Zend\Filter\FilterChain;
 
 class DoctrineRestServiceResource extends AbstractResourceListener
 {
@@ -87,6 +88,33 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      */
     public function create($data)
     {
+/*
+    Examples
+{
+    "objectManager": "doctrine.entitymanager.orm_default",
+    "resourceName": "Artist",
+    "entityClass": "Db\\Entity\\Artist",
+    "pageSizeParam": "limit",
+    "routeIdentifierName": "artist_id",
+    "entityIdentifierName": "id",
+    "routeMatch": "/api/artist",
+    "hydratorName": "DbApi\\V1\\Rest\\Artist\\AlbumHydrator",
+    "hydrateByValue": true
+}
+
+{
+    "objectManager": "doctrine.entitymanager.orm_default",
+    "resourceName": "Album",
+    "entityClass": "Db\\Entity\\Album",
+    "pageSizeParam": "limit",
+    "routeIdentifierName": "album_id",
+    "entityIdentifierName": "id",
+    "routeMatch": "/api/album",
+    "hydratorName": "DbApi\\V1\\Rest\\Album\\AlbumHydrator",
+    "hydrateByValue": true
+}
+
+*/
         if (is_object($data)) {
             $data = (array) $data;
         }
@@ -103,6 +131,39 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         } catch (\Exception $e) {
             die($e->getMessage());
             throw new CreationException('Unable to create REST service', $e->getCode(), $e);
+        }
+
+        $objectManager = $this->restFactory->getServiceManager()->get($data['objectManager']);
+        $entityMetadata = $objectManager->getMetadataFactory()->getMetadataFor($data['entityClass']);
+
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
+
+        foreach ($entityMetadata->associationMappings as $mapping) {
+            switch ($mapping['type']) {
+                case 4:
+                    $rpcServiceResource = $this->restFactory->getServiceManager()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+                    $rpcServiceResource->setModuleName($this->getModuleName());
+                    $rpcServiceResource->create(array(
+                        'service_name' => $data['resourceName'] . '' . $mapping['fieldName'],
+                        'route' => $mappingRoute = $data['routeMatch'] . '[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
+                        'http_methods' => array(
+                            'GET',
+                        ),
+                        'options' => array(
+                            'target_entity' => $mapping['targetEntity'],
+                            'source_entity' => $mapping['sourceEntity'],
+                            'field_name' => $mapping['fieldName'],
+                        ),
+                    ));
+
+                    $_SESSION[$results][$entityMetadata->name . $mapping['fieldName']] = $mappingRoute;
+
+                    break;
+                default:
+                    break;
+            }
         }
 
         return $service;
