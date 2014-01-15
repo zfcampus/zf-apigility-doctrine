@@ -376,13 +376,13 @@ class DoctrineRpcServiceModel
             'controllers' => array(
                 $controllerService => $selector,
             ),
-            'accept_whitelist' => array(
+            'accept-whitelist' => array(
                 $controllerService => array(
                     'application/json',
                     'application/*+json',
                 ),
             ),
-            'content_type_whitelist' => array(
+            'content-type-whitelist' => array(
                 $controllerService => array(
                     'application/json',
                 ),
@@ -497,10 +497,10 @@ class DoctrineRpcServiceModel
         $key = array('zf-content-negotiation', 'controllers', $serviceName);
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'accept_whitelist', $serviceName);
+        $key = array('zf-content-negotiation', 'accept-whitelist', $serviceName);
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'content_type_whitelist', $serviceName);
+        $key = array('zf-content-negotiation', 'content-type-whitelist', $serviceName);
         $this->configResource->deleteKey($key);
     }
 

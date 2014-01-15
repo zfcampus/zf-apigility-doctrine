@@ -171,6 +171,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     public function fetch($controllerService)
     {
         $config = $this->configResource->fetch(true);
+
         if (!isset($config['zf-rest'])
             || !isset($config['zf-rest'][$controllerService])
         ) {
@@ -356,8 +357,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             ), 404);
         }
 
+        $this->deleteDoctrineConfig($service);
         $this->deleteRoute($service);
         $this->deleteRestConfig($service);
+
+        die('deleted!');
         return true;
     }
 
@@ -816,6 +820,22 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
     }
 
+    public function deleteDoctrineConfig(RestServiceEntity $entity)
+    {
+        // Get hydrator name
+        $config = $this->configResource->fetch(true);
+        $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
+
+        $key = array('zf-rest-doctrine-hydrator', $hydratorName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('hydrators', 'invokables', $hydratorName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-rest-doctrine-resource', $entity->resourceClass);
+        $this->configResource->deleteKey($key);
+    }
+
     /**
      * Delete the route associated with the given service
      *
@@ -837,7 +857,23 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     public function deleteRestConfig(RestServiceEntity $entity)
     {
         $controllerService = $entity->controllerServiceName;
+
         $key = array('zf-rest', $controllerService);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'controllers', $controllerService);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'accept-whitelist', $controllerService);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'content-type-whitelist', $controllerService);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-hal', 'metadata_map', $entity->collectionClass);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-hal', 'metadata_map', $entity->entityClass);
         $this->configResource->deleteKey($key);
     }
 
@@ -1002,7 +1038,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             && isset($config['content-type-whitelist'][$controllerServiceName])
         ) {
             $metadata->exchangeArray(array(
-                'content_type_whitelist' => $config['content-type-whitelist'][$controllerServiceName],
+                'content-type-whitelist' => $config['content-type-whitelist'][$controllerServiceName],
             ));
         }
     }

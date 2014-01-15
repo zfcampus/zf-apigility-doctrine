@@ -231,7 +231,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
                     $updated = $model->updateService($entity);
             }
         } catch (\Exception $e) {
-            throw new PatchException('Error updating REST service', 500, $e);
+            throw new PatchException('Error updating Doctrine REST service', 500, $e);
         }
 
         return $updated;
@@ -256,7 +256,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
                     $model->deleteService($entity->controllerServiceName);
             }
         } catch (\Exception $e) {
-            throw new \Exception('Error deleting REST service', 500, $e);
+            throw new \Exception('Error deleting Doctrine REST service', 500, $e);
         }
 
         return true;
