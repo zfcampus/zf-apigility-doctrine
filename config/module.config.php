@@ -98,7 +98,6 @@ return array(
                 ),
                 'may_terminate' => true,
             ),
-
         ),
     ),
 

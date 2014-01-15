@@ -129,7 +129,6 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         try {
             $service = $model->createService($creationData);
         } catch (\Exception $e) {
-            die($e->getMessage());
             throw new CreationException('Unable to create REST service', $e->getCode(), $e);
         }
 
@@ -158,8 +157,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
                         ),
                     ));
 
-                    $_SESSION[$results][$entityMetadata->name . $mapping['fieldName']] = $mappingRoute;
-
+                    // Should these be included in the return?
                     break;
                 default:
                     break;
@@ -253,7 +251,11 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             switch (true) {
                 case ($entity instanceof DoctrineRestServiceEntity):
                 default:
-                    $model->deleteService($entity->controllerServiceName);
+                    $result = $model->deleteService($entity->controllerServiceName);
+
+                    if ($result instanceof ApiProblem) {
+                        return $response;
+                    }
             }
         } catch (\Exception $e) {
             throw new \Exception('Error deleting Doctrine REST service', 500, $e);

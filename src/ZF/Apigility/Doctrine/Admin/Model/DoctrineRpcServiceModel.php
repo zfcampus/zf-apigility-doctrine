@@ -199,8 +199,9 @@ class DoctrineRpcServiceModel
         $routeName   = $entity->routeName;
 
         $this->deleteRouteConfig($routeName);
-        $this->deleteRpcConfig($serviceName);
+        $this->deleteDoctrineRpcConfig($serviceName);
         $this->deleteContentNegotiationConfig($serviceName);
+
         return true;
     }
 
@@ -471,7 +472,12 @@ class DoctrineRpcServiceModel
      */
     public function deleteRouteConfig($routeName)
     {
+        $config = $this->configResource->fetch(true);
+
         $key = array('router', 'routes', $routeName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-versioning', 'uri', array_search($routeName, $config['zf-versioning']['uri']));
         $this->configResource->deleteKey($key);
     }
 
@@ -480,10 +486,14 @@ class DoctrineRpcServiceModel
      *
      * @param  string $serviceName
      */
-    public function deleteRpcConfig($serviceName)
+    public function deleteDoctrineRpcConfig($serviceName)
     {
         $key = array('zf-rpc', $serviceName);
         $this->configResource->deleteKey($key);
+
+        $key = array('zf-rpc-doctrine-controller', $serviceName);
+        $this->configResource->deleteKey($key);
+
     }
 
     /**
