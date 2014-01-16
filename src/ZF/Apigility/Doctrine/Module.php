@@ -6,7 +6,6 @@
 
 namespace ZF\Apigility\Doctrine;
 
-use ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorManager;
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
 use Zend\EventManager\EventInterface;
 use Zend\Mvc\MvcEvent;
