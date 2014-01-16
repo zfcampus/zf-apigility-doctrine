@@ -116,11 +116,15 @@ class FetchAllOrmQuery
                         break;
 
                     case 'in':
-                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], $option['values']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['values']);
                         break;
 
                     case 'notin':
-                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], $option['values']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['values']);
                         break;
 
                     case 'like':
