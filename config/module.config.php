@@ -26,68 +26,8 @@ return array(
         ),
     ),
 
-    'controllers' => array(
-        'invokables' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\Application' => 'ZF\Apigility\Doctrine\Admin\Controller\ApplicationController',
-        ),
-    ),
-
     'router' => array(
         'routes' => array(
-/*
-            'zf-apigility-doctrine-admin' => array(
-                'type'  => 'Zend\Mvc\Router\Http\Literal',
-                'options' => array(
-                    'route' => '/admin/doctrine-controller',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
-                        'action'     => 'index',
-                    ),
-                ),
-            ),
-            'zf-apigility-doctrine-admin-create-module' => array(
-                'type'  => 'Zend\Mvc\Router\Http\Literal',
-                'options' => array(
-                    'route' => '/admin/doctrine-controller/create-module',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
-                        'action'     => 'createModule',
-                    ),
-                ),
-            ),
-            'zf-apigility-doctrine-admin-select-entities' => array(
-                'type'  => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route' => '/admin/doctrine-controller/select-entities[/:moduleName][/:objectManagerAlias]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
-                        'action'     => 'selectEntities',
-                    ),
-                ),
-            ),
-            'apigility-doctrine-admin-create-resources' => array(
-                'type'  => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route' => '/admin/doctrine-controller/create-resources[/:moduleName]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
-                        'action'     => 'createResources',
-                    ),
-                ),
-            ),
-
-            'apigility-doctrine-admin-done' => array(
-                'type'  => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
-                    'route' => '/admin/doctrine-controller/done[/:moduleName][/:results]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\Application',
-                        'action'     => 'done',
-                    ),
-                ),
-            ),
-*/
-
             'zf-apigility-doctrine-service' => array(
                 'type' => 'segment',
                 'options' => array(
