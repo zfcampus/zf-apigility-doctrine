@@ -72,27 +72,39 @@ class FetchAllOrmQuery
                 switch (strtolower($option['type'])) {
                     case 'eq':
                         // field, value
-                        $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'neq':
-                        $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'lt':
-                        $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'lte':
-                        $queryBuilder->$queryType($queryBuilder->expr()->lte('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->lte('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'gt':
-                        $queryBuilder->$queryType($queryBuilder->expr()->gt('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->gt('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'gte':
-                        $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], $option['value']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'isnull':
