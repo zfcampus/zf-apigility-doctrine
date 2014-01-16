@@ -12,6 +12,12 @@ return array(
         ),
     ),
 
+    'hydrators' => array(
+        'abstract_factories' => array(
+            'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
+        )
+    ),
+
     'asset_manager' => array(
         'resolver_configs' => array(
             'paths' => array(

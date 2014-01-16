@@ -694,11 +694,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     'hydrator' => $details->hydratorName,
                 ),
             ),
-            'hydrators' => array(
-                'invokables' => array(
-                    $details->hydratorName => $details->hydratorName
-                ),
-            ),
         );
 
         $this->configResource->patch($config, true);
@@ -857,9 +852,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
          $objectManagerClass = $config['zf-rest-doctrine-hydrator'][$hydratorName]['object_manager'];
 
          $key = array('zf-rest-doctrine-hydrator', $hydratorName);
-         $this->configResource->deleteKey($key);
-
-         $key = array('hydrators', 'invokables', $hydratorName);
          $this->configResource->deleteKey($key);
 
          $key = array('zf-rest-doctrine-resource', $entity->resourceClass);

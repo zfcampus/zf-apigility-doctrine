@@ -44,12 +44,13 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             return $this->lookupCache[$requestedName];
         }
 
-        if (!$serviceLocator->has('Config')) {
+        $serviceManager = $serviceLocator->getServiceLocator();
+        if (!$serviceManager->has('Config')) {
             return false;
         }
 
         // Validate object is set
-        $config = $serviceLocator->get('Config');
+        $config = $serviceManager->get('Config');
         $namespace = self::FACTORY_NAMESPACE;
         if (!isset($config[$namespace]) || !is_array($config[$namespace]) || !isset($config[$namespace][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
@@ -90,12 +91,13 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $config   = $serviceLocator->get('Config');
+        $serviceManager = $serviceLocator->getServiceLocator();
+        $config   = $serviceManager->get('Config');
         $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
 
-        $objectManager = $this->loadObjectManager($serviceLocator, $config);
-        $entityHydrator = $this->loadEntityHydrator($serviceLocator, $config, $objectManager);
-        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($serviceLocator, $config, $objectManager);
+        $objectManager = $this->loadObjectManager($serviceManager, $config);
+        $entityHydrator = $this->loadEntityHydrator($serviceManager, $config, $objectManager);
+        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($serviceManager, $config, $objectManager);
 
         $hydrator = new DoctrineHydrator();
 
@@ -126,16 +128,16 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ServiceLocatorInterface $serviceManager
      * @param                         $config
      *
      * @return ObjectManager
      * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
      */
-    protected function loadObjectManager(ServiceLocatorInterface $serviceLocator, $config)
+    protected function loadObjectManager(ServiceLocatorInterface $serviceManager, $config)
     {
-        if ($serviceLocator->has($config['object_manager'])) {
-            $objectManager = $serviceLocator->get($config['object_manager']);
+        if ($serviceManager->has($config['object_manager'])) {
+            $objectManager = $serviceManager->get($config['object_manager']);
         } else {
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
@@ -143,13 +145,13 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ServiceLocatorInterface $serviceManager
      * @param                         $config
      * @param ObjectManager $objectManager
      *
      * @return mixed
      */
-    protected function loadEntityHydrator(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function loadEntityHydrator(ServiceLocatorInterface $serviceManager, $config, $objectManager)
     {
         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
@@ -168,22 +170,22 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         }
 
         // Configure hydrator:
-        $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
+        $this->configureHydratorStrategies($hydrator, $serviceManager, $config, $objectManager);
 
         return $hydrator;
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ServiceLocatorInterface $serviceManager
      * @param                         $config
      * @param ObjectManager $objectManager
      *
      * @return HydratorInterface
      */
-    protected function loadDoctrineModuleHydrator(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function loadDoctrineModuleHydrator(ServiceLocatorInterface $serviceManager, $config, $objectManager)
     {
         $hydrator = new Hydrator\DoctrineObject($objectManager, $config['entity_class'], $config['by_value']);
-        $this->configureHydratorStrategies($hydrator, $serviceLocator, $config, $objectManager);
+        $this->configureHydratorStrategies($hydrator, $serviceManager, $config, $objectManager);
         return $hydrator;
     }
 
@@ -196,14 +198,14 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
      * @return void
      */
-    protected function configureHydratorStrategies($hydrator, ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function configureHydratorStrategies($hydrator, ServiceLocatorInterface $serviceManager, $config, $objectManager)
     {
         if (!($hydrator instanceof StrategyEnabledInterface) || !isset($config['strategies'])) {
             return;
         }
 
         foreach ($config['strategies'] as $field => $strategyKey) {
-            if (!$serviceLocator->has($strategyKey)) {
+            if (!$serviceManager->has($strategyKey)) {
                 if (!class_exists($strategyKey)) {
                     die('no class');
                 }
@@ -211,7 +213,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
                 throw new ServiceNotCreatedException(sprintf('Invalid strategy %s for field %s', $strategyKey, $field));
             }
 
-            $strategy = $serviceLocator->get($strategyKey);
+            $strategy = $serviceManager->get($strategyKey);
             if (!$strategy instanceof StrategyInterface) {
                 throw new ServiceNotCreatedException(sprintf('Invalid strategy class %s for field %s', get_class($strategy), $field));
             }
