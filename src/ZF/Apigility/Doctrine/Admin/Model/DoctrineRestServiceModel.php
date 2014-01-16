@@ -22,6 +22,7 @@ use ZF\Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use ZF\ApiProblem\ApiProblem;
 
 class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceManagerAwareInterface
 {
@@ -171,6 +172,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     public function fetch($controllerService)
     {
         $config = $this->configResource->fetch(true);
+
         if (!isset($config['zf-rest'])
             || !isset($config['zf-rest'][$controllerService])
         ) {
@@ -357,7 +359,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         $this->deleteRoute($service);
-        $this->deleteRestConfig($service);
+        $response = $this->deleteDoctrineRestConfig($service);
+
+        if ($response instanceof ApiProblem) {
+            return $response;
+        }
+
         return true;
     }
 
@@ -823,9 +830,17 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      */
     public function deleteRoute(RestServiceEntity $entity)
     {
+        $config = $this->configResource->fetch(true);
+
         $route = $entity->routeName;
         $key   = array('router', 'routes', $route);
         $this->configResource->deleteKey($key);
+
+        $uriKey = array_search($route, $config['zf-versioning']['uri']);
+        if ($uriKey !== false) {
+            $key = array('zf-versioning', 'uri', $uriKey);
+            $this->configResource->deleteKey($key);
+        }
     }
 
     /**
@@ -834,11 +849,71 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      *
      * @param  RestServiceEntity $entity
      */
-    public function deleteRestConfig(RestServiceEntity $entity)
+    public function deleteDoctrineRestConfig(RestServiceEntity $entity)
     {
-        $controllerService = $entity->controllerServiceName;
-        $key = array('zf-rest', $controllerService);
+         // Get hydrator name
+         $config = $this->configResource->fetch(true);
+         $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
+         $objectManagerClass = $config['zf-rest-doctrine-hydrator'][$hydratorName]['object_manager'];
+
+         $key = array('zf-rest-doctrine-hydrator', $hydratorName);
+         $this->configResource->deleteKey($key);
+
+         $key = array('hydrators', 'invokables', $hydratorName);
+         $this->configResource->deleteKey($key);
+
+         $key = array('zf-rest-doctrine-resource', $entity->resourceClass);
+         $this->configResource->deleteKey($key);
+
+        $key = array('zf-rest', $entity->controllerServiceName);
         $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'controllers', $entity->controllerServiceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'accept-whitelist', $entity->controllerServiceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'content-type-whitelist', $entity->controllerServiceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-hal', 'metadata_map', $entity->collectionClass);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-hal', 'metadata_map', $entity->entityClass);
+        $this->configResource->deleteKey($key);
+
+        $objectManager = $this->getServiceManager()->get($objectManagerClass);
+        if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
+
+            $metadataFactory = $objectManager->getMetadataFactory();
+            $metadata = $metadataFactory->getMetadataFor($entity->entityClass);
+
+            foreach ($metadata->associationMappings as $relationName => $relationMapping) {
+                switch ($relationMapping['type']) {
+                    case 4:
+
+                        $resourceName = substr($entity->resourceClass,
+                            strlen($this->module . '\\' . $this->moduleEntity->getLatestVersion() . '\\Rest\\') + 1);
+                        $resourceName = substr($resourceName, 0, strlen($resourceName) - 15);
+
+                        $rpcServiceName = $this->module . '\\V' . $this->moduleEntity->getLatestVersion() . '\\Rpc\\'
+                            . $resourceName . $relationName . '\\Controller';
+
+                        $doctrineRpcServiceResource = $this->getServiceManager()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+                        $doctrineRpcServiceResource->setModuleName($this->module);
+
+                        $response = $doctrineRpcServiceResource->delete($rpcServiceName);
+                        if ($response instanceof ApiProblem) {
+                            return $response;
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -1002,7 +1077,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             && isset($config['content-type-whitelist'][$controllerServiceName])
         ) {
             $metadata->exchangeArray(array(
-                'content_type_whitelist' => $config['content-type-whitelist'][$controllerServiceName],
+                'content-type-whitelist' => $config['content-type-whitelist'][$controllerServiceName],
             ));
         }
     }

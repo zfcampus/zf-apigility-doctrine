@@ -9,8 +9,9 @@ namespace ZF\Apigility\Doctrine\Admin\Model;
 use InvalidArgumentException;
 use RuntimeException;
 use ZF\Hal\Collection as HalCollection;
+use ZF\Apigility\Admin\Model\RpcServiceEntity;
 
-class DoctrineRpcServiceEntity
+class DoctrineRpcServiceEntity extends RpcServiceEntity
 {
     protected $acceptWhitelist = array(
         'application/json',

@@ -101,7 +101,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      * Create a new RPC service
      *
      * @param  array|object $data
-     * @return RpcServiceEntity
+     * @return DoctrineRpcServiceEntity
      * @throws CreationException
      */
     public function create($data)
@@ -171,12 +171,12 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      * Fetch RPC metadata
      *
      * @param  string $id
-     * @return RpcServiceEntity|ApiProblem
+     * @return DoctrineRpcServiceEntity|ApiProblem
      */
     public function fetch($id)
     {
         $service = $this->getModel()->fetch($id);
-        if (!$service instanceof RpcServiceEntity) {
+        if (!$service instanceof DoctrineRpcServiceEntity) {
             return new ApiProblem(404, 'RPC service not found');
         }
         $this->injectInputFilters($service);
@@ -188,7 +188,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      * Fetch metadata for all RPC services
      *
      * @param  array $params
-     * @return RpcServiceEntity[]
+     * @return DoctrineRpcServiceEntity[]
      */
     public function fetchAll($params = array())
     {
@@ -208,7 +208,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      *
      * @param  string $id
      * @param  object|array $data
-     * @return ApiProblem|RpcServiceEntity
+     * @return ApiProblem|DoctrineRpcServiceEntity
      * @throws PatchException if unable to update configuration
      */
     public function patch($id, $data)
@@ -269,15 +269,16 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         if ($entity instanceof ApiProblem) {
             return $entity;
         }
+
         return $this->getModel()->deleteService($entity);
     }
 
     /**
      * Inject the input filters collection, if any, as an embedded collection
      *
-     * @param RpcServiceEntity $service
+     * @param DoctrineRpcServiceEntity $service
      */
-    protected function injectInputFilters(RpcServiceEntity $service)
+    protected function injectInputFilters(DoctrineRpcServiceEntity $service)
     {
         $inputFilters = $this->inputFilterModel->fetch($this->moduleName, $service->controllerServiceName);
         if (!$inputFilters instanceof InputFilterCollection
@@ -321,9 +322,9 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * Inject the class name of the controller, if it can be resolved.
      *
-     * @param RpcServiceEntity $service
+     * @param DoctrineRpcServiceEntity $service
      */
-    protected function injectControllerClass(RpcServiceEntity $service)
+    protected function injectControllerClass(DoctrineRpcServiceEntity $service)
     {
         $controllerServiceName = $service->controllerServiceName;
         if (!$this->controllerManager->has($controllerServiceName)) {
