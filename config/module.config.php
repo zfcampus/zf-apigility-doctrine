@@ -8,7 +8,6 @@ return array(
     'service_manager' => array(
         'abstract_factories' => array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-            'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
         ),
     ),
 
