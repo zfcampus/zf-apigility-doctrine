@@ -44,7 +44,11 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             return $this->lookupCache[$requestedName];
         }
 
-        $serviceManager = $serviceLocator->getServiceLocator();
+        if (method_exists($serviceLocator, 'getServiceLocator')) {
+            $serviceManager = $serviceLocator->getServiceLocator();
+        } else {
+            $serviceManager = $serviceLocator;
+        }
         if (!$serviceManager->has('Config')) {
             return false;
         }
@@ -91,7 +95,12 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $serviceManager = $serviceLocator->getServiceLocator();
+        if (method_exists($serviceLocator, 'getServiceLocator')) {
+            $serviceManager = $serviceLocator->getServiceLocator();
+        } else {
+            $serviceManager = $serviceLocator;
+        }
+
         $config   = $serviceManager->get('Config');
         $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
 
