@@ -38,23 +38,20 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      * @return bool
      * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreateServiceWithName(ServiceLocatorInterface $hydratorManager, $name, $requestedName)
     {
         if (array_key_exists($requestedName, $this->lookupCache)) {
             return $this->lookupCache[$requestedName];
         }
 
-        if (method_exists($serviceLocator, 'getServiceLocator')) {
-            $hydratorManager = $serviceLocator->getServiceLocator();
-        } else {
-            $hydratorManager = $serviceLocator;
-        }
-        if (!$hydratorManager->has('Config')) {
+        $serviceManager = $hydratorManager->getServiceLocator();
+        
+        if (!$serviceManager->has('Config')) {
             return false;
         }
 
         // Validate object is set
-        $config = $hydratorManager->get('Config');
+        $config = $serviceManager->get('Config');
         $namespace = self::FACTORY_NAMESPACE;
         if (!isset($config[$namespace]) || !is_array($config[$namespace]) || !isset($config[$namespace][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
@@ -93,20 +90,17 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      *
      * @return DoctrineHydrator
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function createServiceWithName(ServiceLocatorInterface $hydratorManager, $name, $requestedName)
     {
-        if (method_exists($serviceLocator, 'getServiceLocator')) {
-            $hydratorManager = $serviceLocator->getServiceLocator();
-        } else {
-            $hydratorManager = $serviceLocator;
-        }
+        
+        $serviceManager = $hydratorManager->getServiceLocator();
 
-        $config   = $hydratorManager->get('Config');
+        $config   = $serviceManager->get('Config');
         $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
 
-        $objectManager = $this->loadObjectManager($hydratorManager, $config);
-        $entityHydrator = $this->loadEntityHydrator($hydratorManager, $config, $objectManager);
-        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($hydratorManager, $config, $objectManager);
+        $objectManager = $this->loadObjectManager($serviceManager, $config);
+        $entityHydrator = $this->loadEntityHydrator($serviceManager, $config, $objectManager);
+        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($serviceManager, $config, $objectManager);
 
         $hydrator = new DoctrineHydrator();
 

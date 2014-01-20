@@ -674,7 +674,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             'service_manager' => array(
                 'abstract_factories' => array(
                     'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory' => 'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-                    'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory' => 'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
                 ),
                 'invokables' => array(
                     'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
