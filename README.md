@@ -19,7 +19,7 @@ Creating the Apigility-enabled module
 -------------------------------------
 
 The Admin tool can create an Apigility-enabled module with the Doctrine entities in scope.
-To enable the Admin include ```'Zf\Apigility\Doctrine',``` in your 
+To enable the Admin include ```'ZF\Apigility\Doctrine',``` in your 
 development.config.php configuration.
 
 All entities managed by the object manager will be available to build into apigility resources.  
