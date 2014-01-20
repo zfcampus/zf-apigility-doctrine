@@ -45,16 +45,16 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         }
 
         if (method_exists($serviceLocator, 'getServiceLocator')) {
-            $serviceManager = $serviceLocator->getServiceLocator();
+            $hydratorManager = $serviceLocator->getServiceLocator();
         } else {
-            $serviceManager = $serviceLocator;
+            $hydratorManager = $serviceLocator;
         }
-        if (!$serviceManager->has('Config')) {
+        if (!$hydratorManager->has('Config')) {
             return false;
         }
 
         // Validate object is set
-        $config = $serviceManager->get('Config');
+        $config = $hydratorManager->get('Config');
         $namespace = self::FACTORY_NAMESPACE;
         if (!isset($config[$namespace]) || !is_array($config[$namespace]) || !isset($config[$namespace][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
@@ -96,17 +96,17 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         if (method_exists($serviceLocator, 'getServiceLocator')) {
-            $serviceManager = $serviceLocator->getServiceLocator();
+            $hydratorManager = $serviceLocator->getServiceLocator();
         } else {
-            $serviceManager = $serviceLocator;
+            $hydratorManager = $serviceLocator;
         }
 
-        $config   = $serviceManager->get('Config');
+        $config   = $hydratorManager->get('Config');
         $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
 
-        $objectManager = $this->loadObjectManager($serviceManager, $config);
-        $entityHydrator = $this->loadEntityHydrator($serviceManager, $config, $objectManager);
-        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($serviceManager, $config, $objectManager);
+        $objectManager = $this->loadObjectManager($hydratorManager, $config);
+        $entityHydrator = $this->loadEntityHydrator($hydratorManager, $config, $objectManager);
+        $doctrineModuleHydrator = $this->loadDoctrineModuleHydrator($hydratorManager, $config, $objectManager);
 
         $hydrator = new DoctrineHydrator();
 
