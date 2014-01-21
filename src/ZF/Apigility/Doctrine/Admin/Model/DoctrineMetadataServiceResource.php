@@ -83,7 +83,16 @@ class DoctrineMetadataServiceResource
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        return $metadataFactory->getAllMetadata();
+        $return = [];
+        foreach ($metadataFactory->getAllMetadata() as $metadata) {
+            $entityClass = $this->getEntityClass();
+            $metadataEntity = new $entityClass;
+            $metadataEntity->exchangeArray((array)$metadata);
+
+            $return[] = $metadataEntity;
+        }
+
+        return $return;
     }
 
     public function patch($id, $data)

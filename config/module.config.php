@@ -93,6 +93,7 @@ return array(
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity' => array(
                 'hydrator'        => 'ArraySerializable',
                 'entity_identifier_name' => 'name',
+                'route_identifier_name'      => 'name',
                 'route_name'      => 'zf-apigility-doctrine-metadata-service',
             ),
         ),
@@ -104,9 +105,9 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
             'route_identifier_name'      => 'controller_service_name',
-            'resource_http_methods'      => array('GET', 'PATCH', 'DELETE'),
+            'resource_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
-            'collection_name'            => 'rest',
+            'collection_name'            => 'doctrine',
             'collection_query_whitelist' => array('version'),
         ),
         'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
