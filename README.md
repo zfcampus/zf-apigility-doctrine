@@ -18,16 +18,13 @@ and add `ZF\Apigility\Doctrine` to your `modules`
 API Resources
 -------------
 
-The Admin tool provides the following API resources:
+***/admin/api/module[/:name]/doctrine[/:controller_service_name]***
 
-```/admin/api/module[/:name]/doctrine[/:controller_service_name]```
 
-This is a resource creation route just like Apigility Admin 
-
-```/admin/api/module[/:name]/rpc[/:controller_service_name]```
+This is a Doctrine resource creation route like Apigility Rest `/admin/api/module[/:name]/rest[/:controller_service_name]`
 
 POST Parameters
-```
+```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
     "resourceName": "Artist",
@@ -41,9 +38,8 @@ POST Parameters
 }
 ```
 
-There is a supporting API for Doctrine Metadata
 
-```/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]```
+***/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]***
 
 This will return metadata for the named entity which is a member of the
 named object manager.  Querying without a name will return all metadata
@@ -148,12 +144,14 @@ $(function() {
 });
 ```
 
-Querying relations
+Querying Relations
 ---------------------
 It is possible to query collections by relations - just supply the relation name as `fieldName` and
 identifier as `value`.
 
-For example, assuming we have defined 2 entities, `User` and `UserGroup`...
+1. Using an RPC created by this module for each collection on each resource: /resource/id/childresource/child_id
+
+2. Assuming we have defined 2 entities, `User` and `UserGroup`...
 
 ````php
 /**
