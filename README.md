@@ -3,35 +3,51 @@ Apigility for Doctrine
 
 Installation
 ------------
-  1. edit `composer.json` file with following contents:
 
-     ```json
-    "require": {
-        "zfcampus/zf-apigility-doctrine": "dev-master"
-    }
-     ```
-  2. install composer via `curl -s http://getcomposer.org/installer | php` (on windows, download
-     http://getcomposer.org/installer and execute it with PHP)
-  3. run `php composer.phar install`
+Installation of this module uses composer. For composer documentation, please refer to
+[getcomposer.org](http://getcomposer.org/).
 
+```sh
+$ php composer.phar require hounddog/doctrine-data-fixture-module:0.0.*
+```
 
-Creating the Apigility-enabled module
--------------------------------------
-
-The Admin tool can create an Apigility-enabled module with the Doctrine entities in scope.
-To enable the Admin include ```'ZF\Apigility\Doctrine',``` in your 
-development.config.php configuration.
-
-All entities managed by the object manager will be available to build into apigility resources.  
+To use the Admin portion of this module for creating Doctrine APIs open `config/application.config.php` 
+and add `ZF\Apigility\Doctrine` to your `modules`
 
 
-*** deprecated ***
-Browse to ```/soliant-consulting/apigility/admin``` to begin.  On this page you will enter the name of a new module which does not already exist.  When the form is submitted
-the module will be created.
+API Resources
+-------------
 
-The next page allows you to select entities from the object manager to build into 
-resources.  You may change your object manager and refresh entities for that object
-manager.  Check the entities you want then submit the form and you're done.  Your new module is enabled in your application and you can start making API requests.  
+The Admin tool provides the following API resources:
+
+```/admin/api/module[/:name]/doctrine[/:controller_service_name]```
+
+This is a resource creation route just like Apigility Admin 
+
+```/admin/api/module[/:name]/rpc[/:controller_service_name]```
+
+POST Parameters
+```
+{
+    "objectManager": "doctrine.entitymanager.orm_default",
+    "resourceName": "Artist",
+    "entityClass": "Db\\Entity\\Artist",
+    "pageSizeParam": "limit",
+    "routeIdentifierName": "artist_id",
+    "entityIdentifierName": "id",
+    "routeMatch": "/api/artist",
+    "hydratorName": "DbApi\\V1\\Rest\\Artist\\AlbumHydrator",
+    "hydrateByValue": true
+}
+```
+
+There is a supporting API for Doctrine Metadata
+
+```/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]```
+
+This will return metadata for the named entity which is a member of the
+named object manager.  Querying without a name will return all metadata
+for the object manager.
 
 
 Hydrating Entities by Value or Reference
@@ -46,7 +62,8 @@ Handling Embedded Resources
 You may choose to supress embedded resources by setting
 `$config['zf-hal']['renderer']['render_embedded_resources']` to false.  Doing so
 returns only links to embedded resources instead of their full details.
-This setting is useful to avoid circular references.
+This setting is useful to avoid circular references.  This was created during the
+development of this module, although it is part of HAL it is documented here for safe keeping.
 
 
 Collections 
