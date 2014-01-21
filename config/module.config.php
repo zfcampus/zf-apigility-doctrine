@@ -43,21 +43,40 @@ return array(
                 ),
                 'may_terminate' => true,
             ),
+            'zf-apigility-doctrine-metadata-service' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]',
+                    'defaults' => array(
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService',
+                    ),
+                ),
+                'may_terminate' => true,
+            ),
         ),
     ),
 
     'zf-content-negotiation' => array(
         'controllers' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => 'HalJson',
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
         ),
         'accept-whitelist' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
                 'application/json',
                 'application/*+json',
             ),
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
+                'application/json',
+                'application/*+json',
+            ),
         ),
         'content-type-whitelist' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
+                'application/json',
+                'application/*+json',
+            ),
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
                 'application/json',
                 'application/*+json',
             ),
@@ -71,6 +90,11 @@ return array(
                 'route_identifier_name' => 'controller_service_name',
                 'route_name'      => 'zf-apigility-doctrine-service',
             ),
+            'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity' => array(
+                'hydrator'        => 'ArraySerializable',
+                'entity_identifier_name' => 'name',
+                'route_name'      => 'zf-apigility-doctrine-metadata-service',
+            ),
         ),
     ),
 
@@ -83,6 +107,16 @@ return array(
             'resource_http_methods'      => array('GET', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
             'collection_name'            => 'rest',
+            'collection_query_whitelist' => array('version'),
+        ),
+        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
+            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
+            'route_name'                 => 'zf-apigility-doctrine-metadata-service',
+            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity',
+            'route_identifier_name'      => 'name',
+            'resource_http_methods'      => array('GET'),
+            'collection_http_methods'    => array('GET'),
+            'collection_name'            => 'doctrine-metadata',
             'collection_query_whitelist' => array('version'),
         ),
     ),

@@ -48,6 +48,13 @@ class Module
     public function getServiceConfig()
     {
         return array('factories' => array(
+            'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' => function ($services) {
+
+                $resource = new Admin\Model\DoctrineMetadataServiceResource();
+
+                return $resource;
+            },
+
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
                 if (!$services->has('ZF\Configuration\ModuleUtils')
                     || !$services->has('ZF\Configuration\ConfigResourceFactory')
