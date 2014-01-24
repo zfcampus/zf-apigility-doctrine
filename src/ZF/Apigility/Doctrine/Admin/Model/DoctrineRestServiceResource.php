@@ -119,6 +119,10 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             $data = (array) $data;
         }
 
+        if (!isset($data['objectManager'])) {
+            return new ApiProblem(400, 'objectManager parameter is required');
+        }
+
         $type = DoctrineRestServiceModelFactory::TYPE_DEFAULT;
         $creationData = new NewRestServiceEntity();
 
