@@ -266,26 +266,28 @@ Between
     array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
 ````
 
-Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
-
-```php
-    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
-```
-
-ORM Only
---------
-
 Like (% is used as a wildcard)
 
 ```php
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
+Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
+
+```php
+    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
+```
+
+
+ORM Only
+--------
+
 Not Like (% is used as a wildcard)
 
 ```php
     array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
 ```
+
 
 ODM Only
 --------
