@@ -198,6 +198,8 @@ to return instead of a link to the collection.
 Available Query Types
 ---------------------
 
+ORM and ODM
+
 Equals
 
 ```php
@@ -258,6 +260,21 @@ NotIn
     array('type' => 'notin', 'field' => 'fieldName', 'values' => array(1, 2, 3))
 ```
 
+Between
+
+```php
+    array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
+````
+
+Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
+
+```php
+    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
+```
+
+ORM Only
+--------
+
 Like (% is used as a wildcard)
 
 ```php
@@ -270,14 +287,12 @@ Not Like (% is used as a wildcard)
     array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
 ```
 
-Between
+ODM Only
+--------
+
+Regex
 
 ```php
-    array('type' => 'between', 'field' => 'fieldName', 'from' => 'startValue', 'to' => 'endValue')
-````
-
-Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
-
-```php
-    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
+    array('type' => 'regex', 'field' => 'fieldName', 'value' => '/.*search.*/i')
 ```
+
