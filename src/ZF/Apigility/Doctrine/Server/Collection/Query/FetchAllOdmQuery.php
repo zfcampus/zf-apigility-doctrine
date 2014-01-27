@@ -141,6 +141,10 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
                         $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->range($option['from'], $option['to']));
                         break;
 
+                    case 'regex':
+                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals(new \MongoRegex($option['value'])));
+                        break;
+
                     default:
                         break;
                 }
