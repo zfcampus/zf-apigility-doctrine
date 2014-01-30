@@ -97,7 +97,7 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
 
                 switch (strtolower($option['type'])) {
                     case 'eq':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals((int)$option['value']));
+                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals($option['value']));
                         break;
 
                     case 'neq':
