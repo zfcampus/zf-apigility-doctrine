@@ -140,7 +140,7 @@ class FetchAllOrmQuery
                         // field, value
                         $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
                         $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$md5) = 0")
-                                     ->setParameter($md5, ":$parameter");
+                                     ->setParameter($md5, $option['value']);
                         break;
 
                     default:
