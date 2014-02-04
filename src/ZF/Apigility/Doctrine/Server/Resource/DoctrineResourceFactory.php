@@ -17,7 +17,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
 
-    const FACTORY_NAMESPACE = 'zf-rest-doctrine-resource';
+    const FACTORY_NAMESPACE = 'zf-apigility.doctrine-connected';
 
     /**
      * Cache of canCreateServiceWithName lookups
