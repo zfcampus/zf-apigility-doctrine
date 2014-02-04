@@ -193,6 +193,13 @@ to return instead of a link to the collection.
     /api/user_data?zoom%5B0%5D=UserGroup
 ```
 
+Format of Date Fields
+---------------------
+
+When a date field is involved in a query you may specify the format of the date
+using PHP date formatting options.  The default date format is ```Y-m-d H:i:s```
+If you have a date field which is just Y-m-d then add 'format' => 'Y-m-d', 'value' => '2014-02-04'
+to your query.
 
 
 Available Query Types

@@ -73,6 +73,14 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
                         case 'custom_id':
                             break;
                         case 'date':
+                            if ($option['value']) {
+                                if (isset($option['format']) and $option['format']) {
+                                    $format = $option['format'];
+                                } else {
+                                    $format = 'Y-m-d H:i:s';
+                                }
+                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
+                            }
                             break;
                         case 'file':
                             break;
