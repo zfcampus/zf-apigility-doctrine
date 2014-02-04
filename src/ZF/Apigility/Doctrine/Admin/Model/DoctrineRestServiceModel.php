@@ -687,10 +687,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     'strategies' => $hydratorStrategies,
                 ),
             ),
-            'zf-rest-doctrine-resource' => array(
-                $details->resourceClass => array(
-                    'object_manager' => $details->objectManager,
-                    'hydrator' => $details->hydratorName,
+            'zf-apigility' => array(
+                'doctrine-connected' => array(
+                    $details->resourceClass => array(
+                        'object_manager' => $details->objectManager,
+                        'hydrator' => $details->hydratorName,
+                    ),
                 ),
             ),
         );
@@ -853,7 +855,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
          $key = array('zf-rest-doctrine-hydrator', $hydratorName);
          $this->configResource->deleteKey($key);
 
-         $key = array('zf-rest-doctrine-resource', $entity->resourceClass);
+         $key = array('zf-apigility', 'doctrine-connected', $entity->resourceClass);
          $this->configResource->deleteKey($key);
 
         $key = array('zf-rest', $entity->controllerServiceName);
