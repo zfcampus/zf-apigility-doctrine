@@ -16,6 +16,7 @@ use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Resource;
 use ZF\Hal\View\HalJsonModel;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use ZF\Apigility\Admin\Model\RestServiceResource;
 
 class Module
 {
@@ -81,8 +82,15 @@ class Module
                         'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource is missing one or more dependencies'
                     );
                 }
+                if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
+                    throw new ServiceNotCreatedException(
+                        'ZF\Apigility\Admin\Model\RestServiceResource is missing one or more dependencies'
+                    );
+                }
                 $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
-                return new Admin\Model\DoctrineRestServiceResource($factory);
+                $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
+                $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
+                return new RestServiceResource($factory, $inputFilterModel, $documentationModel);
             },
 
 
