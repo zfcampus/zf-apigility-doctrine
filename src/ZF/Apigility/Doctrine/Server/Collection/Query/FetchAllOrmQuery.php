@@ -116,13 +116,13 @@ class FetchAllOrmQuery
                         break;
 
                     case 'in':
-                        $parameter = md5(uniqid());
+                        $parameter = uniqid('a');
                         $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['values']);
                         break;
 
                     case 'notin':
-                        $parameter = md5(uniqid());
+                        $parameter = uniqid('a');
                         $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['values']);
                         break;
@@ -142,9 +142,9 @@ class FetchAllOrmQuery
 
                     case 'decimation':
                         // field, value
-                        $md5 = 'a' . md5(uniqid()); # parameter cannot start with #
-                        $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$md5) = 0")
-                                     ->setParameter($md5, $option['value']);
+                        $parameter = uniqid('a');
+                        $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$parameter) = 0")
+                                     ->setParameter($parameter, $option['value']);
                         break;
 
                     default:
