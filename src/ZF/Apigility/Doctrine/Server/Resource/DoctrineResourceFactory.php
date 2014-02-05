@@ -17,8 +17,6 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
 
-    const FACTORY_NAMESPACE = 'zf-apigility.doctrine-connected';
-
     /**
      * Cache of canCreateServiceWithName lookups
      * @var array
@@ -47,8 +45,8 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         // Validate object is set
         $config = $serviceLocator->get('Config');
-        $namespace = self::FACTORY_NAMESPACE;
-        if (!isset($config[$namespace]) || !is_array($config[$namespace]) || !isset($config[$namespace][$requestedName])) {
+
+        if (!isset($config['zf-apigility']['doctrine-connected']) || !is_array($config['zf-apigility']['doctrine-connected']) || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
             return false;
         }
@@ -66,7 +64,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         }
 
         // Validate object manager
-        $config = $config[$namespace];
+        $config = $config['zf-apigility']['doctrine-connected'];
         if (!isset($config[$requestedName]) || !isset($config[$requestedName]['object_manager'])) {
             throw new ServiceNotFoundException(sprintf(
                 '%s requires that a valid "object_manager" is specified for listener %s; no service found',
@@ -91,12 +89,12 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         $config   = $serviceLocator->get('Config');
-        $config   = $config[self::FACTORY_NAMESPACE][$requestedName];
+
+        $config   = $config['zf-apigility']['doctrine-connected'][$requestedName];
 
         $className = isset($config['class']) ? $config['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
         $listener = new $className();
-
         $listener->setObjectManager($this->loadObjectManager($serviceLocator, $config));
         $listener->setHydrator($this->loadHydrator($serviceLocator, $config));
 
