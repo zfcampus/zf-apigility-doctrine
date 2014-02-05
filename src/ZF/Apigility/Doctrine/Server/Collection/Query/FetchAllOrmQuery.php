@@ -72,37 +72,61 @@ class FetchAllOrmQuery
                 switch (strtolower($option['type'])) {
                     case 'eq':
                         // field, value
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'neq':
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'lt':
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'lte':
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->lte('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'gt':
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->gt('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
 
                     case 'gte':
+<<<<<<< HEAD
                         $parameter = uniqid('a');
+=======
+                        $parameter = md5(uniqid());
+>>>>>>> 0e285a31c4b5f9d11d961a5fe752ce4e04fe1bcf
                         $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], ":$parameter"));
                         $queryBuilder->setParameter($parameter, $option['value']);
                         break;
@@ -116,11 +140,15 @@ class FetchAllOrmQuery
                         break;
 
                     case 'in':
-                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], $option['values']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['values']);
                         break;
 
                     case 'notin':
-                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], $option['values']));
+                        $parameter = md5(uniqid());
+                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
+                        $queryBuilder->setParameter($parameter, $option['values']);
                         break;
 
                     case 'like':

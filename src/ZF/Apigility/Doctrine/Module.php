@@ -17,6 +17,7 @@ use ZF\Hal\Resource;
 use ZF\Hal\View\HalJsonModel;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use ZF\Apigility\Admin\Model\RestServiceResource;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 
 class Module
 {
@@ -90,7 +91,7 @@ class Module
                 $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
                 $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                 $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
-                return new RestServiceResource($factory, $inputFilterModel, $documentationModel);
+                return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
             },
 
 
