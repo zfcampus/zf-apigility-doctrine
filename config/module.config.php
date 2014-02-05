@@ -88,6 +88,7 @@ return array(
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity' => array(
                 'hydrator'        => 'ArraySerializable',
                 'route_identifier_name' => 'controller_service_name',
+                'entity_identifier_name' => 'controller_service_name',
                 'route_name'      => 'zf-apigility-doctrine-service',
             ),
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity' => array(
