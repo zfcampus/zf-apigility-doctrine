@@ -331,7 +331,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $controllerService = ($details->controllerServiceName) ?: $this->createControllerServiceName($resourceName);
         $routeName = ($details->routeName) ?: $this->createRoute($resourceName, $details->routeMatch, $details->routeIdentifierName, $controllerService);
         $hydratorName = ($details->hydratorName) ?: $this->createHydratorName($resourceName);
-        $pageSizeParam = ($details->pageSizeParam) ?: 'limit';
         $objectManager = ($details->objectManager) ?: 'doctrine.entitymanager.orm_default';
 
         $entity->exchangeArray(array(
