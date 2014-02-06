@@ -19,7 +19,6 @@ use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
 use ZF\Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use ZF\ApiProblem\ApiProblem;
@@ -167,7 +166,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
     /**
      * @param  string $controllerService
-     * @return RestServiceEntity|false
+     * @return DoctrineRestServiceEntity|false
      */
     public function fetch($controllerService)
     {
@@ -189,7 +188,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $restConfig['resource_class']        = $restConfig['listener'];
         unset($restConfig['listener']);
 
-        $entity = new RestServiceEntity();
+        $entity = new DoctrineRestServiceEntity();
         $entity->exchangeArray($restConfig);
 
         $this->getRouteInfo($entity, $config);
@@ -202,7 +201,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             'entity' => $entity,
             'config' => $config,
         ), function ($r) {
-            return ($r instanceof RestServiceEntity);
+            return ($r instanceof DoctrineRestServiceEntity);
         });
         if ($eventResults->stopped()) {
             return $eventResults->last();
@@ -214,7 +213,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Fetch all services
      *
-     * @return RestServiceEntity[]
+     * @return DoctrineRestServiceEntity[]
      */
     public function fetchAll($version = null)
     {
@@ -263,7 +262,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Create a new service using the details provided
      *
      * @param  NewRestServiceEntity $details
-     * @return RestServiceEntity
+     * @return DoctrineRestServiceEntity
      */
     public function createService(NewRestServiceEntity $details)
     {
@@ -273,7 +272,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             throw new CreationException('Invalid resource name; must be a valid PHP namespace name.');
         }
 
-        $entity       = new RestServiceEntity();
+        $entity       = new DoctrineRestServiceEntity();
         $entity->exchangeArray($details->getArrayCopy());
 
         $mediaType         = $this->createMediaType();
@@ -317,10 +316,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Update an existing service
      *
-     * @param  RestServiceEntity $update
-     * @return RestServiceEntity
+     * @param  DoctrineRestServiceEntity $update
+     * @return DoctrineRestServiceEntity
      */
-    public function updateService(RestServiceEntity $update)
+    public function updateService(DoctrineRestServiceEntity $update)
     {
         $controllerService = $update->controllerServiceName;
 
@@ -586,12 +585,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Creates REST configuration
      *
-     * @param  RestServiceEntity $details
+     * @param  DoctrineRestServiceEntity $details
      * @param  string $controllerService
      * @param  string $resourceClass
      * @param  string $routeName
      */
-    public function createRestConfig(DoctrineRestServiceEntity $details, $controllerService, $resourceClass, $routeName)
+    public function createRestConfig(DoctrineDoctrineRestServiceEntity $details, $controllerService, $resourceClass, $routeName)
     {
         $config = array('zf-rest' => array(
             $controllerService => array(
@@ -616,10 +615,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Create content negotiation configuration based on payload and discovered
      * controller service name
      *
-     * @param  RestServiceEntity $details
+     * @param  DoctrineRestServiceEntity $details
      * @param  string $controllerService
      */
-    public function createContentNegotiationConfig(RestServiceEntity $details, $controllerService)
+    public function createContentNegotiationConfig(DoctrineRestServiceEntity $details, $controllerService)
     {
         $config = array(
             'controllers' => array(
@@ -641,12 +640,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create Doctrine configuration
      *
-     * @param  RestServiceEntity $details
+     * @param  DoctrineRestServiceEntity $details
      * @param  string $entityClass
      * @param  string $collectionClass
      * @param  string $routeName
      */
-    public function createDoctrineConfig(RestServiceEntity $details, $entityClass, $collectionClass, $routeName)
+    public function createDoctrineConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
         $entityValue = $details->getArrayCopy();
         $objectManager = $this->getServiceManager()->get($details->objectManager);
@@ -703,12 +702,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create HAL configuration
      *
-     * @param  RestServiceEntity $details
+     * @param  DoctrineRestServiceEntity $details
      * @param  string $entityClass
      * @param  string $collectionClass
      * @param  string $routeName
      */
-    public function createHalConfig(RestServiceEntity $details, $entityClass, $collectionClass, $routeName)
+    public function createHalConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
         $config = array('zf-hal' => array('metadata_map' => array(
             $entityClass => array(
@@ -731,10 +730,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Update the route for an existing service
      *
-     * @param  RestServiceEntity $original
-     * @param  RestServiceEntity $update
+     * @param  DoctrineRestServiceEntity $original
+     * @param  DoctrineRestServiceEntity $update
      */
-    public function updateRoute(RestServiceEntity $original, RestServiceEntity $update)
+    public function updateRoute(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
         $route = $update->routeMatch;
         if (!$route) {
@@ -752,10 +751,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Update REST configuration
      *
-     * @param  RestServiceEntity $original
-     * @param  RestServiceEntity $update
+     * @param  DoctrineRestServiceEntity $original
+     * @param  DoctrineRestServiceEntity $update
      */
-    public function updateRestConfig(RestServiceEntity $original, RestServiceEntity $update)
+    public function updateRestConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
         $patch = array();
         foreach ($this->restScalarUpdateOptions as $property => $configKey) {
@@ -788,10 +787,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Update the content negotiation configuration for the service
      *
-     * @param  RestServiceEntity $original
-     * @param  RestServiceEntity $update
+     * @param  DoctrineRestServiceEntity $original
+     * @param  DoctrineRestServiceEntity $update
      */
-    public function updateContentNegotiationConfig(RestServiceEntity $original, RestServiceEntity $update)
+    public function updateContentNegotiationConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
         $baseKey = 'zf-content-negotiation.';
         $service = $original->controllerServiceName;
@@ -822,9 +821,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Delete the route associated with the given service
      *
-     * @param  RestServiceEntity $entity
+     * @param  DoctrineRestServiceEntity $entity
      */
-    public function deleteRoute(RestServiceEntity $entity)
+    public function deleteRoute(DoctrineRestServiceEntity $entity)
     {
         $config = $this->configResource->fetch(true);
 
@@ -843,9 +842,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Delete the REST configuration associated with the given
      * service
      *
-     * @param  RestServiceEntity $entity
+     * @param  DoctrineRestServiceEntity $entity
      */
-    public function deleteDoctrineRestConfig(RestServiceEntity $entity)
+    public function deleteDoctrineRestConfig(DoctrineRestServiceEntity $entity)
     {
          // Get hydrator name
          $config = $this->configResource->fetch(true);
@@ -1015,10 +1014,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Retrieve route information for a given service based on the configuration available
      *
-     * @param  RestServiceEntity $metadata
+     * @param  DoctrineRestServiceEntity $metadata
      * @param  array $config
      */
-    protected function getRouteInfo(RestServiceEntity $metadata, array $config)
+    protected function getRouteInfo(DoctrineRestServiceEntity $metadata, array $config)
     {
         $routeName = $metadata->routeName;
         if (!$routeName
@@ -1040,10 +1039,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * service into the REST metadata
      *
      * @param  string $controllerServiceName
-     * @param  RestServiceEntity $metadata
+     * @param  DoctrineRestServiceEntity $metadata
      * @param  array $config
      */
-    protected function mergeContentNegotiationConfig($controllerServiceName, RestServiceEntity $metadata, array $config)
+    protected function mergeContentNegotiationConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
         if (!isset($config['zf-content-negotiation'])) {
             return;
@@ -1079,10 +1078,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Merge entity and collection class into metadata, if found
      *
      * @param  string $controllerServiceName
-     * @param  RestServiceEntity $metadata
+     * @param  DoctrineRestServiceEntity $metadata
      * @param  array $config
      */
-    protected function mergeHalConfig($controllerServiceName, RestServiceEntity $metadata, array $config)
+    protected function mergeHalConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
         if (!isset($config['zf-hal'])
             || !isset($config['zf-hal']['metadata_map'])
@@ -1111,11 +1110,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Derive the name of the entity class from the controller service name
      *
      * @param  string $controllerServiceName
-     * @param  RestServiceEntity $metadata
+     * @param  DoctrineRestServiceEntity $metadata
      * @param  array $config
      * @return string
      */
-    protected function deriveEntityClass($controllerServiceName, RestServiceEntity $metadata, array $config)
+    protected function deriveEntityClass($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
         if (isset($config['zf-rest'])
             && isset($config['zf-rest'][$controllerServiceName])
@@ -1135,11 +1134,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Derive the name of the collection class from the controller service name
      *
      * @param  string $controllerServiceName
-     * @param  RestServiceEntity $metadata
+     * @param  DoctrineRestServiceEntity $metadata
      * @param  array $config
      * @return string
      */
-    protected function deriveCollectionClass($controllerServiceName, RestServiceEntity $metadata, array $config)
+    protected function deriveCollectionClass($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
         if (isset($config['zf-rest'])
             && isset($config['zf-rest'][$controllerServiceName])
