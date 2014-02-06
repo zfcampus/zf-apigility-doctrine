@@ -38,6 +38,17 @@ POST Parameters
 }
 ```
 
+Minimal POST Parameters
+```json
+{
+    "resourceName": "Album",
+    "entityClass": "Db\\Entity\\Album",
+    "routeIdentifierName": "album_id",
+    "entityIdentifierName": "id",
+    "routeMatch": "/api/album"
+}
+```
+
 
 ***/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]***
 
