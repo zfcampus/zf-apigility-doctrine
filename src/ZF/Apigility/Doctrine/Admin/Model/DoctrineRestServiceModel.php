@@ -104,6 +104,35 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     }
 
     /**
+     * Determine if the given entity is DB-connected, and, if so, recast to a DbConnectedRestServiceEntity
+     *
+     * @param  \Zend\EventManager\Event $e
+     * @return null|DbConnectedRestServiceEntity
+     */
+    public static function onFetch($e)
+    {
+        $entity = $e->getParam('entity', false);
+        if (!$entity) {
+            // No entity; nothing to do
+            return;
+        }
+
+        $config = $e->getParam('config', array());
+        if (!isset($config['zf-apigility'])
+            || !isset($config['zf-apigility']['doctrine-connected'])
+            || !isset($config['zf-apigility']['doctrine-connected'][$entity->resourceClass])
+        ) {
+            // No DB-connected configuration for this service; nothing to do
+            return;
+        }
+        $config = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
+
+        $doctrineEntity = new DoctrineRestServiceEntity();
+        $doctrineEntity->exchangeArray(array_merge($entity->getArrayCopy(), $config));
+        return $doctrineEntity;
+    }
+
+    /**
      * Allow read-only access to properties
      *
      * @param  string $name
