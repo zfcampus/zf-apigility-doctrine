@@ -18,7 +18,7 @@ use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
-use ZF\Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
+use ZF\Apigility\Doctrine\Admin\Model\NewDoctrineServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity as RestServiceEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -290,12 +290,28 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     }
 
     /**
+     * Create a default hydrator name
+     *
+     * @param string $resourceName
+     * @return string
+     */
+    public function createHydratorName($resourceName) {
+        return sprintf(
+            '%s\\V%s\\Rest\\%s\\%sHydrator',
+            $this->module,
+            $this->moduleEntity->getLatestVersion(),
+            $resourceName,
+            $resourceName
+        );
+    }
+
+    /**
      * Create a new service using the details provided
      *
-     * @param  NewRestServiceEntity $details
+     * @param  NewDoctrineServiceEntity $details
      * @return RestServiceEntity
      */
-    public function createService(NewRestServiceEntity $details)
+    public function createService(NewDoctrineServiceEntity $details)
     {
         $resourceName = ucfirst($details->resourceName);
 
@@ -306,21 +322,23 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $entity       = new RestServiceEntity();
         $entity->exchangeArray($details->getArrayCopy());
 
-        $mediaType         = $this->createMediaType();
-        $resourceClass     = ($details->resourceClass) ? $details->resourceClass: $this->createResourceClass($resourceName, $details);
-        $collectionClass   = ($details->collectionClass) ? $details->collectionClass: $this->createCollectionClass($resourceName);
-        $entityClass       = ($details->entityClass) ? $details->entityClass: $this->createEntityClass($resourceName, $details);
-        $module            = ($details->module) ? $details->module: $this->module;
+        $mediaType = $this->createMediaType();
+        $resourceClass = ($details->resourceClass) ?: $this->createResourceClass($resourceName, $details);
+        $collectionClass = ($details->collectionClass) ?: $this->createCollectionClass($resourceName);
+        $entityClass = ($details->entityClass) ?: $this->createEntityClass($resourceName, $details);
+        $module = ($details->module) ?: $this->module;
 
-        $controllerService = ($details->controllerServiceName) ? $details->controllerServiceName: $this->createControllerServiceName($resourceName);
-        $routeName         = ($details->routeName) ? $details->routeName: $this->createRoute($resourceName, $details->routeMatch, $details->routeIdentifierName, $controllerService);
-
-        $objectManager     = ($details->objectManager) ? $details->objectManager: 'doctrine.entitymanager.orm_default';
+        $controllerService = ($details->controllerServiceName) ?: $this->createControllerServiceName($resourceName);
+        $routeName = ($details->routeName) ?: $this->createRoute($resourceName, $details->routeMatch, $details->routeIdentifierName, $controllerService);
+        $hydratorName = ($details->hydratorName) ?: $this->createHydratorName($resourceName);
+        $pageSizeParam = ($details->pageSizeParam) ?: 'limit';
+        $objectManager = ($details->objectManager) ?: 'doctrine.entitymanager.orm_default';
 
         $entity->exchangeArray(array(
             'collection_class'        => $collectionClass,
             'controller_service_name' => $controllerService,
             'entity_class'            => $entityClass,
+            'hydrator_name'           => $hydratorName,
             'module'                  => $module,
             'resource_class'          => $resourceClass,
             'route_name'              => $routeName,
@@ -421,7 +439,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * @param  string $resourceName
      * @return string The name of the newly created class
      */
-    public function createResourceClass($resourceName, NewRestServiceEntity $details)
+    public function createResourceClass($resourceName, NewDoctrineServiceEntity $details)
     {
         $module  = $this->module;
         $srcPath = $this->getSourcePath($resourceName);

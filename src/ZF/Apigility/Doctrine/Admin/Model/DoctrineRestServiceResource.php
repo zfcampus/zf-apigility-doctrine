@@ -11,7 +11,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
-use ZF\Apigility\Doctrine\Admin\Model\NewRestServiceEntity;
+use ZF\Apigility\Doctrine\Admin\Model\NewDoctrineServiceEntity;
 
 class DoctrineRestServiceResource extends AbstractResourceListener
 {
@@ -92,7 +92,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         }
 
         $type = DoctrineRestServiceModelFactory::TYPE_DEFAULT;
-        $creationData = new NewRestServiceEntity();
+        $creationData = new NewDoctrineServiceEntity();
 
         $creationData->exchangeArray($data);
 

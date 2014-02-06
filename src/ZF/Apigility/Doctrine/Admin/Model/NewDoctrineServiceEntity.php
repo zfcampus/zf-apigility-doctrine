@@ -9,13 +9,13 @@ namespace ZF\Apigility\Doctrine\Admin\Model;
 use ZF\Rest\Exception\CreationException;
 use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 
-class NewRestServiceEntity extends ZFNewRestServiceEntity
+class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
 {
     protected $objectManager;
 
     protected $hydratorName;
 
-    protected $hydrateByValue = false;
+    protected $hydrateByValue = true;
 
     public function exchangeArray(array $data)
     {
