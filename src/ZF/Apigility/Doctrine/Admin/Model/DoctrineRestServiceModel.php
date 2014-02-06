@@ -104,10 +104,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     }
 
     /**
-     * Determine if the given entity is DB-connected, and, if so, recast to a DbConnectedRestServiceEntity
+     * Determine if the given entity is doctrine-connected, and, if so, recast to a DoctrineRestServiceEntity
      *
      * @param  \Zend\EventManager\Event $e
-     * @return null|DbConnectedRestServiceEntity
+     * @return null|DoctrineRestServiceEntity
      */
     public static function onFetch($e)
     {
@@ -129,6 +129,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $doctrineEntity = new DoctrineRestServiceEntity();
         $doctrineEntity->exchangeArray(array_merge($entity->getArrayCopy(), $config));
+
         return $doctrineEntity;
     }
 
