@@ -33,7 +33,7 @@ POST Parameters
     "routeIdentifierName": "artist_id",
     "entityIdentifierName": "id",
     "routeMatch": "/api/artist",
-    "hydratorName": "DbApi\\V1\\Rest\\Artist\\AlbumHydrator",
+    "hydratorName": "DbApi\\V1\\Rest\\Artist\\ArtistHydrator",
     "hydrateByValue": true
 }
 ```
