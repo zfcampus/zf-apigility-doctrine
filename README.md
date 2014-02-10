@@ -45,7 +45,7 @@ Minimal POST Parameters
     "entityClass": "Db\\Entity\\Album",
     "routeIdentifierName": "album_id",
     "entityIdentifierName": "id",
-    "routeMatch": "/api/album"
+    "routeMatch": "/api/album",
 }
 ```
 
