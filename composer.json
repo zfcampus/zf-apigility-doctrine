@@ -34,7 +34,7 @@
     "autoload": {
         "psr-0": {
             "ZF\\Apigility\\Doctrine": "src/",
-            "ZF\\Apigility\\Doctrine\\Admin": "src/",
+            "ZF\\Apigility\\Doctrine\\Admin": "src/"
         }
     }
 }
