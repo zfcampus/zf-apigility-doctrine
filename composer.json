@@ -1,7 +1,7 @@
 {
-    "name": "zfcampus/zf-apigility-doctrine",
+    "name": "zfcampus/zf-apigility-doctrine-admin",
     "type": "library",
-    "description": "Doctrine for Apigility Admin and Server",
+    "description": "Doctrine for Apigility Administration",
     "keywords": [
         "apigility",
         "doctrine",
@@ -26,7 +26,8 @@
         "php": ">=5.4",
         "zendframework/zendframework": "dev-develop",
         "zfcampus/zf-apigility": "dev-master",
-        "zfcampus/zf-configuration": "dev-master"
+        "zfcampus/zf-configuration": "dev-master",
+	"zfcampus/zf-apigility-doctrine-server": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -34,7 +35,6 @@
         "psr-0": {
             "ZF\\Apigility\\Doctrine": "src/",
             "ZF\\Apigility\\Doctrine\\Admin": "src/",
-            "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }
 }
