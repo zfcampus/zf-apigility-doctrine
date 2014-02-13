@@ -1,7 +1,7 @@
 {
-    "name": "zfcampus/zf-apigility-doctrine",
+    "name": "zfcampus/zf-apigility-doctrine-server",
     "type": "library",
-    "description": "Doctrine for Apigility Admin and Server",
+    "description": "Doctrine for Apigility Server",
     "keywords": [
         "apigility",
         "doctrine",
@@ -33,7 +33,6 @@
     "autoload": {
         "psr-0": {
             "ZF\\Apigility\\Doctrine": "src/",
-            "ZF\\Apigility\\Doctrine\\Admin": "src/",
             "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }
