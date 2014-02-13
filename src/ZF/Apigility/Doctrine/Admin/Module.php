@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\Apigility\Doctrine;
+namespace ZF\Apigility\Doctrine\Admin;
 
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
 use Zend\EventManager\EventInterface;
