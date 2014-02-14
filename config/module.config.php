@@ -5,32 +5,6 @@
  */
 
 return array(
-    'service_manager' => array(
-        'abstract_factories' => array(
-            'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-        ),
-    ),
-
-    'hydrators' => array(
-        'abstract_factories' => array(
-            'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
-        )
-    ),
-
-    'asset_manager' => array(
-        'resolver_configs' => array(
-            'paths' => array(
-                __DIR__ . '/../asset',
-            ),
-        ),
-    ),
-
-    'view_manager' => array(
-        'template_path_stack' => array(
-            __DIR__ . '/../view',
-        ),
-    ),
-
     'router' => array(
         'routes' => array(
             'zf-apigility-doctrine-service' => array(
