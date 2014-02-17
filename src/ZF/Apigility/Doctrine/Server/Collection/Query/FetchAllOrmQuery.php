@@ -6,7 +6,7 @@ use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
 use Zend\Paginator\Adapter\AdapterInterface;
-
+use Zend\ServiceManager\AbstractPluginManager;
 
 /**
  * Class FetchAllOrmQuery
@@ -20,6 +20,7 @@ class FetchAllOrmQuery
     use ProvidesObjectManager;
 
     protected $collectionClass;
+    protected $filterManager;
 
     public function getCollectionClass()
     {
@@ -30,6 +31,17 @@ class FetchAllOrmQuery
     {
         $this->collectionClass = $value;
         return $this;
+    }
+
+    public function setFilterManager(AbstractPluginManager $filterManager)
+    {
+        $this->filterManager = $filterManager;
+        return $this;
+    }
+
+    public function getFilterManager()
+    {
+        return $this->filterManager;
     }
 
     /**
@@ -53,103 +65,69 @@ class FetchAllOrmQuery
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
 
-        // Add query parameters
+        // Get metadata for type casting
+        $cmf = $this->getObjectManager()->getMetadataFactory();
+        $metadata = (array)$cmf->getMetadataFor($entityClass);
+
+        // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                // Allow and/or queries
-                if (isset($option['where'])) {
-                    if ($option['where'] == 'and') {
-                        $queryType = 'andWhere';
-                    } elseif ($option['where'] == 'or') {
-                        $queryType = 'orWhere';
+                if(isset($option['field']) and isset($metadata['fieldMappings'][$option['field']]['type'])) {
+                    switch ($metadata['fieldMappings'][$option['field']]['type']) {
+                        case 'string':
+                            settype($option['value'], 'string');
+                            break;
+                        case 'integer':
+                        case 'smallint':
+                        #case 'bigint':
+                            settype($option['value'], 'integer');
+                            break;
+                        case 'boolean':
+                            settype($option['value'], 'boolean');
+                            break;
+                        case 'decimal':
+                            settype($option['value'], 'decimal');
+                            break;
+                        case 'date':
+                            if ($option['value']) {
+                                if (isset($option['format']) and $option['format']) {
+                                    $format = $option['format'];
+                                } else {
+                                    $format = 'Y-m-d';
+                                }
+                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
+                            }
+                            break;
+                        case 'time':
+                            if ($option['value']) {
+                                if (isset($option['format']) and $option['format']) {
+                                    $format = $option['format'];
+                                } else {
+                                    $format = 'H:i:s';
+                                }
+                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
+                            }
+                            break;
+                        case 'datetime':
+                            if ($option['value']) {
+                                if (isset($option['format']) and $option['format']) {
+                                    $format = $option['format'];
+                                } else {
+                                    $format = 'Y-m-d H:i:s';
+                                }
+                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
+                            }
+                            break;
+                        case 'float':
+                            settype($option['value'], 'float');
+                            break;
+                        default:
+                            break;
                     }
                 }
 
-                if (!isset($queryType)) {
-                    $queryType = 'andWhere';
-                }
-
-                switch (strtolower($option['type'])) {
-                    case 'eq':
-                        // field, value
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'neq':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'lt':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'lte':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->lte('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'gt':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->gt('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'gte':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['value']);
-                        break;
-
-                    case 'isnull':
-                        $queryBuilder->$queryType($queryBuilder->expr()->isNull('row.' . $option['field']));
-                        break;
-
-                    case 'isnotnull':
-                        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull('row.' . $option['field']));
-                        break;
-
-                    case 'in':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['values']);
-                        break;
-
-                    case 'notin':
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
-                        $queryBuilder->setParameter($parameter, $option['values']);
-                        break;
-
-                    case 'like':
-                        $queryBuilder->$queryType($queryBuilder->expr()->like('row.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
-                        break;
-
-                    case 'notlike':
-                        $queryBuilder->$queryType($queryBuilder->expr()->notLike('row.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
-                        break;
-
-                    case 'between':
-                        // field, from, to
-                        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
-                        break;
-
-                    case 'decimation':
-                        // field, value
-                        $parameter = uniqid('a');
-                        $queryBuilder->$queryType("mod(row." . $option['field'] . ", :$parameter) = 0")
-                                     ->setParameter($parameter, $option['value']);
-                        break;
-
-                    default:
-                        break;
-                }
+                $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                $filter->filter($queryBuilder, $option);
             }
         }
 
