@@ -4,7 +4,7 @@ namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
 use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
 
-class NotLike implements FilterInterface
+class Between implements FilterInterface
 {
     public function filter($queryBuilder, $option) {
         if (isset($option['where'])) {

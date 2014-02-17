@@ -4,11 +4,22 @@ namespace ZF\Apigility\Doctrine\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
+use Zend\ServiceManager\AbstractPluginManager;
 
 class FetchAllOdmQuery implements ApigilityFetchAllQuery
 {
-
     use ProvidesObjectManager;
+
+    public function setFilterManager(AbstractPluginManager $filterManager)
+    {
+        $this->filterManager = $filterManager;
+        return $this;
+    }
+
+    public function getFilterManager()
+    {
+        return $this->filterManager;
+    }
 
     /**
      * {@inheritDoc}
@@ -31,18 +42,9 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         $cmf = $this->getObjectManager()->getMetadataFactory();
         $metadata = (array)$cmf->getMetadataFor($entityClass);
 
-        // Filter:
+        // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                $queryType = 'addAnd';
-                if (isset($option['where'])) {
-                    if ($option['where'] == 'and') {
-                        $queryType = 'addAnd';
-                    } elseif ($option['where'] == 'or') {
-                        $queryType = 'addOr';
-                    }
-                }
-
                 // Type cast value
                 if(isset($metadata['fieldMappings'][$option['field']]['type'])) {
                     switch ($metadata['fieldMappings'][$option['field']]['type']) {
@@ -103,64 +105,8 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
                     }
                 }
 
-                switch (strtolower($option['type'])) {
-                    case 'eq':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals($option['value']));
-                        break;
-
-                    case 'neq':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notEqual($option['value']));
-                        break;
-
-                    case 'lt':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->lt($option['value']));
-                        break;
-
-                    case 'lte':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->lte($option['value']));
-                        break;
-
-                    case 'gt':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->gt($option['value']));
-                        break;
-
-                    case 'gte':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->gte($option['value']));
-                        break;
-
-                    case 'isnull':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->exists(false));
-                        break;
-
-                    case 'isnotnull':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->exists(true));
-                        break;
-
-                    case 'in':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->in($option['values']));
-                        break;
-
-                    case 'notin':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notIn($option['values']));
-                        break;
-
-                    case 'between':
-                        // field, from, to
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->range($option['from'], $option['to']));
-                        break;
-
-                    case 'like':
-                        $regex = '/' . str_replace('%', '.*?', $option['value']) . '/i';
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals(new \MongoRegex($regex)));
-                        break;
-
-                    case 'regex':
-                        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals(new \MongoRegex($option['value'])));
-                        break;
-
-                    default:
-                        break;
-                }
+                $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                $filter->filter($queryBuilder, $option);
             }
         }
 

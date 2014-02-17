@@ -32,10 +32,17 @@ class Module
         $serviceListener = $sm->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            'ApigilityDoctrineServerCollectionORMFilterManager',
-            'apigility-doctrine-server-collection-orm-filter',
+            'ZfOrmCollectionFilterManager',
+            'zf-orm-collection-filter',
             'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
-            'getApigilityDoctrineCollectionORMFilterConfig'
+            'getZfOrmFilterConfig'
+        );
+
+        $serviceListener->addServiceManager(
+            'ZfOdmCollectionFilterManager',
+            'zf-odm-collection-filter',
+            'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
+            'getZfOrmFilterConfig'
         );
     }
 }

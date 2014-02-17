@@ -167,10 +167,10 @@ class DoctrineResource extends AbstractResourceListener
         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $queryBuilder = new Query\FetchAllOrmQuery();
-            $queryBuilder->setFilterManager($this->getServiceManager()->get('ApigilityDoctrineServerCollectionORMFilterManager'));
+            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $queryBuilder = new Query\FetchAllOdmQuery();
-            $queryBuilder->setFilterManager($this->getServiceManager()->get('ApigilityDoctrineServerCollectionODMFilterManager'));
+            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
         } else {
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
