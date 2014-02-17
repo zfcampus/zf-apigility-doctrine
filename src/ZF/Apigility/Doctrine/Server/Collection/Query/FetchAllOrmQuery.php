@@ -72,7 +72,7 @@ class FetchAllOrmQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                if(isset($metadata['fieldMappings'][$option['field']]['type'])) {
+                if(isset($option['field']) and isset($metadata['fieldMappings'][$option['field']]['type'])) {
                     switch ($metadata['fieldMappings'][$option['field']]['type']) {
                         case 'string':
                             settype($option['value'], 'string');

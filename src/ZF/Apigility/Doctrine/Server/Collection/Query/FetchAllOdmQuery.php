@@ -46,7 +46,7 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
                 // Type cast value
-                if(isset($metadata['fieldMappings'][$option['field']]['type'])) {
+                if(isset($option['field']) and isset($metadata['fieldMappings'][$option['field']]['type'])) {
                     switch ($metadata['fieldMappings'][$option['field']]['type']) {
                         case 'int':
                             settype($option['value'], 'integer');
