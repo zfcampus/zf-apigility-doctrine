@@ -9,6 +9,26 @@ return array(
         'abstract_factories' => array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
         ),
+        'factories' => array(
+            'ApigilityDoctrineServerCollectionORMFilterManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\ORMFilterManagerFactory'
+        ),
+    ),
+
+    'apigility-doctrine-server-collection-orm-filter' => array(
+        'invokables' => array(
+            'eq' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Equals',
+            'neq' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\NotEquals',
+            'lt' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\LessThan',
+            'lte' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\LessThanOrEquals',
+            'gt' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\GreaterThan',
+            'gte' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\GreaterThanOrEquals',
+            'isnull' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\IsNull',
+            'isnotnull' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\IsNotNull',
+            'in' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\In',
+            'notin' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\NotIn',
+            'between' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Between',
+            'like' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Like',
+        ),
     ),
 
     'hydrators' => array(

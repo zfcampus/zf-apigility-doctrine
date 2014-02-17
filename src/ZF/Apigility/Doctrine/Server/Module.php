@@ -6,6 +6,8 @@
 
 namespace ZF\Apigility\Doctrine\Server;
 
+use Zend\ModuleManager\ModuleManager;
+
 class Module
 {
     public function getAutoloaderConfig()
@@ -22,5 +24,18 @@ class Module
     public function getConfig()
     {
         return include __DIR__ . '/../../../../../config/module.config.php';
+    }
+
+    public function init(ModuleManager $moduleManager)
+    {
+        $sm = $moduleManager->getEvent()->getParam('ServiceManager');
+        $serviceListener = $sm->get('ServiceListener');
+
+        $serviceListener->addServiceManager(
+            'ApigilityDoctrineServerCollectionORMFilterManager',
+            'apigility-doctrine-server-collection-orm-filter',
+            'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
+            'getApigilityDoctrineCollectionORMFilterConfig'
+        );
     }
 }

@@ -4,10 +4,12 @@ namespace ZF\Apigility\Doctrine\Server\Collection\Query;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\Paginator\Adapter\AdapterInterface;
-
+use Zend\ServiceManager\AbstractPluginManager;
 
 interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
 {
+    public function setFilterManager(AbstractPluginManager $filterManager);
+    public function getFilterManager();
 
     /**
      * @param string $entityClass
