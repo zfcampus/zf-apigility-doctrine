@@ -12,6 +12,8 @@ use ZF\Rest\AbstractResourceListener;
 use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
 use ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 /**
  * Class DoctrineResource
@@ -19,10 +21,22 @@ use ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener
-    implements ObjectManagerAwareInterface
+    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface
 {
-
     use ProvidesObjectManager;
+
+    protected $serviceManager;
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
 
     /**
      * @var HydratorInterface
@@ -153,8 +167,10 @@ class DoctrineResource extends AbstractResourceListener
         /** @var Query\ApigilityFetchAllQuery $queryBuilder */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $queryBuilder = new Query\FetchAllOrmQuery();
+            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $queryBuilder = new Query\FetchAllOdmQuery();
+            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
         } else {
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }

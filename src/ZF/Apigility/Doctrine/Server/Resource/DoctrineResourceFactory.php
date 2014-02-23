@@ -97,6 +97,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener = new $className();
         $listener->setObjectManager($this->loadObjectManager($serviceLocator, $config));
         $listener->setHydrator($this->loadHydrator($serviceLocator, $config));
+        $listener->setServiceManager($serviceLocator);
 
         return $listener;
     }
@@ -140,11 +141,16 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             return null;
         }
 
-        if (!$serviceLocator->has($config['hydrator'])) {
+        if (!$serviceLocator->has('HydratorManager')) {
             return null;
         }
 
-        return $serviceLocator->get($config['hydrator']);
+        $hydratorManager = $serviceLocator->get('HydratorManager');
+        if (!$hydratorManager->has($config['hydrator'])) {
+            return null;
+        }
+
+        return $hydratorManager->get($config['hydrator']);
     }
 
 }

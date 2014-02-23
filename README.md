@@ -235,13 +235,6 @@ Like (% is used as a wildcard)
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
-Decimation (mod(field, value) = 0 e.g. value = 10 fetch one of every ten rows)
-
-```php
-    array('type' => 'decimation', 'field' => 'fieldName', 'value' => 'decimationModValue')
-```
-
-
 ORM Only
 --------
 
