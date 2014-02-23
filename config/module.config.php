@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
+
 return array(
     'service_manager' => array(
         'invokables' => array(
