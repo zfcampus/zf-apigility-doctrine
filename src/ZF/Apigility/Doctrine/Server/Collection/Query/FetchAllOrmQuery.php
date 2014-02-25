@@ -135,14 +135,12 @@ class FetchAllOrmQuery
     }
 
     /**
-     * @param       $entityClass
-     * @param array $parameters
+     * @param       $queryBuilder
      *
      * @return AdapterInterface
      */
-    public function getPaginatedQuery($entityClass, array $parameters)
+    public function getPaginatedQuery($queryBuilder)
     {
-        $queryBuilder = $this->createQuery($entityClass, $parameters);
         $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
         return $adapter;
     }

@@ -114,14 +114,12 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
     }
 
     /**
-     * @param       $entityClass
-     * @param array $parameters
+     * @param       $queryBuilder
      *
      * @return DoctrineOdmAdapter
      */
-    public function getPaginatedQuery($entityClass, array $parameters)
+    public function getPaginatedQuery($queryBuilder)
     {
-        $queryBuilder = $this->createQuery($entityClass, $parameters);
         $adapter = new DoctrineOdmAdapter($queryBuilder);
         return $adapter;
     }
