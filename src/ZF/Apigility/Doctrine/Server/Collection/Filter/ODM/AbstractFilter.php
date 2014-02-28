@@ -8,7 +8,7 @@ abstract class AbstractFilter implements FilterInterface
 {
     abstract function filter($queryBuilder, $metadata, $option);
 
-    protected function typeCastField($metadata, $field, $value, $format = null)
+    protected function typeCastField($metadata, $field, $value, $format)
     {
         if (!isset($metadata['fieldMappings'][$field])) {
             throw new \Exception("Invalid field '$field' for entity metadata " . $metadata['name'] . ' in filter ' . get_class($this));

@@ -17,7 +17,12 @@ class Equals extends AbstractFilter
             }
         }
 
-        $value = $this->typeCastField($metadata, $option['field'], $option['value']);
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
+        $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
 
         $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->equals($value));
     }

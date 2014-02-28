@@ -20,7 +20,12 @@ class NotEquals extends AbstractFilter
             $queryType = 'andWhere';
         }
 
-        $value = $this->typeCastField($metadata, $option['field'], $option['value']);
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
+        $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
 
         $parameter = uniqid('a');
         $queryBuilder->$queryType($queryBuilder->expr()->neq('row.' . $option['field'], ":$parameter"));

@@ -20,12 +20,13 @@ class Between extends AbstractFilter
             $queryType = 'andWhere';
         }
 
-        if (!isset($option['format'])) {
-            $option['format'] = null;
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
         }
 
-        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $option['format']);
-        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $option['format']);
+        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $format);
+        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $format);
 
         $fromParameter = uniqid('a');
         $toParameter = uniqid('a');

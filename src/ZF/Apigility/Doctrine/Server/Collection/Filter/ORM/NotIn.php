@@ -20,9 +20,14 @@ class NotIn extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
         $queryValues = array();
         foreach ($option['values'] as $value) {
-            $queryValues[] = $this->typeCastField($value, $option['field'], $value);
+            $queryValues[] = $this->typeCastField($value, $option['field'], $value, $format);
         }
 
         $parameter = uniqid('a');

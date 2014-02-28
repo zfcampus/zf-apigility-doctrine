@@ -21,8 +21,13 @@ class Between extends AbstractFilter
             $option['format'] = null;
         }
 
-        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $option['format']);
-        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $option['format']);
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
+        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $format);
+        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $format);
 
         $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->range($from, $to));
     }

@@ -4,7 +4,7 @@ namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
 use ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AbstractFilter;
 
-class Equals extends AbstracFilter
+class Equals extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)
     {
@@ -20,7 +20,12 @@ class Equals extends AbstracFilter
             $queryType = 'andWhere';
         }
 
-        $value = $this->typeCastField($metadata, $option['field'], $option['value']);
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
+        $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
 
         $parameter = uniqid('a');
         $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], ":$parameter"));
