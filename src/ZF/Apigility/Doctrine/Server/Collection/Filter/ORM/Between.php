@@ -18,7 +18,7 @@ class Between implements FilterInterface
         if (!isset($queryType)) {
             $queryType = 'andWhere';
         }
-
-        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
+        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'],':from'.$option['field'],':to'.$option['field']));
+        $queryBuilder->setParameters(array('from'.$option['field'] => $option['from'], 'to'.$option['field']  => $option['to']));
     }
 }

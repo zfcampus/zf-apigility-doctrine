@@ -109,7 +109,8 @@ class FetchAllOrmQuery
                             }
                             break;
                         case 'datetime':
-                            if ($option['value']) {
+                        	
+                            if (!empty($option['value'])) {
                                 if (isset($option['format']) and $option['format']) {
                                     $format = $option['format'];
                                 } else {
