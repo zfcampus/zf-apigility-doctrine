@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ODM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
 
-class NotEquals implements FilterInterface
+class NotEquals extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         $queryType = 'addAnd';
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
@@ -16,6 +17,8 @@ class NotEquals implements FilterInterface
             }
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notEqual($option['value']));
+        $value = $this->typeCastField($metadata, $option['field'], $option['value']);
+
+        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notEqual($value));
     }
 }

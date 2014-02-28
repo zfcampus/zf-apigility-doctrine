@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ODM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
 
-class Between implements FilterInterface
+class Between extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         $queryType = 'addAnd';
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
@@ -16,6 +17,13 @@ class Between implements FilterInterface
             }
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->range($option['from'], $option['to']));
+        if (!isset($option['format'])) {
+            $option['format'] = null;
+        }
+
+        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $option['format']);
+        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $option['format']);
+
+        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->range($from, $to));
     }
 }

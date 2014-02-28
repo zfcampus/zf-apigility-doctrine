@@ -45,68 +45,8 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                // Type cast value
-                if(isset($option['field']) and isset($metadata['fieldMappings'][$option['field']]['type'])) {
-                    switch ($metadata['fieldMappings'][$option['field']]['type']) {
-                        case 'int':
-                            settype($option['value'], 'integer');
-                            break;
-                        case 'boolean':
-                            settype($option['value'], 'boolean');
-                            break;
-                        case 'float':
-                            settype($option['value'], 'float');
-                            break;
-                        case 'string':
-                            settype($option['value'], 'string');
-                            break;
-                        case 'bin_data_custom':
-                            break;
-                        case 'bin_data_func':
-                            break;
-                        case 'bin_data_md5':
-                            break;
-                        case 'bin_data':
-                            break;
-                        case 'bin_data_uuid':
-                            break;
-                        case 'collection':
-                            break;
-                        case 'custom_id':
-                            break;
-                        case 'date':
-                            if ($option['value']) {
-                                if (isset($option['format']) and $option['format']) {
-                                    $format = $option['format'];
-                                } else {
-                                    $format = 'Y-m-d H:i:s';
-                                }
-                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
-                            }
-                            break;
-                        case 'file':
-                            break;
-                        case 'hash':
-                            break;
-                        case 'id':
-                            break;
-                        case 'increment':
-                            break;
-                        case 'key':
-                            break;
-                        case 'object_id':
-                            break;
-                        case 'raw_type':
-                            break;
-                        case 'timestamp':
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
                 $filter = $this->getFilterManager()->get(strtolower($option['type']));
-                $filter->filter($queryBuilder, $option);
+                $filter->filter($queryBuilder, $metadata, $option);
             }
         }
 
