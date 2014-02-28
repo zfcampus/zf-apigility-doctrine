@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AbstractFilter;
 
-class Equals implements FilterInterface
+class Equals extends AbstracFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
                 $queryType = 'andWhere';
@@ -19,8 +20,10 @@ class Equals implements FilterInterface
             $queryType = 'andWhere';
         }
 
+        $value = $this->typeCastField($metadata, $option['field'], $option['value']);
+
         $parameter = uniqid('a');
         $queryBuilder->$queryType($queryBuilder->expr()->eq('row.' . $option['field'], ":$parameter"));
-        $queryBuilder->setParameter($parameter, $option['value']);
+        $queryBuilder->setParameter($parameter, $value);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
 
-class Like implements FilterInterface
+class Like extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
                 $queryType = 'andWhere';

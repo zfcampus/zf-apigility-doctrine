@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AbstractFilter;
 
-class Between implements FilterInterface
+class Between extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
                 $queryType = 'andWhere';
@@ -19,6 +20,17 @@ class Between implements FilterInterface
             $queryType = 'andWhere';
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], $option['from'], $option['to']));
+        if (!isset($option['format'])) {
+            $option['format'] = null;
+        }
+
+        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $option['format']);
+        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $option['format']);
+
+        $fromParameter = uniqid('a');
+        $toParameter = uniqid('a');
+
+        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], ":$fromParameter", ":$toParameter"));
+        $queryBuilder->setParameters(array($fromParameter => $from, $toParameter => $to));
     }
 }

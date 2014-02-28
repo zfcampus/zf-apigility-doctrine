@@ -20,12 +20,11 @@ interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
     public function createQuery($entityClass, array $parameters);
 
     /**
-     * @param       $entityClass
-     * @param array $parameters
+     * @param       $queryBuilder
      *
      * @return AdapterInterface
      */
-    public function getPaginatedQuery($entityClass, array $parameters);
+    public function getPaginatedQuery($queryBuilder);
 
     /**
      * @param       $entityClass

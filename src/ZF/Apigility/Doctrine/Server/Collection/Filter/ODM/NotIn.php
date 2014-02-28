@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ODM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
 
-class NotIn implements FilterInterface
+class NotIn extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         $queryType = 'addAnd';
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
@@ -16,6 +17,11 @@ class NotIn implements FilterInterface
             }
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notIn($option['values']));
+        $queryValues = array();
+        foreach ($option['values'] as $value) {
+            $queryValues[] = $this->typeCastField($value, $option['field'], $value);
+        }
+
+        $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notIn($queryValues));
     }
 }
