@@ -2,7 +2,7 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AbstractFilter;
 
 class NotLike extends AbstractFilter
 {
