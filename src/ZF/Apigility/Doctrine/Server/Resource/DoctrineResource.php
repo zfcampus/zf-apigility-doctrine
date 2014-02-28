@@ -164,27 +164,28 @@ class DoctrineResource extends AbstractResourceListener
 
         // Load the correct queryFactory:
         $objectManager = $this->getObjectManager();
-        /** @var Query\ApigilityFetchAllQuery $queryBuilder */
+        /** @var Query\ApigilityFetchAllQuery $fetchAllQuery */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $queryBuilder = new Query\FetchAllOrmQuery();
-            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
+            $fetchAllQuery = new Query\FetchAllOrmQuery();
+            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
-            $queryBuilder = new Query\FetchAllOdmQuery();
-            $queryBuilder->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
+            $fetchAllQuery = new Query\FetchAllOdmQuery();
+            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
         } else {
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
 
         // Create collection
-        $queryBuilder->setObjectManager($objectManager);
-        $adapter = $queryBuilder->getPaginatedQuery($this->getEntityClass(), $parameters);
+        $fetchAllQuery->setObjectManager($objectManager);
+        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $parameters);
+        $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
-            function($e) use ($queryBuilder, $entityClass, $parameters) {
+            function($e) use ($fetchAllQuery, $entityClass, $parameters) {
                 $halCollection = $e->getParam('collection');
                 $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
                 $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
@@ -192,7 +193,7 @@ class DoctrineResource extends AbstractResourceListener
                 $halCollection->setAttributes(array(
                    'count' => $halCollection->getCollection()->getCurrentItemCount(),
                    'total' => $halCollection->getCollection()->getTotalItemCount(),
-                   'collectionTotal' => $queryBuilder->getCollectionTotal($entityClass),
+                   'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
                 ));
 
                 $halCollection->setCollectionRouteOptions(array(
