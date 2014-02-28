@@ -2,11 +2,12 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Filter\AbstractFilter;
 
-class NotIn implements FilterInterface
+class NotIn extends AbstractFilter
 {
-    public function filter($queryBuilder, $option) {
+    public function filter($queryBuilder, $metadata, $option)
+    {
         if (isset($option['where'])) {
             if ($option['where'] == 'and') {
                 $queryType = 'andWhere';
@@ -19,8 +20,13 @@ class NotIn implements FilterInterface
             $queryType = 'andWhere';
         }
 
+        $queryValues = array();
+        foreach ($option['values'] as $value) {
+            $queryValues[] = $this->typeCastField($value, $option['field'], $value);
+        }
+
         $parameter = uniqid('a');
         $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
-        $queryBuilder->setParameter($parameter, $option['values']);
+        $queryBuilder->setParameter($parameter, $queryValues);
     }
 }

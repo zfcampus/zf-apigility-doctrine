@@ -72,63 +72,8 @@ class FetchAllOrmQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                if(isset($option['field']) and isset($metadata['fieldMappings'][$option['field']]['type'])) {
-                    switch ($metadata['fieldMappings'][$option['field']]['type']) {
-                        case 'string':
-                            settype($option['value'], 'string');
-                            break;
-                        case 'integer':
-                        case 'smallint':
-                        #case 'bigint':
-                            settype($option['value'], 'integer');
-                            break;
-                        case 'boolean':
-                            settype($option['value'], 'boolean');
-                            break;
-                        case 'decimal':
-                            settype($option['value'], 'decimal');
-                            break;
-                        case 'date':
-                            if ($option['value']) {
-                                if (isset($option['format']) and $option['format']) {
-                                    $format = $option['format'];
-                                } else {
-                                    $format = 'Y-m-d';
-                                }
-                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
-                            }
-                            break;
-                        case 'time':
-                            if ($option['value']) {
-                                if (isset($option['format']) and $option['format']) {
-                                    $format = $option['format'];
-                                } else {
-                                    $format = 'H:i:s';
-                                }
-                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
-                            }
-                            break;
-                        case 'datetime':
-                        	
-                            if (!empty($option['value'])) {
-                                if (isset($option['format']) and $option['format']) {
-                                    $format = $option['format'];
-                                } else {
-                                    $format = 'Y-m-d H:i:s';
-                                }
-                                $option['value'] = \DateTime::createFromFormat($format, $option['value']);
-                            }
-                            break;
-                        case 'float':
-                            settype($option['value'], 'float');
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
                 $filter = $this->getFilterManager()->get(strtolower($option['type']));
-                $filter->filter($queryBuilder, $option);
+                $filter->filter($queryBuilder, $metadata, $option);
             }
         }
 
