@@ -341,6 +341,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->createHalConfig($entity, $entityClass, $collectionClass, $routeName);
         $this->createDoctrineConfig($entity, $entityClass, $collectionClass, $routeName);
 
+        $this->getEventManager()->trigger(
+            __FUNCTION__,
+            $this,
+            array(
+                'entity' => $entity,
+                'configResource' => $this->configResource,
+            )
+        );
+
         return $entity;
     }
 
