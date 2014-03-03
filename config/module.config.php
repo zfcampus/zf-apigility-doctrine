@@ -5,38 +5,12 @@
  */
 
 return array(
-    'service_manager' => array(
-        'abstract_factories' => array(
-            'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-        ),
-    ),
-
-    'hydrators' => array(
-        'abstract_factories' => array(
-            'ZF\Apigility\Doctrine\Server\Hydrator\DoctrineHydratorFactory',
-        )
-    ),
-
-    'asset_manager' => array(
-        'resolver_configs' => array(
-            'paths' => array(
-                __DIR__ . '/../asset',
-            ),
-        ),
-    ),
-
-    'view_manager' => array(
-        'template_path_stack' => array(
-            __DIR__ . '/../view',
-        ),
-    ),
-
     'router' => array(
         'routes' => array(
             'zf-apigility-doctrine-service' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/admin/api/module[/:name]/doctrine[/:controller_service_name]',
+                    'route' => '/apigility/api/module[/:name]/doctrine[/:controller_service_name]',
                     'defaults' => array(
                         'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService',
                     ),
@@ -46,7 +20,7 @@ return array(
             'zf-apigility-doctrine-metadata-service' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]',
+                    'route' => '/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]',
                     'defaults' => array(
                         'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService',
                     ),

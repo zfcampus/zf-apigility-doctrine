@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\Apigility\Doctrine;
+namespace ZF\Apigility\Doctrine\Admin;
 
 use Zend\Config\Writer\PhpArray as PhpArrayWriter;
 use Zend\EventManager\EventInterface;
@@ -44,7 +44,7 @@ class Module
 
     public function getConfig()
     {
-        return include __DIR__ . '/../../../../config/module.config.php';
+        return include __DIR__ . '/../../../../../config/module.config.php';
     }
 
     public function getServiceConfig()
@@ -52,7 +52,7 @@ class Module
         return array('factories' => array(
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' => function ($services) {
 
-                $resource = new Admin\Model\DoctrineMetadataServiceResource();
+                $resource = new Model\DoctrineMetadataServiceResource();
 
                 return $resource;
             },
@@ -75,7 +75,7 @@ class Module
                 // Wire DB-Connected fetch listener
                 $sharedEvents->attach(__NAMESPACE__ . '\Admin\Model\DoctrineRestServiceModel', 'fetch', 'ZF\Apigility\Admin\Model\DbConnectedRestServiceModel::onFetch');
 
-                return new Admin\Model\DoctrineRestServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
+                return new Model\DoctrineRestServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
             },
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function ($services) {
                 if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory')) {
@@ -109,7 +109,7 @@ class Module
                 $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
                 $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
                 $sharedEvents  = $services->get('SharedEventManager');
-                return new Admin\Model\DoctrineRpcServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
+                return new Model\DoctrineRpcServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
             },
 
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
@@ -131,7 +131,7 @@ class Module
                 $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory');
                 $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                 $controllerManager = $services->get('ControllerManager');
-                return new Admin\Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
+                return new Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
             },
         ));
     }

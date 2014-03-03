@@ -358,6 +358,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->createHalConfig($entity, $entityClass, $collectionClass, $routeName);
         $this->createDoctrineConfig($entity, $entityClass, $collectionClass, $routeName);
 
+        $this->getEventManager()->trigger(
+            __FUNCTION__,
+            $this,
+            array(
+                'entity' => $entity,
+                'configResource' => $this->configResource,
+            )
+        );
+
         return $entity;
     }
 
@@ -718,14 +727,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
-            'service_manager' => array(
-                'abstract_factories' => array(
-                    'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory' => 'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
-                ),
-                'invokables' => array(
-                    'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'ZF\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
-                ),
-            ),
             'zf-rest-doctrine-hydrator' => array(
                 $details->hydratorName => array(
                     'entity_class' => $entityClass,
