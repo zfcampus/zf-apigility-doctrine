@@ -10,7 +10,7 @@ return array(
             'zf-apigility-doctrine-service' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/admin/api/module[/:name]/doctrine[/:controller_service_name]',
+                    'route' => '/apigility/api/module[/:name]/doctrine[/:controller_service_name]',
                     'defaults' => array(
                         'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService',
                     ),
@@ -20,7 +20,7 @@ return array(
             'zf-apigility-doctrine-metadata-service' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]',
+                    'route' => '/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]',
                     'defaults' => array(
                         'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService',
                     ),

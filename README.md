@@ -17,9 +17,9 @@ Add `ZF\Apigility\Doctrine\Admin` and `ZF\Apigility\Doctrine\Server` to your `mo
 API Resources
 -------------
 
-***/admin/api/module[/:name]/doctrine[/:controller_service_name]***
+***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
-This is a Doctrine resource creation route like Apigility Rest `/admin/api/module[/:name]/rest[/:controller_service_name]`
+This is a Doctrine resource creation route like Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
 
 POST Parameters
 ```json
@@ -37,7 +37,7 @@ POST Parameters
 ```
 
 
-***/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]***
+***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
 
 This will return metadata for the named entity which is a member of the
 named object manager.  Querying without a name will return all metadata
