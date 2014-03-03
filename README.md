@@ -27,15 +27,14 @@ POST Parameters
     "objectManager": "doctrine.entitymanager.orm_default",
     "resourceName": "Artist",
     "entityClass": "Db\\Entity\\Artist",
-    "pageSizeParam": "limit",
     "routeIdentifierName": "artist_id",
     "entityIdentifierName": "id",
     "routeMatch": "/api/artist",
-    "hydratorName": "DbApi\\V1\\Rest\\Artist\\ArtistHydrator",
-    "hydrateByValue": true
+    "pageSizeParam": "limit", // optional default null
+    "hydratorName": "DbApi\\V1\\Rest\\Artist\\ArtistHydrator", // Optional default generated
+    "hydrateByValue": true // Optional default true
 }
 ```
-
 
 ***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
 
