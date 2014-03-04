@@ -11,7 +11,6 @@ abstract class AbstractFilter implements FilterInterface
     protected function typeCastField($metadata, $field, $value, $format)
     {
         if (!isset($metadata['fieldMappings'][$field])) {
-            print_r($metadata);die();
             throw new \Exception("Invalid field '$field' for entity metadata " . $metadata['name'] . ' in filter ' . get_class($this));
         }
 
