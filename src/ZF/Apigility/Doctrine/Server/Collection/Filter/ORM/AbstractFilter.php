@@ -11,7 +11,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function typeCastField($metadata, $field, $value, $format)
     {
         if (!isset($metadata['fieldMappings'][$field])) {
-            return;
+            return $value;
         }
 
         switch ($metadata['fieldMappings'][$field]['type']) {
