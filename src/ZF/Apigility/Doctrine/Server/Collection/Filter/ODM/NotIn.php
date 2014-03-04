@@ -17,9 +17,14 @@ class NotIn extends AbstractFilter
             }
         }
 
+        $format = null;
+        if (isset($option['format'])) {
+            $format = $option['format'];
+        }
+
         $queryValues = array();
         foreach ($option['values'] as $value) {
-            $queryValues[] = $this->typeCastField($value, $option['field'], $value);
+            $queryValues[] = $this->typeCastField($value, $option['field'], $value, $format);
         }
 
         $queryBuilder->$queryType($queryBuilder->expr()->field($option['field'])->notIn($queryValues));
