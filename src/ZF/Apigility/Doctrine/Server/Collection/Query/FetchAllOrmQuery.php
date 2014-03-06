@@ -73,11 +73,15 @@ class FetchAllOrmQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-               if (!isset($option['type']) or !$option['type']) {
+                if (!isset($option['type']) or !$option['type']) {
                     return new ApiProblem(500, 'Array element "type" is required for all filters');
-               }
+                }
 
-                $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                try {
+                    $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
+                    return new ApiProblem(500, $e->getMessage());
+                }
                 $filter->filter($queryBuilder, $metadata, $option);
             }
         }
