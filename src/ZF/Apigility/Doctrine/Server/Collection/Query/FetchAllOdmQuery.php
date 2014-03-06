@@ -5,6 +5,7 @@ namespace ZF\Apigility\Doctrine\Server\Collection\Query;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
 use Zend\ServiceManager\AbstractPluginManager;
+use ZF\ApiProblem\ApiProblem;
 
 class FetchAllOdmQuery implements ApigilityFetchAllQuery
 {
@@ -45,7 +46,15 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
-                $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                if (!isset($option['type']) or !$option['type']) {
+                     return new ApiProblem(500, 'Array element "type" is required for all filters');
+                }
+
+                try {
+                    $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
+                    return new ApiProblem(500, $e->getMessage());
+                }
                 $filter->filter($queryBuilder, $metadata, $option);
             }
         }
