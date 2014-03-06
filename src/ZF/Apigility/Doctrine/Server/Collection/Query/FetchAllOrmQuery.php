@@ -7,6 +7,7 @@ use DoctrineModule\Persistence\ProvidesObjectManager;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
 use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
+use ZF\ApiProblem\ApiProblem;
 
 /**
  * Class FetchAllOrmQuery
@@ -72,6 +73,10 @@ class FetchAllOrmQuery
         // Run filters on query
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
+               if (!isset($option['type']) or !$option['type']) {
+                    return new ApiProblem(500, 'Array element "type" is required for all filters');
+               }
+
                 $filter = $this->getFilterManager()->get(strtolower($option['type']));
                 $filter->filter($queryBuilder, $metadata, $option);
             }

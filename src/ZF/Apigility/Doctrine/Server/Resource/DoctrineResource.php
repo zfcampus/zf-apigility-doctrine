@@ -178,6 +178,9 @@ class DoctrineResource extends AbstractResourceListener
         // Create collection
         $fetchAllQuery->setObjectManager($objectManager);
         $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $parameters);
+        if ($queryBuilder instanceof ApiProblem) {
+            return $queryBuilder;
+        }
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
