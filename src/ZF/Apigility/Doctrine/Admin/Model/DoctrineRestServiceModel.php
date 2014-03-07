@@ -592,7 +592,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $filter    = $this->getRouteNameFilter();
         $routeName = sprintf(
-            '%s.rest.%s',
+            '%s.rest.doctrine.%s',
             $filter->filter($this->module),
             $filter->filter($resourceName)
         );
