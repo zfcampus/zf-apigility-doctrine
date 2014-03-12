@@ -24,7 +24,7 @@
     },
     "require": {
         "php": ">=5.4",
-        "zendframework/zendframework": "dev-develop",
+        "zendframework/zendframework": "2.3.*",
         "zfcampus/zf-apigility": "dev-master",
         "zfcampus/zf-configuration": "dev-master",
 	"zfcampus/zf-apigility-doctrine-server": "dev-master"
