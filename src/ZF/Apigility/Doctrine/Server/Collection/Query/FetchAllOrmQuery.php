@@ -58,17 +58,18 @@ class FetchAllOrmQuery
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
 
+
+        // Get metadata for type casting
+        $cmf = $this->getObjectManager()->getMetadataFactory();
+        $entityMetaData = $cmf->getMetadataFor($entityClass);
+        $metadata = (array)$entityMetaData;
         // Orderby
         if (!isset($parameters['orderBy'])) {
-            $parameters['orderBy'] = array('id' => 'asc');
+            $parameters['orderBy'] = array($entityMetaData->getIdentifier()[0] => 'asc');
         }
         foreach($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
-
-        // Get metadata for type casting
-        $cmf = $this->getObjectManager()->getMetadataFactory();
-        $metadata = (array)$cmf->getMetadataFor($entityClass);
 
         // Run filters on query
         if (isset($parameters['query'])) {
@@ -108,8 +109,10 @@ class FetchAllOrmQuery
     public function getCollectionTotal($entityClass)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
+        $cmf = $this->getObjectManager()->getMetadataFactory();
+        $entityMetaData = $cmf->getMetadataFor($entityClass);
 
-        $queryBuilder->select('count(row.id)')
+        $queryBuilder->select('count(row.' . $entityMetaData->getIdentifier()[0] . ')')
             ->from($entityClass, 'row');
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
