@@ -34,7 +34,7 @@ class DoctrineMetadataServiceResource
         return $this->serviceManager;
     }
 
-    public function create() {
+    public function create($data) {
         throw new \Exception('Not Implemented');
     }
 

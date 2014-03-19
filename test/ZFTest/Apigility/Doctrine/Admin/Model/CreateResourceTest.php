@@ -26,7 +26,7 @@ use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
-class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
+class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
 {
     public function setUp()
     {
@@ -34,11 +34,6 @@ class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\Abst
                 include __DIR__ . '/../../../../../config/application.config.php'
         );
         parent::setUp();
-
-        $em = $this->getApplication()->getServiceManager()->get('doctrine.entitymanager.orm_default');
-
-        $tool = new SchemaTool($em);
-        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
     }
 
     public function tearDown()
@@ -49,12 +44,14 @@ class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\Abst
     /**
      * @see https://github.com/zfcampus/zf-apigility/issues/18
      */
-    public function testCreateReturnsRestServiceEntityWithControllerServiceNamePopulated()
+    public function testCreateResource()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
-
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
-die('ok');
+
+        $tool = new SchemaTool($em);
+        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
+
         // Create DB
         $resourceDefinition = [
             "objectManager"=> "doctrine.entitymanager.orm_default",
@@ -64,8 +61,6 @@ die('ok');
             "entityIdentifierName" => "id",
             "routeMatch" => "/db-test/artist",
         ];
-
-        $serviceManager = ServiceManagerFactory::getServiceManager();
 
         // Verify ORM is working
         $artist = new \Db\Entity\Artist;
@@ -85,68 +80,6 @@ die('ok');
         $this->assertNotEmpty($controllerServiceName);
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
 
-#        $serviceManager = ServiceManagerFactory::getServiceManager();
-#        $config = $serviceManager->get('Config');
-
-#        $routerConfig = isset($config['router']) ? $config['router'] : array();
-#        $router = HttpRouter::factory($routerConfig);
-
-#        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
-#        $event = new MvcEvent();
-#        $event->setRouter($router);
-#        $event->setRouteMatch($routeMatch);
-
-#        $this->getRequest()->setMethod('GET');
-
-        try {
-            $request = $this->getRequest();
-            $request->setMethod('GET');
-            $request->getHeaders()->addHeaders(array(
-                'Accept' => 'application/json',
-            ));
-
-            $this->dispatch('/db-api/artist');
-        } catch (\Exception $e) {
-            $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
-
-            die($e->getMessage());
-        }
-
-#        $controller->setEvent($event);
-#        $controller->setServiceLocator($serviceManager);
-
-#        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
-
-#        print_r($config);
-#        print_r(get_class_methods($router));
-
-        $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
-        return;
-
-
-#        $controller = new $controllerServiceName;
-#        $request    = new Request();
-
-
-        $query = [];
-        $query[] = array('type' => 'eq', 'field' => 'id', 'value' => $found->getId());
-
-        // Fetch test runs
-        $routeMatch->setParam('action', 'index');
-
-        $result   = $controller->dispatch($this->request);
-        $response = $controller->getResponse();
-
-#        $this->assertEquals(200, $response->getStatusCode());
-
-        $hal = $response->getBody();
-
-        $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
-        $data = json_decode($renderer->render($hal), true);
-
-print_r($data);
-
-
-
+        $this->resource->delete($controllerServiceName);
     }
 }
