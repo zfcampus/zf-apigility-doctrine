@@ -75,31 +75,6 @@ return array(
         ),
     ),
 
-    'router' => array(
-        'routes' => array(
-            'zf-apigility-doctrine-service' => array(
-                'type' => 'segment',
-                'options' => array(
-                    'route' => '/admin/api/module[/:name]/doctrine[/:controller_service_name]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService',
-                    ),
-                ),
-                'may_terminate' => true,
-            ),
-            'zf-apigility-doctrine-metadata-service' => array(
-                'type' => 'segment',
-                'options' => array(
-                    'route' => '/admin/api/doctrine[/:object_manager_alias]/metadata[/:name]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService',
-                    ),
-                ),
-                'may_terminate' => true,
-            ),
-        ),
-    ),
-
     'zf-content-negotiation' => array(
         'controllers' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => 'HalJson',
