@@ -22,8 +22,8 @@ return array(
             __DIR__ . '/testing.config.php',
         ),
         'module_paths' => array(
-            'Db' => __DIR__ . '/ZFTest/Assets/Module/Db',
-            'DbApi' => __DIR__ . '/ZFTest/Assets/Module/DbApi',
+            'Db' => __DIR__ . '/../assets/module/Db',
+            'DbApi' => __DIR__ . '/../assets/module/DbApi',
         ),
     ),
 );

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     colors="true"
-    bootstrap="./test/Bootstrap.php"
 >
     <testsuites>
     <testsuite name="ZFApigility\Doctrine\Admin Module Tests">

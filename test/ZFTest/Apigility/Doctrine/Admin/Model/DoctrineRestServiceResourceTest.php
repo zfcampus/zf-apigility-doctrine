@@ -6,7 +6,6 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use BarConf;
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
 use Zend\Config\Writer\PhpArray;
@@ -20,13 +19,26 @@ use ZF\Configuration\ModuleUtils;
 use ZFTest\Util\ServiceManagerFactory;
 use Doctrine\ORM\Tools\SchemaTool;
 
+use Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter;
+use Application\Controller\IndexController;
+use Zend\Http\Request;
+use Zend\Http\Response;
+use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\RouteMatch;
 
-require_once __DIR__ . '/TestAsset/module/BarConf/Module.php';
-
-class DoctrineRestServiceResourceTest extends TestCase
+class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
 {
     public function setUp()
     {
+        $this->setApplicationConfig(
+                include __DIR__ . '/../../../../../config/application.config.php'
+        );
+        parent::setUp();
+
+        $em = $this->getApplication()->getServiceManager()->get('doctrine.entitymanager.orm_default');
+
+        $tool = new SchemaTool($em);
+        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
     }
 
     public function tearDown()
@@ -39,13 +51,11 @@ class DoctrineRestServiceResourceTest extends TestCase
      */
     public function testCreateReturnsRestServiceEntityWithControllerServiceNamePopulated()
     {
-        $serviceManager = ServiceManagerFactory::getServiceManager();
+        $serviceManager = $this->getApplication()->getServiceManager();
 
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+die('ok');
         // Create DB
-        $em = ServiceManagerFactory::getServiceManager()->get('doctrine.entitymanager.orm_default');
-        $tool = new SchemaTool($em);
-        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
-
         $resourceDefinition = [
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
@@ -75,7 +85,68 @@ class DoctrineRestServiceResourceTest extends TestCase
         $this->assertNotEmpty($controllerServiceName);
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
 
+#        $serviceManager = ServiceManagerFactory::getServiceManager();
+#        $config = $serviceManager->get('Config');
+
+#        $routerConfig = isset($config['router']) ? $config['router'] : array();
+#        $router = HttpRouter::factory($routerConfig);
+
+#        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
+#        $event = new MvcEvent();
+#        $event->setRouter($router);
+#        $event->setRouteMatch($routeMatch);
+
+#        $this->getRequest()->setMethod('GET');
+
+        try {
+            $request = $this->getRequest();
+            $request->setMethod('GET');
+            $request->getHeaders()->addHeaders(array(
+                'Accept' => 'application/json',
+            ));
+
+            $this->dispatch('/db-api/artist');
+        } catch (\Exception $e) {
+            $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
+
+            die($e->getMessage());
+        }
+
+#        $controller->setEvent($event);
+#        $controller->setServiceLocator($serviceManager);
+
+#        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
+
+#        print_r($config);
+#        print_r(get_class_methods($router));
+
         $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
+        return;
+
+
+#        $controller = new $controllerServiceName;
+#        $request    = new Request();
+
+
+        $query = [];
+        $query[] = array('type' => 'eq', 'field' => 'id', 'value' => $found->getId());
+
+        // Fetch test runs
+        $routeMatch->setParam('action', 'index');
+
+        $result   = $controller->dispatch($this->request);
+        $response = $controller->getResponse();
+
+#        $this->assertEquals(200, $response->getStatusCode());
+
+        $hal = $response->getBody();
+
+        $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
+        $data = json_decode($renderer->render($hal), true);
+
+print_r($data);
+
+
 
     }
 }
