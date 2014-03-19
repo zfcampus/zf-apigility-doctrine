@@ -24,7 +24,6 @@
     },
     "require": {
         "php": ">=5.4",
-        "zendframework/zendframework": "dev-develop",
         "zfcampus/zf-apigility": "dev-master",
         "zfcampus/zf-configuration": "dev-master"
     },
@@ -32,7 +31,6 @@
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
-            "ZF\\Apigility\\Doctrine": "src/",
             "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }

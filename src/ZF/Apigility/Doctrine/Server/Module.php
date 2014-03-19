@@ -42,7 +42,7 @@ class Module
             'ZfOdmCollectionFilterManager',
             'zf-odm-collection-filter',
             'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
-            'getZfOrmFilterConfig'
+            'getZfOdmFilterConfig'
         );
     }
 }
