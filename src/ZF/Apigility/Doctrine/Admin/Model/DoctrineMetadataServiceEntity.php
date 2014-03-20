@@ -153,14 +153,18 @@ class DoctrineMetadataServiceEntity
                     $this->isReadOnly = $value;
                     break;
                 case '*namingStrategy':
+                    // @codeCoverageIgnoreStart
                     $this->namingStrategy = $value;
                     break;
+                    // @codeCoverageIgnoreEnd
                 case 'reflFields':
                     $this->reflFields = $value;
                     break;
                 case 'Doctrine\ORM\Mapping\ClassMetadataInfo_prototype':
+                    // @codeCoverageIgnoreStart
                     $this->ClassMetadataInfo_prototype = $value;
                     break;
+                    // @codeCoverageIgnoreEnd
                 default:
                     break;
             }

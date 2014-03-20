@@ -206,10 +206,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (!isset($config['zf-rest'])
             || !isset($config['zf-rest'][$controllerService])
         ) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'Could not find REST resource by name of %s',
                 $controllerService
             ), 404);
+            // @codeCoverageIgnoreEnd
         }
 
         $restConfig = $config['zf-rest'][$controllerService];
@@ -325,7 +327,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $mediaType = $this->createMediaType();
         $resourceClass = ($details->resourceClass) ?: $this->createResourceClass($resourceName, $details);
         $collectionClass = ($details->collectionClass) ?: $this->createCollectionClass($resourceName);
-        $entityClass = ($details->entityClass) ?: $this->createEntityClass($resourceName, $details);
+        if (!$entityClass = $details->entityClass or !class_exists($details->entityClass)) {
+            // @codeCoverageIgnoreStart
+            throw new \Exception('entityClass is required and must exist');
+            // @codeCoverageIgnoreEnd
+        }
         $module = ($details->module) ?: $this->module;
 
         $controllerService = ($details->controllerServiceName) ?: $this->createControllerServiceName($resourceName);
@@ -489,54 +495,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     }
 
     /**
-     * Create an entity class for the resource
-     *
-     * @param  string $resourceName
-     * @param  string $template Which template to use; defaults to 'entity'
-     * @return string The name of the newly created entity class
-     */
-    public function createEntityClass($resourceName, $template = 'entity')
-    {
-        $module     = $this->module;
-        $srcPath    = $this->getSourcePath($resourceName);
-
-        $className = sprintf('%sEntity', $resourceName);
-        $classPath = sprintf('%s/%s.php', $srcPath, $className);
-
-        if (file_exists($classPath)) {
-            throw new Exception\RuntimeException(sprintf(
-                'The entity "%s" already exists',
-                $className
-            ));
-        }
-
-        $view = new ViewModel(array(
-            'module'    => $module,
-            'resource'  => $resourceName,
-            'classname' => $className,
-            'version'   => $this->moduleEntity->getLatestVersion(),
-        ));
-// Entity creation removed for Doctrine
-        /*
-        if (!$this->createClassFile($view, $template, $classPath)) {
-            throw new Exception\RuntimeException(sprintf(
-                'Unable to create entity "%s"; unable to write file',
-                $className
-            ));
-        }
-        */
-
-        $fullClassName = sprintf(
-            '%s\\V%s\\Rest\\%s\\%s',
-            $module,
-            $this->moduleEntity->getLatestVersion(),
-            $resourceName,
-            $className
-        );
-        return $fullClassName;
-    }
-
-    /**
      * Create a collection class for the resource
      *
      * @param  string $resourceName
@@ -551,10 +509,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $classPath = sprintf('%s/%s.php', $srcPath, $className);
 
         if (file_exists($classPath)) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'The collection "%s" already exists',
                 $className
             ));
+            // @codeCoverageIgnoreEnd
         }
 
         $view = new ViewModel(array(
@@ -564,10 +524,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             'version'   => $this->moduleEntity->getLatestVersion(),
         ));
         if (!$this->createClassFile($view, 'collection', $classPath)) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create entity "%s"; unable to write file',
                 $className
             ));
+            // @codeCoverageIgnoreEnd
         }
 
         $fullClassName = sprintf(
@@ -968,7 +930,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                         if ($response instanceof ApiProblem) {
                             return $response;
                         }
-
+// @codeCoverageIgnoreStart
                         break;
                     default:
                         break;
@@ -976,6 +938,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             }
         }
     }
+// @codeCoverageIgnoreEnd
 
     /**
      * Create a class file
@@ -1000,8 +963,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         )) {
             return true;
         }
-
+        // @codeCoverageIgnoreStart
         return false;
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -1096,7 +1060,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             || !isset($config['router']['routes'][$routeName]['options'])
             || !isset($config['router']['routes'][$routeName]['options']['route'])
         ) {
+            // @codeCoverageIgnoreStart
             return;
+            // @codeCoverageIgnoreEnd
         }
         $metadata->exchangeArray(array(
             'route_match' => $config['router']['routes'][$routeName]['options']['route'],
@@ -1113,9 +1079,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      */
     protected function mergeContentNegotiationConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
+        // @codeCoverageIgnoreStart
         if (!isset($config['zf-content-negotiation'])) {
+
             return;
         }
+        // @codeCoverageIgnoreEnd
+
         $config = $config['zf-content-negotiation'];
 
         if (isset($config['controllers'])
@@ -1155,7 +1125,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (!isset($config['zf-hal'])
             || !isset($config['zf-hal']['metadata_map'])
         ) {
+            // @codeCoverageIgnoreStart
             return;
+            // @codeCoverageIgnoreEnd
         }
 
         $config = $config['zf-hal']['metadata_map'];
@@ -1164,6 +1136,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $collectionClass = $this->deriveCollectionClass($controllerServiceName, $metadata, $config);
         $merge           = array();
 
+        // @codeCoverageIgnoreStart
         if (isset($config[$entityClass])) {
             $merge['entity_class'] = $entityClass;
         }
@@ -1171,6 +1144,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (isset($config[$collectionClass])) {
             $merge['collection_class'] = $collectionClass;
         }
+        // @codeCoverageIgnoreEnd
 
         $metadata->exchangeArray($merge);
     }
