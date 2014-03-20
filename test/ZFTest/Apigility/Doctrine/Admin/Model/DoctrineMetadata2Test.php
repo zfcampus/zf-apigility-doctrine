@@ -73,40 +73,27 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $this->rpcResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
         $this->rpcResource->setModuleName('DbApi');
 
-         try {
-            foreach ($body['_embedded']['doctrine'] as $service) {
-                $this->resource->delete($service['controller_service_name']);
-            }
 
-            $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc', Request::METHOD_GET);
-            $body = json_decode($this->getResponse()->getBody(), true);
-            $this->assertEquals('DbApi\V1\Rpc\Artistalbum\Controller', $body['_embedded']['doctrine-rpc'][0]['controller_service_name']);
+        $this->getRequest()->setContent('{"routematch": "/doctrine-rpc-changed/test"}');
 
-            foreach ($body['_embedded']['doctrine-rpc'] as $rpc) {
-                $this->rpcResource->delete($rpc['controller_service_name']);
-            }
+#            // Try to update service
+#            $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc/DbApi%5CV1%5CRpc%5CArtistalbum%5CController', Request::METHOD_PUT);
+#            $body = json_decode($this->getResponse()->getBody(), true);
 
-#        $this->assertArrayHasKey('controller_service_name', $body);
-#        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['controller_service_name']);
+#print_r($body);
 
-/*
-            $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
-
-            $metadataFactory = $em->getMetadataFactory();
-            $entityMetadata = $metadataFactory->getMetadataFor("Db\\Entity\\Artist")
-
-            foreach ($entityMetadata->associationMappings as $mapping) {
-                switch ($mapping['type']) {
-                    case 4:
-                        $rpcServiceResource = $this->getServiceLocator()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
-                        $rpcServiceResource->setModuleName('DbApi');
-                        #$rpcServiceResource->delete('DbApi');
-                        break;
-                }
-            }
-*/
-        } catch (\Exception $e) {
-            throw $e;
+        foreach ($body['_embedded']['doctrine'] as $service) {
+            $this->resource->delete($service['controller_service_name']);
         }
+
+        $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc?version=1', Request::METHOD_GET);
+        $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals('DbApi\V1\Rpc\Artistalbum\Controller', $body['_embedded']['doctrine-rpc'][0]['controller_service_name']);
+
+        foreach ($body['_embedded']['doctrine-rpc'] as $rpc) {
+            $this->rpcResource->delete($rpc['controller_service_name']);
+        }
+
     }
 }
