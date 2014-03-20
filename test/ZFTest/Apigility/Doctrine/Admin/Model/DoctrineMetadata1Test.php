@@ -26,7 +26,7 @@ use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
-class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
+class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
@@ -44,7 +44,28 @@ class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
     /**
      * @see https://github.com/zfcampus/zf-apigility/issues/18
      */
-    public function testCreateResource()
+    public function testDoctrineMetadataResource()
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+
+        $this->getRequest()->getHeaders()->addHeaders(array(
+            'Accept' => 'application/json',
+        ));
+
+        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertArrayHasKey('name', $body);
+        $this->assertEquals('Db\Entity\Artist', $body['name']);
+
+        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertArrayHasKey('_embedded', $body);
+        $this->assertEquals('Db\Entity\Album', $body['_embedded']['doctrine-metadata'][0]['name']);
+        $this->assertEquals('Db\Entity\Artist', $body['_embedded']['doctrine-metadata'][1]['name']);
+    }
+
+    public function testDoctrineService()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
@@ -62,14 +83,6 @@ class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
             "routeMatch" => "/db-test/artist",
         ];
 
-        // Verify ORM is working
-        $artist = new \Db\Entity\Artist;
-        $artist->setName('TestInsert');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
-        $found = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
-        $this->assertInstanceOf('Db\Entity\Artist', $found);
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
@@ -78,6 +91,7 @@ class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
             $entity = $this->resource->create($resourceDefinition);
         } catch (\ZF\Rest\Exception\CreationException $e) {
             $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
+            die('deleted');
             $entity = $this->resource->create($resourceDefinition);
         }
 
@@ -86,6 +100,5 @@ class CreateResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
         $this->assertNotEmpty($controllerServiceName);
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
 
-        $this->resource->delete($controllerServiceName);
     }
 }

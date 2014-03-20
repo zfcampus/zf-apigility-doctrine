@@ -34,6 +34,9 @@ class DoctrineMetadataServiceResource
         return $this->serviceManager;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function create($data) {
         throw new \Exception('Not Implemented');
     }
@@ -49,7 +52,10 @@ class DoctrineMetadataServiceResource
         $objectManagerAlias = $this->getEvent()->getRouteParam('object_manager_alias');
 
         if (!$objectManagerAlias) {
+
+            // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No objectManager manager specificed in request.');
+            // @codeCoverageIgnoreEnd
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerAlias);
@@ -77,7 +83,9 @@ class DoctrineMetadataServiceResource
         }
 
         if (!$objectManagerClass) {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No objectManager manager specificed in request.');
+            // @codeCoverageIgnoreEnd
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
@@ -95,11 +103,17 @@ class DoctrineMetadataServiceResource
         return $return;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function patch($id, $data)
     {
         throw new \Exception('Not Implemented');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function delete($id)
     {
         throw new \Exception('Not Implemented');

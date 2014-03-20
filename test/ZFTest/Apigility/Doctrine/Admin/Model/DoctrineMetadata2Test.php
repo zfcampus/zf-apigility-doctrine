@@ -26,7 +26,7 @@ use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
-class DoctrineMetadata extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
@@ -44,7 +44,8 @@ class DoctrineMetadata extends \Zend\Test\PHPUnit\Controller\AbstractHttpControl
     /**
      * @see https://github.com/zfcampus/zf-apigility/issues/18
      */
-    public function testCreateResource()
+
+    public function testDoctrineService()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
@@ -53,9 +54,18 @@ class DoctrineMetadata extends \Zend\Test\PHPUnit\Controller\AbstractHttpControl
             'Accept' => 'application/json',
         ));
 
-        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist', Request::METHOD_GET);
+        $this->dispatch('/apigility/api/module/DbApi/doctrine/DbApi%5CV1%5CRest%5CArtist%5CController', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
 
-        $this->assertArrayHasKey('name', $body);
+        $this->assertArrayHasKey('controller_service_name', $body);
+        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['controller_service_name']);
+
+        $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
+        $this->resource->setModuleName('DbApi');
+        try {
+            $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
+        } catch (\Exception $e) {
+
+        }
     }
 }
