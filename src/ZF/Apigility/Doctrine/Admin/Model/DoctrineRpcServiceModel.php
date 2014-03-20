@@ -117,7 +117,7 @@ class DoctrineRpcServiceModel
     public function fetchAll($version = null)
     {
         $config = $this->configResource->fetch(true);
-        if (!isset($config['zf-rpc'])) {
+        if (!isset($config['zf-rpc-doctrine-controller'])) {
             return array();
         }
 
@@ -141,7 +141,7 @@ class DoctrineRpcServiceModel
             );
         }
 
-        foreach (array_keys($config['zf-rpc']) as $controllerService) {
+        foreach (array_keys($config['zf-rpc-doctrine-controller']) as $controllerService) {
             if (!$pattern) {
                 $services[] = $this->fetch($controllerService);
                 continue;
@@ -193,16 +193,32 @@ class DoctrineRpcServiceModel
      * @param  DoctrineRpcServiceEntity $entity
      * @return true
      */
-    public function deleteService(DoctrineRpcServiceEntity $entity)
+    public function deleteService(DoctrineRpcServiceEntity $entity, $deleteFiles = true)
     {
         $serviceName = $entity->controllerServiceName;
         $routeName   = $entity->routeName;
 
+        if ($deleteFiles) {
+            $this->deleteFiles($entity);
+        }
         $this->deleteRouteConfig($routeName);
         $this->deleteDoctrineRpcConfig($serviceName);
         $this->deleteContentNegotiationConfig($serviceName);
 
         return true;
+    }
+
+    /**
+     * Delete the files which were automatically created
+     *
+     * @param  DoctrineRestServiceEntity $entity
+     */
+    public function deleteFiles(DoctrineRpcServiceEntity $entity)
+    {
+        $config = $this->configResource->fetch(true);
+
+        $reflector = new \ReflectionClass($entity->controllerClass);
+        unlink($reflector->getFileName());
     }
 
     /**
@@ -494,6 +510,8 @@ class DoctrineRpcServiceModel
         $key = array('zf-rpc-doctrine-controller', $serviceName);
         $this->configResource->deleteKey($key);
 
+        $key = array('controllers', 'invokables', $serviceName);
+        $this->configResource->deleteKey($key);
     }
 
     /**

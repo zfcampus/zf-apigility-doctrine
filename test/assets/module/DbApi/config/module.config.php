@@ -19,4 +19,9 @@ return array(
     'zf-apigility' => array(
         'doctrine-connected' => array(),
     ),
+    'controllers' => array(
+        'invokables' => array(),
+    ),
+    'zf-rpc' => array(),
+    'zf-rpc-doctrine-controller' => array(),
 );

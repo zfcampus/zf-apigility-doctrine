@@ -176,11 +176,14 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     public function fetch($id)
     {
         $service = $this->getModel()->fetch($id);
+
         if (!$service instanceof DoctrineRpcServiceEntity) {
             return new ApiProblem(404, 'RPC service not found');
         }
+
         $this->injectInputFilters($service);
         $this->injectControllerClass($service);
+
         return $service;
     }
 

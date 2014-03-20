@@ -186,7 +186,6 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         // Make sure we have an entity first
         $model  = $this->getModel();
         $entity = $model->fetch($id);
-
         try {
             switch (true) {
                 case ($entity instanceof DoctrineRestServiceEntity):

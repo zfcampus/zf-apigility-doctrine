@@ -25,6 +25,8 @@ use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
+use Zend\Filter\FilterChain;
+
 
 class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
@@ -87,18 +89,43 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
 
-        try {
-            $entity = $this->resource->create($resourceDefinition);
-        } catch (\ZF\Rest\Exception\CreationException $e) {
-            $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
-            die('deleted');
-            $entity = $this->resource->create($resourceDefinition);
-        }
+        $entity = $this->resource->create($resourceDefinition);
 
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $entity);
         $controllerServiceName = $entity->controllerServiceName;
         $this->assertNotEmpty($controllerServiceName);
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
+
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+               ->attachByName('StringToLower');
+
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $metadataFactory = $em->getMetadataFactory();
+        $entityMetadata = $metadataFactory->getMetadataFor("Db\\Entity\\Artist");
+
+        foreach ($entityMetadata->associationMappings as $mapping) {
+            switch ($mapping['type']) {
+                case 4:
+                    $rpcServiceResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+                    $rpcServiceResource->setModuleName('DbApi');
+                    $rpcServiceResource->create(array(
+                        'service_name' => 'Artist' . $mapping['fieldName'],
+                        'route' => '/db-test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
+                        'http_methods' => array(
+                            'GET',
+                        ),
+                        'options' => array(
+                            'target_entity' => $mapping['targetEntity'],
+                            'source_entity' => $mapping['sourceEntity'],
+                            'field_name' => $mapping['fieldName'],
+                        ),
+                    ));
+                    break;
+                default:
+                    break;
+            }
+        }
 
     }
 }

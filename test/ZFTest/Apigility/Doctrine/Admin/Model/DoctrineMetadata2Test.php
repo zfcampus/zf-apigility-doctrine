@@ -56,16 +56,57 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
 
         $this->dispatch('/apigility/api/module/DbApi/doctrine/DbApi%5CV1%5CRest%5CArtist%5CController', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
-
         $this->assertArrayHasKey('controller_service_name', $body);
         $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['controller_service_name']);
 
+        $this->dispatch('/apigility/api/module/DbApi/doctrine?version=1', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['_embedded']['doctrine'][0]['controller_service_name']);
+
+        $this->dispatch('/apigility/api/module/DbApi/doctrine', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['_embedded']['doctrine'][0]['controller_service_name']);
+
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
-        try {
-            $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
-        } catch (\Exception $e) {
 
+        $this->rpcResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+        $this->rpcResource->setModuleName('DbApi');
+
+         try {
+            foreach ($body['_embedded']['doctrine'] as $service) {
+                $this->resource->delete($service['controller_service_name']);
+            }
+
+            $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc', Request::METHOD_GET);
+            $body = json_decode($this->getResponse()->getBody(), true);
+            $this->assertEquals('DbApi\V1\Rpc\Artistalbum\Controller', $body['_embedded']['doctrine-rpc'][0]['controller_service_name']);
+
+            foreach ($body['_embedded']['doctrine-rpc'] as $rpc) {
+                $this->rpcResource->delete($rpc['controller_service_name']);
+            }
+
+#        $this->assertArrayHasKey('controller_service_name', $body);
+#        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['controller_service_name']);
+
+/*
+            $this->resource->delete('DbApi\V1\Rest\Artist\Controller');
+
+            $metadataFactory = $em->getMetadataFactory();
+            $entityMetadata = $metadataFactory->getMetadataFor("Db\\Entity\\Artist")
+
+            foreach ($entityMetadata->associationMappings as $mapping) {
+                switch ($mapping['type']) {
+                    case 4:
+                        $rpcServiceResource = $this->getServiceLocator()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+                        $rpcServiceResource->setModuleName('DbApi');
+                        #$rpcServiceResource->delete('DbApi');
+                        break;
+                }
+            }
+*/
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 }

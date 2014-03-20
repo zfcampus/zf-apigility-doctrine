@@ -252,7 +252,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $config = $this->configResource->fetch(true);
         if (!isset($config['zf-rest'])) {
+            // @codeCoverageIgnoreStart
             return array();
+            // @codeCoverageIgnoreEnd
         }
 
         $services = array();
@@ -262,10 +264,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (null !== $version) {
             $version = (int) $version;
             if (!in_array($version, $this->moduleEntity->getVersions(), true)) {
+                // @codeCoverageIgnoreStart
                 throw new Exception\RuntimeException(sprintf(
                     'Invalid version "%s" provided',
                     $version
                 ), 400);
+                // @codeCoverageIgnoreEnd
             }
             $namespaceSep = preg_quote('\\');
             $pattern = sprintf(
@@ -318,7 +322,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $resourceName = ucfirst($details->serviceName);
 
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*(\\\[a-zA-Z][a-zA-Z0-9_]*)*$/', $resourceName)) {
+            // @codeCoverageIgnoreStart
             throw new CreationException('Invalid resource name; must be a valid PHP namespace name.');
+            // @codeCoverageIgnoreEnd
         }
 
         $entity       = new DoctrineRestServiceEntity();
@@ -409,18 +415,22 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * @param  string $controllerService
      * @return true
      */
-    public function deleteService($controllerService, $removeFiles = true)
+    public function deleteService($controllerService, $deleteFiles = true)
     {
         try {
             $service = $this->fetch($controllerService);
         } catch (Exception\RuntimeException $e) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'Cannot delete REST service "%s"; not found',
                 $controllerService
             ), 404);
+            // @codeCoverageIgnoreEnd
         }
 
-        if ($removeFiles) $this->deleteFiles($service);
+        if ($deleteFiles) {
+            $this->deleteFiles($service);
+        }
         $this->deleteRoute($service);
         $response = $this->deleteDoctrineRestConfig($service);
 
@@ -428,7 +438,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             return $response;
         }
 
+        // @codeCoverageIgnoreStart
         return true;
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -463,10 +475,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $classPath = sprintf('%s/%s.php', $srcPath, $className);
 
         if (file_exists($classPath)) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'The resource "%s" already exists',
                 $className
             ));
+            // @codeCoverageIgnoreEnd
         }
 
         $view = new ViewModel(array(
@@ -477,10 +491,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             'version'   => $this->moduleEntity->getLatestVersion(),
         ));
         if (!$this->createClassFile($view, 'resource', $classPath)) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create resource "%s"; unable to write file',
                 $className
             ));
+            // @codeCoverageIgnoreEnd
         }
 
         $fullClassName = sprintf(
@@ -682,8 +698,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     case 4:
                         $hydratorStrategies[$relationName] = $collectionStrategyName;
                         break;
+
+                    // @codeCoverageIgnoreStart
                     default:
                         break;
+                    // @codeCoverageIgnoreEnd
+
                 }
             }
         }
@@ -905,38 +925,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $key = array('zf-hal', 'metadata_map', $entity->entityClass);
         $this->configResource->deleteKey($key);
-
-        $objectManager = $this->getServiceManager()->get($objectManagerClass);
-        if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
-
-            $metadataFactory = $objectManager->getMetadataFactory();
-            $metadata = $metadataFactory->getMetadataFor($entity->entityClass);
-
-            foreach ($metadata->associationMappings as $relationName => $relationMapping) {
-                switch ($relationMapping['type']) {
-                    case 4:
-
-                        $resourceName = substr($entity->resourceClass,
-                            strlen($this->module . '\\' . $this->moduleEntity->getLatestVersion() . '\\Rest\\') + 1);
-                        $resourceName = substr($resourceName, 0, strlen($resourceName) - 15);
-
-                        $rpcServiceName = $this->module . '\\V' . $this->moduleEntity->getLatestVersion() . '\\Rpc\\'
-                            . $resourceName . $relationName . '\\Controller';
-
-                        $doctrineRpcServiceResource = $this->getServiceManager()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
-                        $doctrineRpcServiceResource->setModuleName($this->module);
-
-                        $response = $doctrineRpcServiceResource->delete($rpcServiceName);
-                        if ($response instanceof ApiProblem) {
-                            return $response;
-                        }
-// @codeCoverageIgnoreStart
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
     }
 // @codeCoverageIgnoreEnd
 
@@ -1020,9 +1008,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $resourceName
         );
 
+        // @codeCoverageIgnoreStart
         if (!file_exists($sourcePath)) {
             mkdir($sourcePath, 0777, true);
         }
+        // @codeCoverageIgnoreEnd
 
         return $sourcePath;
     }
