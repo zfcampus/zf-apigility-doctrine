@@ -12,6 +12,7 @@ return array(
         'ZF\Rpc',
         'ZF\Configuration',
         'ZF\Versioning',
+        'ZF\ApiProblem',
         'ZF\Apigility\Doctrine\Admin',
         'ZF\Apigility\Doctrine\Server',
         'Db',

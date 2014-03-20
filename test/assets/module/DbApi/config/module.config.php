@@ -1,22 +1,22 @@
 <?php
-return [
-    'router' => [
-        'routes' => [],
-    ],
-    'zf-versioning' => [
-        'uri' => [],
-    ],
-    'zf-rest' => [],
-    'zf-content-negotiation' => [
-        'controllers' => [],
-        'accept-whitelist' => [],
-        'content-type-whitelist' => [],
-    ],
-    'zf-hal' => [
-        'metadata_map' => [],
-    ],
-    'zf-rest-doctrine-hydrator' => [],
-    'zf-apigility' => [
-        'doctrine-connected' => [],
-    ],
-];
+return array(
+    'router' => array(
+        'routes' => array(),
+    ),
+    'zf-versioning' => array(
+        'uri' => array(),
+    ),
+    'zf-rest' => array(),
+    'zf-content-negotiation' => array(
+        'controllers' => array(),
+        'accept-whitelist' => array(),
+        'content-type-whitelist' => array(),
+    ),
+    'zf-hal' => array(
+        'metadata_map' => array(),
+    ),
+    'zf-rest-doctrine-hydrator' => array(),
+    'zf-apigility' => array(
+        'doctrine-connected' => array(),
+    ),
+);

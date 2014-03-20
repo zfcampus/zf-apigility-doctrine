@@ -49,11 +49,13 @@ class DoctrineMetadata extends \Zend\Test\PHPUnit\Controller\AbstractHttpControl
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
-        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist');
+        $this->getRequest()->getHeaders()->addHeaders(array(
+            'Accept' => 'application/json',
+        ));
 
-        print_r($this->getResponse());
+        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist', Request::METHOD_GET);
+        $body = json_decode($this->getResponse()->getBody(), true);
 
-#        $this->assertInstanceOf('
-
+        $this->assertArrayHasKey('name', $body);
     }
 }
