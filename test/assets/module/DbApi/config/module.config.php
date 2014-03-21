@@ -11,16 +11,8 @@ return array(
         'controllers' => array(),
         'accept-whitelist' => array(),
         'content-type-whitelist' => array(),
-        'accept_whitelist' => array(
-            'DbApi\\V1\\Rpc\\Artistalbum\\Controller' => array(
-                0 => 'new whitelist',
-            ),
-        ),
-        'content_type_whitelist' => array(
-            'DbApi\\V1\\Rpc\\Artistalbum\\Controller' => array(
-                0 => 'new content whitelist',
-            ),
-        ),
+        'accept_whitelist' => array(),
+        'content_type_whitelist' => array(),
     ),
     'zf-hal' => array(
         'metadata_map' => array(),

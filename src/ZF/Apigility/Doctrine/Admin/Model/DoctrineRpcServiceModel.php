@@ -546,6 +546,12 @@ class DoctrineRpcServiceModel
 
         $key = array('controllers', 'invokables', $serviceName);
         $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'accept_whitelist', $serviceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'content_type_whitelist', $serviceName);
+        $this->configResource->deleteKey($key);
     }
 
     /**
