@@ -57,5 +57,3 @@ You may choose to supress embedded resources by setting
 returns only links to embedded resources instead of their full details.
 This setting is useful to avoid circular references.  This was created during the
 development of this module, although it is part of HAL it is documented here for safe keeping.
-
-
