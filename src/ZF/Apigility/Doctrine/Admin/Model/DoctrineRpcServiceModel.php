@@ -94,14 +94,20 @@ class DoctrineRpcServiceModel
             if (isset($contentNegotiationConfig['accept_whitelist'])
                 && isset($contentNegotiationConfig['accept_whitelist'][$controllerServiceName])
             ) {
+                // @codeCoverageIgnoreStart
+                // Is this handled differently in recent versions of Apigility // FIXME: verify this\
                 $data['accept_whitelist'] = $contentNegotiationConfig['accept_whitelist'][$controllerServiceName];
             }
+                // @codeCoverageIgnoreEnd
 
             if (isset($contentNegotiationConfig['content_type_whitelist'])
                 && isset($contentNegotiationConfig['content_type_whitelist'][$controllerServiceName])
             ) {
+                // @codeCoverageIgnoreStart
+                // Is this handled differently in recent versions of Apigility // FIXME: verify this\
                 $data['content_type_whitelist'] = $contentNegotiationConfig['content_type_whitelist'][$controllerServiceName];
             }
+                // @codeCoverageIgnoreEnd
         }
 
         $service = new DoctrineRpcServiceEntity();
@@ -117,14 +123,19 @@ class DoctrineRpcServiceModel
     public function fetchAll($version = null)
     {
         $config = $this->configResource->fetch(true);
-        if (!isset($config['zf-rpc'])) {
+        if (!isset($config['zf-rpc-doctrine-controller'])) {
+            // @codeCoverageIgnoreStart
             return array();
+            // @codeCoverageIgnoreEnd
         }
 
         $services = array();
         $pattern  = false;
 
+        // @codeCoverageIgnoreStart
         // Initialize pattern if a version was passed and it's valid
+        // Ignored from code coverage because Apigility sets the version
+        // and it's no longer handled here: FIXME: verify this
         if (null !== $version) {
             if (!in_array($version, $this->moduleEntity->getVersions())) {
                 throw new Exception\RuntimeException(sprintf(
@@ -141,11 +152,12 @@ class DoctrineRpcServiceModel
             );
         }
 
-        foreach (array_keys($config['zf-rpc']) as $controllerService) {
+        foreach (array_keys($config['zf-rpc-doctrine-controller']) as $controllerService) {
             if (!$pattern) {
                 $services[] = $this->fetch($controllerService);
                 continue;
             }
+        // @codeCoverageIgnoreEnd
 
             if (preg_match($pattern, $controllerService)) {
                 $services[] = $this->fetch($controllerService);
@@ -174,7 +186,9 @@ class DoctrineRpcServiceModel
 
         if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*(\\\[a-zA-Z][a-zA-Z0-9_]*)*$/', $serviceName)) {
             /** @todo define exception in Rpc namespace */
+            // @codeCoverageIgnoreStart
             throw new CreationException('Invalid service name; must be a valid PHP namespace name.');
+            // @codeCoverageIgnoreEnd
         }
 
         $controllerData    = $this->createController($serviceName);
@@ -193,16 +207,32 @@ class DoctrineRpcServiceModel
      * @param  DoctrineRpcServiceEntity $entity
      * @return true
      */
-    public function deleteService(DoctrineRpcServiceEntity $entity)
+    public function deleteService(DoctrineRpcServiceEntity $entity, $deleteFiles = true)
     {
         $serviceName = $entity->controllerServiceName;
         $routeName   = $entity->routeName;
 
+        if ($deleteFiles) {
+            $this->deleteFiles($entity);
+        }
         $this->deleteRouteConfig($routeName);
         $this->deleteDoctrineRpcConfig($serviceName);
         $this->deleteContentNegotiationConfig($serviceName);
 
         return true;
+    }
+
+    /**
+     * Delete the files which were automatically created
+     *
+     * @param  DoctrineRestServiceEntity $entity
+     */
+    public function deleteFiles(DoctrineRpcServiceEntity $entity)
+    {
+        $config = $this->configResource->fetch(true);
+
+        $reflector = new \ReflectionClass($entity->controllerClass);
+        unlink($reflector->getFileName());
     }
 
     /**
@@ -226,18 +256,22 @@ class DoctrineRpcServiceModel
         );
 
         if (!file_exists($srcPath)) {
+            // @codeCoverageIgnoreStart
             mkdir($srcPath, 0777, true);
         }
+            // @codeCoverageIgnoreEnd
 
         $className         = sprintf('%sController', $serviceName);
         $classPath         = sprintf('%s/%s.php', $srcPath, $className);
         $controllerService = sprintf('%s\\V%s\\Rpc\\%s\\Controller', $module, $version, $serviceName);
 
         if (file_exists($classPath)) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'The controller "%s" already exists',
                 $className
             ));
+            // @codeCoverageIgnoreEnd
         }
 
         $view = new ViewModel(array(
@@ -257,8 +291,10 @@ class DoctrineRpcServiceModel
 
         if (!file_put_contents($classPath,
             "<?php\n" . $renderer->render($view))) {
+            // @codeCoverageIgnoreStart
             return false;
         }
+            // @codeCoverageIgnoreEnd
 
         $fullClassName = sprintf('%s\\V%s\\Rpc\\%s\\%s', $module, $version, $serviceName, $className);
         $this->configResource->patch(array(
@@ -287,11 +323,13 @@ class DoctrineRpcServiceModel
     public function createRoute($route, $serviceName, $controllerService = null)
     {
         if (null === $controllerService) {
+            // @codeCoverageIgnoreStart
             $controllerService = sprintf('%s\\Rpc\\%s\\Controller', $this->module, $serviceName);
         }
+            // @codeCoverageIgnoreEnd
 
         $routeName = sprintf('%s.rpc.%s', $this->normalize($this->module), $this->normalize($serviceName));
-        $action    = 'index'; # lcfirst($serviceName);
+        $action    = 'index';
 
         $config = array(
             'router' => array(
@@ -355,8 +393,10 @@ class DoctrineRpcServiceModel
             ),
         ));
         if (null !== $callable) {
+            // @codeCoverageIgnoreStart
             $config[$controllerService]['callable'] = $callable;
         }
+        // @codeCoverageIgnoreEnd
         return $this->configResource->patch($config, true);
     }
 
@@ -369,9 +409,11 @@ class DoctrineRpcServiceModel
      */
     public function createContentNegotiationConfig($controllerService, $selector = null)
     {
+        // @codeCoverageIgnoreStart
         if (null === $selector) {
             $selector = 'Json';
         }
+        // @codeCoverageIgnoreEnd
 
         $config = array('zf-content-negotiation' => array(
             'controllers' => array(
@@ -403,14 +445,19 @@ class DoctrineRpcServiceModel
     {
         $services  = $this->fetch($controllerService);
         if (!$services) {
+            // @codeCoverageIgnoreStart
             return false;
         }
+            // @codeCoverageIgnoreEnd
+
         $services  = $services->getArrayCopy();
         $routeName = $services['route_name'];
 
         $config = $this->configResource->fetch(true);
         $config['router']['routes'][$routeName]['options']['route'] = $routeMatch;
+
         $this->configResource->overwrite($config);
+
         return true;
     }
 
@@ -456,12 +503,15 @@ class DoctrineRpcServiceModel
     {
         if (!in_array($headerType, array('accept', 'content_type'))) {
             /** @todo define exception in Rpc namespace */
+            // @codeCoverageIgnoreStart
             throw new PatchException('Invalid content negotiation whitelist type provided', 422);
+            // @codeCoverageIgnoreEnd
         }
         $headerType .= '_whitelist';
         $config = $this->configResource->fetch(true);
         $config['zf-content-negotiation'][$headerType][$controllerService] = $whitelist;
         $this->configResource->overwrite($config);
+
         return true;
     }
 
@@ -494,6 +544,14 @@ class DoctrineRpcServiceModel
         $key = array('zf-rpc-doctrine-controller', $serviceName);
         $this->configResource->deleteKey($key);
 
+        $key = array('controllers', 'invokables', $serviceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'accept_whitelist', $serviceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('zf-content-negotiation', 'content_type_whitelist', $serviceName);
+        $this->configResource->deleteKey($key);
     }
 
     /**
@@ -552,6 +610,7 @@ class DoctrineRpcServiceModel
      */
     protected function getRouteMatchStringFromModuleConfig($routeName, array $config)
     {
+        // @codeCoverageIgnoreStart
         if (!isset($config['router'])
             || !isset($config['router']['routes'])
         ) {
@@ -572,6 +631,7 @@ class DoctrineRpcServiceModel
         ) {
             return false;
         }
+        // @codeCoverageIgnoreEnd
 
         return $config['options']['route'];
     }

@@ -7,6 +7,16 @@
 return array(
     'router' => array(
         'routes' => array(
+            'zf-apigility-doctrine-rpc-service' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/apigility/api/module[/:name]/doctrine-rpc[/:controller_service_name]',
+                    'defaults' => array(
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService',
+                    ),
+                ),
+                'may_terminate' => true,
+            ),
             'zf-apigility-doctrine-service' => array(
                 'type' => 'segment',
                 'options' => array(
@@ -33,9 +43,14 @@ return array(
     'zf-content-negotiation' => array(
         'controllers' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => 'HalJson',
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => 'HalJson',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
         ),
         'accept-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
+                'application/json',
+                'application/*+json',
+            ),
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
                 'application/json',
                 'application/*+json',
@@ -46,6 +61,10 @@ return array(
             ),
         ),
         'content-type-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
+                'application/json',
+                'application/*+json',
+            ),
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
                 'application/json',
                 'application/*+json',
@@ -59,6 +78,12 @@ return array(
 
     'zf-hal' => array(
         'metadata_map' => array(
+            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity' => array(
+                'hydrator'        => 'ArraySerializable',
+                'route_identifier_name' => 'controller_service_name',
+                'entity_identifier_name' => 'controller_service_name',
+                'route_name'      => 'zf-apigility-doctrine-rpc-service',
+            ),
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity' => array(
                 'hydrator'        => 'ArraySerializable',
                 'route_identifier_name' => 'controller_service_name',
@@ -75,12 +100,22 @@ return array(
     ),
 
     'zf-rest' => array(
+        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
+            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource',
+            'route_name'                 => 'zf-apigility-doctrine-rpc-service',
+            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity',
+            'route_identifier_name'      => 'controller_service_name',
+            'entity_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
+            'collection_http_methods'    => array('GET', 'POST'),
+            'collection_name'            => 'doctrine-rpc',
+            'collection_query_whitelist' => array('version'),
+        ),
         'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
             'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource',
             'route_name'                 => 'zf-apigility-doctrine-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
             'route_identifier_name'      => 'controller_service_name',
-            'resource_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
+            'entity_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
             'collection_name'            => 'doctrine',
             'collection_query_whitelist' => array('version'),
@@ -90,7 +125,7 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-metadata-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity',
             'route_identifier_name'      => 'name',
-            'resource_http_methods'      => array('GET'),
+            'entity_http_methods'      => array('GET'),
             'collection_http_methods'    => array('GET'),
             'collection_name'            => 'doctrine-metadata',
             'collection_query_whitelist' => array('version'),

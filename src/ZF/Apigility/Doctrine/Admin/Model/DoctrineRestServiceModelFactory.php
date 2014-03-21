@@ -24,8 +24,10 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
         if (isset($this->models[$type])
             && isset($this->models[$type][$module])
         ) {
+            // @codeCoverageIgnoreStart
             return $this->models[$type][$module];
         }
+            // @codeCoverageIgnoreEnd
 
         $moduleName   = $this->normalizeModuleName($module);
         $config       = $this->configFactory->factory($module);
@@ -39,12 +41,14 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
             case self::TYPE_DEFAULT:
                 $this->models[$type][$module] = $restModel;
                 return $restModel;
+            // @codeCoverageIgnoreStart
             default:
                 throw new Exception\InvalidArgumentException(sprintf(
                     'Model of type "%s" does not exist or cannot be handled by this factory',
                     $type
                 ));
         }
+            // @codeCoverageIgnoreEnd
     }
 
     protected $serviceManager;
