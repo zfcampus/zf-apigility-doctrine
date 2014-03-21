@@ -4,7 +4,10 @@ php:
   - 5.4
 
 before_script:
-    - phpenv config-add .travis-config.ini
-    - composer install --dev
+  - phpenv config-add .travis-config.ini
+  - composer self-update
+  - pecl install -f mongo-1.4.1
+  - composer install --dev --prefer-source
 
-services: mongodb
+services: 
+  - mongodb
