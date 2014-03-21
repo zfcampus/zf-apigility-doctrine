@@ -76,11 +76,11 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
 
         $this->getRequest()->setContent('{"routematch": "/doctrine-rpc-changed/test"}');
 
-#            // Try to update service
-#            $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc/DbApi%5CV1%5CRpc%5CArtistalbum%5CController', Request::METHOD_PUT);
-#            $body = json_decode($this->getResponse()->getBody(), true);
-
-#print_r($body);
+        // Try to update service
+        $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc/DbApi%5CV1%5CRpc%5CArtistalbum%5CController', Request::METHOD_PUT);
+        $body = json_decode($this->getResponse()->getBody(), true);
+die();
+print_r($this->getRequest());
 
         foreach ($body['_embedded']['doctrine'] as $service) {
             $this->resource->delete($service['controller_service_name']);

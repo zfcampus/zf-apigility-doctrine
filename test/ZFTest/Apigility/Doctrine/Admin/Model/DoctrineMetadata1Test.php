@@ -113,7 +113,7 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
                         'service_name' => 'Artist' . $mapping['fieldName'],
                         'route' => '/db-test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
                         'http_methods' => array(
-                            'GET',
+                            'GET', 'PUT', 'POST'
                         ),
                         'options' => array(
                             'target_entity' => $mapping['targetEntity'],

@@ -216,6 +216,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
+die('patching');
+
         if (is_object($data)) {
             $data = (array) $data;
         }
