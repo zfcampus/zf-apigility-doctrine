@@ -1,6 +1,8 @@
 Apigility for Doctrine - Admin
 ==============================
 
+[![Build status](https://api.travis-ci.org/soliantconsulting/zf-apigility-doctrine-admin.svg)](http://travis-ci.org/soliantconsulting/zf-apigility-doctrine-admin) 
+
 Installation
 ------------
 
