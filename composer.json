@@ -26,7 +26,7 @@
         "php": ">=5.4",
         "zfcampus/zf-apigility": "dev-master",
         "zfcampus/zf-configuration": "dev-master",
-	"zfcampus/zf-apigility-doctrine-server": "dev-master"
+        "zfcampus/zf-apigility-doctrine-server": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
