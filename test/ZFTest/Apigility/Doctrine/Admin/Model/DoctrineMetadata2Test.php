@@ -72,20 +72,22 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
 
         $this->rpcResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
         $this->rpcResource->setModuleName('DbApi');
+        $this->rpcResource->patch('DbApi\\V1\\Rpc\\Artistalbum\\Controller', array(
+            'routematch' => '/doctrine-rpc-changed/test',
+            'httpmethods' => array('GET', 'POST', 'PUT'),
+            'selector' => 'new selector',
+            'accept_whitelist' => array('new whitelist'),
+            'content_type_whitelist' => array('new content whitelist'),
+        ));
 
+        // Test get model returns cached model
+        $this->assertEquals($this->rpcResource->getModel(), $this->rpcResource->getModel());
+        $this->assertEquals($this->rpcResource->getModuleName(), $this->rpcResource->getModuleName());
 
-        $this->getRequest()->setContent('{"routematch": "/doctrine-rpc-changed/test"}');
-
-        // Try to update service
-        $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc/DbApi%5CV1%5CRpc%5CArtistalbum%5CController', Request::METHOD_PUT);
-        $body = json_decode($this->getResponse()->getBody(), true);
-die();
-print_r($this->getRequest());
 
         foreach ($body['_embedded']['doctrine'] as $service) {
             $this->resource->delete($service['controller_service_name']);
         }
-
         $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc?version=1', Request::METHOD_GET);
         $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);

@@ -120,6 +120,7 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
                             'source_entity' => $mapping['sourceEntity'],
                             'field_name' => $mapping['fieldName'],
                         ),
+                        'selector' => 'custom selector',
                     ));
                     break;
                 default:

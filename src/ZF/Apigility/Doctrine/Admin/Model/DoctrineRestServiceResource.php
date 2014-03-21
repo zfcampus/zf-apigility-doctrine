@@ -156,36 +156,23 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             return new ApiProblem(400, 'No data provided for update');
         }
 
-        $model = $this->getModel();
-        foreach ($data as $key => $value) {
-            try {
-                switch (strtolower($key)) {
-                    case 'httpmethods':
-                    case 'http_methods':
-                        $model->updateHttpMethods($id, $value);
-                        break;
-                    case 'routematch':
-                    case 'route_match':
-                        $model->updateRoute($id, $value);
-                        break;
-                    case 'selector':
-                        $model->updateSelector($id, $value);
-                        break;
-                    case 'accept_whitelist':
-                        $model->updateContentNegotiationWhitelist($id, 'accept', $value);
-                        break;
-                    case 'content_type_whitelist':
-                        $model->updateContentNegotiationWhitelist($id, 'content_type', $value);
-                        break;
-                    default:
-                        break;
-                }
-            } catch (\Exception $e) {
-                throw new PatchException('Error updating RPC service', 500, $e);
+        // Make sure we have an entity first
+        $model  = $this->getModel();
+        $entity = $model->fetch($id);
+
+        $entity->exchangeArray($data);
+
+        try {
+            switch (true) {
+                case ($entity instanceof DoctrineRestServiceEntity):
+                default:
+                    $updated = $model->updateService($entity);
             }
+        } catch (\Exception $e) {
+            throw new PatchException('Error updating REST service', 500, $e);
         }
 
-        return $model->fetch($id);
+        return $updated;
     }
 
     /**
