@@ -63,8 +63,6 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertArrayHasKey('_embedded', $body);
-        $this->assertEquals('Db\Entity\Album', $body['_embedded']['doctrine-metadata'][0]['name']);
-        $this->assertEquals('Db\Entity\Artist', $body['_embedded']['doctrine-metadata'][1]['name']);
     }
 
     public function testDoctrineService()
