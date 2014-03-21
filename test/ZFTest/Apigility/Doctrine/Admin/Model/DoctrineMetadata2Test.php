@@ -69,6 +69,15 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
+        $this->assertEquals($this->resource->getModuleName(), 'DbApi');
+
+        $entity = $this->resource->patch('DbApi\\V1\\Rest\\Artist\\Controller', array(
+            'routematch' => '/doctrine-changed/test',
+            'httpmethods' => array('GET', 'POST', 'PUT'),
+            'selector' => 'new doctrine selector',
+            'accept_whitelist' => array('new whitelist accept'),
+            'content_type_whitelist' => array('new content whitelist'),
+        ));
 
         $this->rpcResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
         $this->rpcResource->setModuleName('DbApi');

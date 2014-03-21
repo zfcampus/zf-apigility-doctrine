@@ -109,6 +109,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * @param  \Zend\EventManager\Event $e
      * @return null|DoctrineRestServiceEntity
      */
+    // @codeCoverageIgnoreStart
+
     public static function onFetch($e)
     {
         $entity = $e->getParam('entity', false);
@@ -150,6 +152,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
         return $this->{$name};
     }
+
+    // @codeCoverageIgnoreEnd
 
     protected $serviceManager;
 
@@ -230,6 +234,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Trigger an event, allowing a listener to alter the entity and/or
         // curry a new one.
+        // @codeCoverageIgnoreStart
         $eventResults = $this->getEventManager()->trigger(__FUNCTION__, $this, array(
             'entity' => $entity,
             'config' => $config,
@@ -240,6 +245,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             return $eventResults->last();
         }
 
+        // @codeCoverageIgnoreEnd
         return $entity;
     }
 
@@ -281,10 +287,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         foreach (array_keys($config['zf-rest']) as $controllerService) {
+        // @codeCoverageIgnoreStart
+        // Because a verion is always supplied this check may not be necessary
             if (!$pattern) {
                 $services[] = $this->fetch($controllerService);
                 continue;
             }
+        // @codeCoverageIgnoreEnd
 
             if (preg_match($pattern, $controllerService)) {
                 $services[] = $this->fetch($controllerService);
@@ -395,11 +404,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         try {
             $original = $this->fetch($controllerService);
         } catch (Exception\RuntimeException $e) {
+            // @codeCoverageIgnoreStart
             throw new Exception\RuntimeException(sprintf(
                 'Cannot update REST service "%s"; not found',
                 $controllerService
             ), 404);
         }
+            // @codeCoverageIgnoreEnd
 
         $this->updateRoute($original, $update);
         $this->updateRestConfig($original, $update);
@@ -435,10 +446,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $response = $this->deleteDoctrineRestConfig($service);
 
         if ($response instanceof ApiProblem) {
+        // @codeCoverageIgnoreStart
             return $response;
         }
 
-        // @codeCoverageIgnoreStart
         return true;
         // @codeCoverageIgnoreEnd
     }
@@ -769,8 +780,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     {
         $route = $update->routeMatch;
         if (!$route) {
+            // @codeCoverageIgnoreStart
             return;
         }
+            // @codeCoverageIgnoreEnd
+
         $routeName = $original->routeName;
         $config    = array('router' => array('routes' => array(
             $routeName => array('options' => array(
@@ -797,8 +811,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         if (empty($patch)) {
+            // @codeCoverageIgnoreStart
             goto updateArrayOptions;
         }
+            // @codeCoverageIgnoreEnd
 
         $config = array('zf-rest' => array(
             $original->controllerServiceName => $patch,
@@ -926,7 +942,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $key = array('zf-hal', 'metadata_map', $entity->entityClass);
         $this->configResource->deleteKey($key);
     }
-// @codeCoverageIgnoreEnd
 
     /**
      * Create a class file
@@ -949,12 +964,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $classPath,
             '<' . "?php\n" . $renderer->render($model)
         )) {
+            // @codeCoverageIgnoreStart
             return true;
         }
-        // @codeCoverageIgnoreStart
+
         return false;
-        // @codeCoverageIgnoreEnd
     }
+        // @codeCoverageIgnoreEnd
 
     /**
      * Get a renderer instance
@@ -1153,14 +1169,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             && isset($config['zf-rest'][$controllerServiceName])
             && isset($config['zf-rest'][$controllerServiceName]['entity_class'])
         ) {
+            // @codeCoverageIgnoreStart
             return $config['zf-rest'][$controllerServiceName]['entity_class'];
+            // @codeCoverageIgnoreEnd
         }
 
         $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
         if (!preg_match('#' . preg_quote($module . '\\Rest\\') . '(?P<service>[^\\\\]+)' . preg_quote('\\Controller') . '#', $controllerServiceName, $matches)) {
             return null;
         }
+
+        // @codeCoverageIgnoreStart
         return sprintf('%s\\Rest\\%s\\%sEntity', $module, $matches['service'], $matches['service']);
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -1177,13 +1198,18 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             && isset($config['zf-rest'][$controllerServiceName])
             && isset($config['zf-rest'][$controllerServiceName]['collection_class'])
         ) {
+            // @codeCoverageIgnoreStart
             return $config['zf-rest'][$controllerServiceName]['collection_class'];
+            // @codeCoverageIgnoreEnd
         }
 
         $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
         if (!preg_match('#' . preg_quote($module . '\\Rest\\') . '(?P<service>[^\\\\]+)' . preg_quote('\\Controller') . '#', $controllerServiceName, $matches)) {
             return null;
         }
+
+        // @codeCoverageIgnoreStart
         return sprintf('%s\\Rest\\%s\\%sCollection', $module, $matches['service'], $matches['service']);
+        // @codeCoverageIgnoreEnd
     }
 }

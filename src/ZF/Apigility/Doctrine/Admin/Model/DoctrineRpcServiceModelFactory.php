@@ -59,8 +59,10 @@ class DoctrineRpcServiceModelFactory
     public function factory($module)
     {
         if (isset($this->models[$module])) {
+        // @codeCoverageIgnoreStart
             return $this->models[$module];
         }
+        // @codeCoverageIgnoreEnd
 
         $moduleName   = $this->normalizeModuleName($module);
         $moduleEntity = $this->moduleModel->getModule($moduleName);

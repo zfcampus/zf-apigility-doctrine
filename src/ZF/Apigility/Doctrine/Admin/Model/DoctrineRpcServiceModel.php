@@ -409,9 +409,11 @@ class DoctrineRpcServiceModel
      */
     public function createContentNegotiationConfig($controllerService, $selector = null)
     {
+        // @codeCoverageIgnoreStart
         if (null === $selector) {
             $selector = 'Json';
         }
+        // @codeCoverageIgnoreEnd
 
         $config = array('zf-content-negotiation' => array(
             'controllers' => array(
@@ -443,8 +445,11 @@ class DoctrineRpcServiceModel
     {
         $services  = $this->fetch($controllerService);
         if (!$services) {
+            // @codeCoverageIgnoreStart
             return false;
         }
+            // @codeCoverageIgnoreEnd
+
         $services  = $services->getArrayCopy();
         $routeName = $services['route_name'];
 
@@ -498,12 +503,15 @@ class DoctrineRpcServiceModel
     {
         if (!in_array($headerType, array('accept', 'content_type'))) {
             /** @todo define exception in Rpc namespace */
+            // @codeCoverageIgnoreStart
             throw new PatchException('Invalid content negotiation whitelist type provided', 422);
+            // @codeCoverageIgnoreEnd
         }
         $headerType .= '_whitelist';
         $config = $this->configResource->fetch(true);
         $config['zf-content-negotiation'][$headerType][$controllerService] = $whitelist;
         $this->configResource->overwrite($config);
+
         return true;
     }
 

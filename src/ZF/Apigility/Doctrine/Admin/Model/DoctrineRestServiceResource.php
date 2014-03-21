@@ -56,10 +56,12 @@ class DoctrineRestServiceResource extends AbstractResourceListener
 
         $moduleName = $this->getEvent()->getRouteParam('name', false);
         if (!$moduleName) {
+            // @codeCoverageIgnoreStart
             throw new RuntimeException(sprintf(
                 '%s cannot operate correctly without a "name" segment in the route matches',
                 __CLASS__
             ));
+            // @codeCoverageIgnoreEnd
         }
         $this->moduleName = $moduleName;
         return $moduleName;
@@ -88,8 +90,10 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     public function create($data)
     {
         if (is_object($data)) {
+            // @codeCoverageIgnoreStart
             $data = (array) $data;
         }
+            // @codeCoverageIgnoreEnd
 
         $type = DoctrineRestServiceModelFactory::TYPE_DEFAULT;
         $creationData = new NewDoctrineServiceEntity();
@@ -101,7 +105,9 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         try {
             $service = $model->createService($creationData);
         } catch (\Exception $e) {
+            // @codeCoverageIgnoreStart
             throw new CreationException('Unable to create REST service', $e->getCode(), $e);
+            // @codeCoverageIgnoreEnd
         }
 
         return $service;
@@ -117,8 +123,10 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     {
         $service = $this->getModel()->fetch($id);
         if (!$service instanceof DoctrineRestServiceEntity) {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'REST service not found');
         }
+            // @codeCoverageIgnoreEnd
         return $service;
     }
 
@@ -144,6 +152,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
+        // @codeCoverageIgnoreStart
         if (is_object($data)) {
             $data = (array) $data;
         }
@@ -155,6 +164,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         if (empty($data)) {
             return new ApiProblem(400, 'No data provided for update');
         }
+        // @codeCoverageIgnoreEnd
 
         // Make sure we have an entity first
         $model  = $this->getModel();
@@ -162,15 +172,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
 
         $entity->exchangeArray($data);
 
-        try {
-            switch (true) {
-                case ($entity instanceof DoctrineRestServiceEntity):
-                default:
-                    $updated = $model->updateService($entity);
-            }
-        } catch (\Exception $e) {
-            throw new PatchException('Error updating REST service', 500, $e);
-        }
+        $updated = $model->updateService($entity);
 
         return $updated;
     }
@@ -193,8 +195,10 @@ class DoctrineRestServiceResource extends AbstractResourceListener
                     $model->deleteService($entity->controllerServiceName);
             }
         } catch (\Exception $e) {
+            // @codeCoverageIgnoreStart
             throw new \Exception('Error deleting REST service', 500, $e);
         }
+            // @codeCoverageIgnoreEnd
 
         return true;
     }
