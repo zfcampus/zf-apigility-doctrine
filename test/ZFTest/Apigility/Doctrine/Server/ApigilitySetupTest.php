@@ -106,9 +106,4 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
         }
 
     }
-
-    public function tearDown()
-    {
-        # FIXME: Drop database from in-memory
-    }
 }

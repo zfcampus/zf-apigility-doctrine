@@ -57,8 +57,11 @@ class DoctrineResource extends AbstractResourceListener
     public function getHydrator()
     {
         if (!$this->hydrator) {
+            // @codeCoverageIgnoreStart
+            // FIXME: find a way to test this line from a created API.  Shouldn't all created API's have a hydrator?
             $this->hydrator = new Hydrator\DoctrineObject($this->getObjectManager(), $this->getEntityClass());
         }
+            // @codeCoverageIgnoreEnd
         return $this->hydrator;
     }
 
@@ -92,8 +95,10 @@ class DoctrineResource extends AbstractResourceListener
     {
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
+            // @codeCoverageIgnoreEnd
 
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
@@ -106,6 +111,7 @@ class DoctrineResource extends AbstractResourceListener
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
+     * @codeCoverageIgnore
      */
     public function deleteList($data)
     {
@@ -123,6 +129,8 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
+        /**
+         * Zoom would be a nice-to-have
         $parameters = $this->getEvent()->getQueryParams()->toArray();
 
         if ($this->getEvent()->getRouteParam('zoom')) {
@@ -137,6 +145,7 @@ class DoctrineResource extends AbstractResourceListener
                 }
             }
         }
+        */
 
         return $this->getObjectManager()->find($this->getEntityClass(), $id);
     }
@@ -172,14 +181,18 @@ class DoctrineResource extends AbstractResourceListener
             $fetchAllQuery = new Query\FetchAllOdmQuery();
             $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
         } else {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
+            // @codeCoverageIgnoreEnd
 
         // Create collection
         $fetchAllQuery->setObjectManager($objectManager);
         $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $parameters);
         if ($queryBuilder instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
             return $queryBuilder;
+            // @codeCoverageIgnoreEnd
         }
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
@@ -219,8 +232,10 @@ class DoctrineResource extends AbstractResourceListener
     {
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
+            // @codeCoverageIgnoreEnd
 
         // Load full data:
         $hydrator = $this->getHydrator();
@@ -239,6 +254,7 @@ class DoctrineResource extends AbstractResourceListener
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
+     * @codeCoverageIgnore
      */
     public function replaceList($data)
     {
@@ -256,7 +272,9 @@ class DoctrineResource extends AbstractResourceListener
     {
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
         if (!$entity) {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
+            // @codeCoverageIgnoreEnd
         }
 
         $hydrator = $this->getHydrator();
