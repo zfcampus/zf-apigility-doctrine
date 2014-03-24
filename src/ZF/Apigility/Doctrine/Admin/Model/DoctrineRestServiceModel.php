@@ -81,7 +81,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     protected $restArrayUpdateOptions = array(
         'collectionHttpMethods'    => 'collection_http_methods',
         'collectionQueryWhitelist' => 'collection_query_whitelist',
-        'resourceHttpMethods'      => 'resource_http_methods',
+        'entityHttpMethods'      => 'entity_http_methods',
     );
 
     /**
@@ -646,7 +646,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                 'route_identifier_name'      => $details->routeIdentifierName,
                 'entity_identifier_name'     => $details->entityIdentifierName,
                 'collection_name'            => $details->collectionName,
-                'resource_http_methods'      => $details->resourceHttpMethods,
+                'entity_http_methods'        => $details->entityHttpMethods,
                 'collection_http_methods'    => $details->collectionHttpMethods,
                 'collection_query_whitelist' => $details->collectionQueryWhitelist,
                 'page_size'                  => $details->pageSize,
