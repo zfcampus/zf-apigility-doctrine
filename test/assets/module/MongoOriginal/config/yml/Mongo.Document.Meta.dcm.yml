@@ -1,0 +1,37 @@
+Mongo\Document\Meta:
+  db: zf-apigility-doctrine-server-test
+  collection: meta
+  repositoryClass: Mongo\Repository\MetaRepository
+  fields:
+    id:
+      id: true
+    itemUrl:
+      type: string
+    identifier:
+      type: string
+    mediatype:
+      type: string
+    publicdate:
+      type: date
+    creator:
+      type: string
+    publisher:
+      type: string
+    description:
+      type: string
+    date:
+      type: string
+    collection:
+      type: collection
+    title:
+      type: string
+    addeddate:
+      type: date    
+    credits:
+      type: string
+    director:
+      type: string
+    contact:
+      type: string
+    subject:
+      type: string
