@@ -20,7 +20,8 @@
         "phpunit/phpunit": "3.7.*",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
+        "doctrine/mongodb-odm": "1.0.0-beta9@dev",
+        "zfcampus/zf-apigility-doctrine-admin": "dev-master"
     },
     "require": {
         "php": ">=5.4",

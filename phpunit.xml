@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="./test/Bootstrap.php" colors="true">
     <testsuites>
-    <testsuite name="ZFApigility\Doctrine\Admin Module Tests">
-            <directory>./test/ZFTest/Apigility/Doctrine/Admin</directory>
+    <testsuite name="ZFApigility\Doctrine\Server Module Tests">
+            <directory>./test/ZFTest/Apigility/Doctrine/Server</directory>
         </testsuite>
     </testsuites>
 

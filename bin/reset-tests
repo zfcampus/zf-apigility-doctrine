@@ -1,0 +1,6 @@
+rm -rf ./test/assets/module/Db
+rm -rf ./test/assets/module/DbApi
+mkdir ./test/assets/module/Db
+mkdir ./test/assets/module/DbApi
+rsync -a ./test/assets/module/DbOriginal/* ./test/assets/module/Db
+rsync -a ./test/assets/module/DbApiOriginal/* ./test/assets/module/DbApi
