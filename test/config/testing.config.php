@@ -11,6 +11,13 @@ return array(
                     'memory' => true,
                 ),
             ),
+            'odm_default' => array(
+                'server' => 'localhost',
+#                'port' => '10143',
+                'user' => '',
+                'password' => '',
+                'dbname' => 'zf_apigility_doctrine_server_test',
+            ),
         ),
     ),
 );
