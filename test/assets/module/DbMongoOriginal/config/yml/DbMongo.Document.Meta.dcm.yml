@@ -8,4 +8,4 @@ DbMongo\Document\Meta:
     name:
       type: string
     createdAt:
-      type: datetime
+      type: date

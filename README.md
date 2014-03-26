@@ -235,15 +235,6 @@ Like (% is used as a wildcard)
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
-ORM Only
---------
-
-Not Like (% is used as a wildcard)
-
-```php
-    array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
-```
-
 
 ODM Only
 --------

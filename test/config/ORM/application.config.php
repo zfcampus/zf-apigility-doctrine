@@ -4,7 +4,6 @@ return array(
     'modules' => array(
         'DoctrineModule',
         'DoctrineORMModule',
-        'DoctrineMongoODMModule',
         'ZF\Apigility',
         'ZF\Apigility\Admin',
         'ZF\Hal',
@@ -16,20 +15,16 @@ return array(
         'ZF\ApiProblem',
         'ZF\Apigility\Doctrine\Admin',
         'ZF\Apigility\Doctrine\Server',
-        'DbMongo',
-        'DbMongoApi',
         'Db',
         'DbApi',
     ),
     'module_listener_options' => array(
         'config_glob_paths' => array(
-            __DIR__ . '/testing.config.php',
+            __DIR__ . '/local.php',
         ),
         'module_paths' => array(
-            'Db' => __DIR__ . '/../assets/module/Db',
-            'DbApi' => __DIR__ . '/../assets/module/DbApi',
-            'DbMongo' => __DIR__ . '/../assets/module/DbMongo',
-            'DbMongoApi' => __DIR__ . '/../assets/module/DbMongoApi',
+            'Db' => __DIR__ . '/../../assets/module/Db',
+            'DbApi' => __DIR__ . '/../../assets/module/DbApi',
         ),
     ),
 );

@@ -8,27 +8,26 @@ namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
-use Db\Entity\Artist as ArtistEntity;
+use DbMongo\Document\Meta as MetaEntity;
 
-class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class ArtistODMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
         $this->setApplicationConfig(
-                include __DIR__ . '/../../../../config/application.config.php'
+            include __DIR__ . '/../../../../../config/ODM/application.config.php'
         );
         parent::setUp();
-
-        $this->createDatabase();
     }
 
-    public function createDatabase()
+    protected function clearData()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $config = $this->getApplication()->getConfig()['doctrine']['connection']['odm_default'];
 
-        $tool = new SchemaTool($em);
-        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
+        $connection = new \MongoClient('mongodb://' . $config['server'] . ':' . $config['port']);
+        $db = $connection->{$config['dbname']};
+        $collection = $db->meta;
+        $collection->remove();
     }
 
     public function testCreate()
@@ -39,8 +38,9 @@ class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         ));
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
-        $this->dispatch('/test/artist');
+        $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
+
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
     }
@@ -48,20 +48,21 @@ class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
     public function testFetch()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $dm = $serviceManager->get('doctrine.documentmanager.odm_default');
+        $this->clearData();
 
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistTwo');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
+        $meta = new MetaEntity();
+        $meta->setName('ArtistTwo');
+        $meta->setCreatedAt(new \Datetime());
+        $dm->persist($meta);
+        $dm->flush();
 
         $this->getRequest()->getHeaders()->addHeaders(array(
             'Accept' => 'application/json',
         ));
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
-        $this->dispatch('/test/artist/' . $artist->getId());
+        $this->dispatch('/test/meta/' . $meta->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
@@ -70,29 +71,30 @@ class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
     public function testFetchAll()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $dm = $serviceManager->get('doctrine.documentmanager.odm_default');
+        $this->clearData();
 
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistThree');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistFour');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
+        $meta = new MetaEntity();
+        $meta->setName('ArtistThree');
+        $meta->setCreatedAt(new \Datetime());
+        $dm->persist($meta);
+        $meta = new MetaEntity();
+        $meta->setName('ArtistFour');
+        $meta->setCreatedAt(new \Datetime());
+        $dm->persist($meta);
+        $dm->flush();
 
         $this->getRequest()->getHeaders()->addHeaders(array(
             'Accept' => 'application/json',
         ));
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
-        $this->dispatch('/test/artist?orderBy%5Bname%5D=ASC');
+        $this->dispatch('/test/meta?orderBy%5Bname%5D=ASC');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
-        $this->assertEquals(2, sizeof($body['_embedded']['artist']));
+        $this->assertEquals(2, sizeof($body['_embedded']['meta']));
     }
-
+/*
     public function testPatch()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
@@ -180,4 +182,7 @@ class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         $this->assertEquals(404, $this->getResponseStatusCode());
 
     }
+
+*/
+
 }

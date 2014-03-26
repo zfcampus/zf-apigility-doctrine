@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="./test/Bootstrap.php" colors="true">
     <testsuites>
-    <testsuite name="ZFApigility\Doctrine\Server Module Tests">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server</directory>
+        <testsuite name="orm">
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM</directory>
+        </testsuite>
+        <testsuite name="odm">
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM</directory>
+        </testsuite>
+        <testsuite name="all">
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM</directory>
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM</directory>
         </testsuite>
     </testsuites>
 

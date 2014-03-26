@@ -44,4 +44,9 @@ class Album
         return $this->artist;
     }
 
+    public function setArtist($value)
+    {
+        $this->artist = $value;
+        return $this;
+    }
 }

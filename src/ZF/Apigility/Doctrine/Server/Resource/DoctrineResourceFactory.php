@@ -40,8 +40,10 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         }
 
         if (!$serviceLocator->has('Config')) {
+            // @codeCoverageIgnoreStart
             return false;
         }
+            // @codeCoverageIgnoreEnd
 
         // Validate object is set
         $config = $serviceLocator->get('Config');
@@ -56,22 +58,26 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $className = $this->normalizeClassname($className);
         $reflection = new \ReflectionClass($className);
         if (!$reflection->isSubclassOf('\ZF\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
+            // @codeCoverageIgnoreStart
             throw new ServiceNotFoundException(sprintf(
                 '%s requires that a valid DoctrineResource "class" is specified for listener %s; no service found',
                 __METHOD__,
                 $requestedName
             ));
         }
+        // @codeCoverageIgnoreEnd
 
         // Validate object manager
         $config = $config['zf-apigility']['doctrine-connected'];
         if (!isset($config[$requestedName]) || !isset($config[$requestedName]['object_manager'])) {
+            // @codeCoverageIgnoreStart
             throw new ServiceNotFoundException(sprintf(
                 '%s requires that a valid "object_manager" is specified for listener %s; no service found',
                 __METHOD__,
                 $requestedName
             ));
         }
+            // @codeCoverageIgnoreEnd
 
         $this->lookupCache[$requestedName] = true;
         return true;
@@ -124,8 +130,11 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         if ($serviceLocator->has($config['object_manager'])) {
             $objectManager = $serviceLocator->get($config['object_manager']);
         } else {
+            // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
+        // @codeCoverageIgnoreEnd
+
         return $objectManager;
     }
 
@@ -137,6 +146,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     protected function loadHydrator(ServiceLocatorInterface $serviceLocator, $config)
     {
+        // @codeCoverageIgnoreStart
         if (!isset($config['hydrator'])) {
             return null;
         }
@@ -149,6 +159,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         if (!$hydratorManager->has($config['hydrator'])) {
             return null;
         }
+        // @codeCoverageIgnoreEnd
 
         return $hydratorManager->get($config['hydrator']);
     }

@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Model;
+namespace ZFTest\Apigility\Doctrine\Admin\Model\Server\ORM;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
@@ -14,28 +14,12 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
     public function setUp()
     {
         $this->setApplicationConfig(
-                include __DIR__ . '/../../../../config/application.config.php'
+            include __DIR__ . '/../../../../../config/ORM/application.config.php'
         );
         parent::setUp();
-
-        // Create testing modules
-        $run = "rm -rf " . __DIR__ . "/../../../../assets/module/Db";
-        $this->assertFalse((bool)exec($run));
-
-        $run = "rm -rf " . __DIR__ . "/../../../../assets/module/DbApi";
-        $this->assertFalse((bool)exec($run));
-
-        $this->assertTrue(mkdir(__DIR__ . '/../../../../assets/module/Db'));
-        $this->assertTrue(mkdir(__DIR__ . '/../../../../assets/module/DbApi'));
-
-        $run = 'rsync -a ' . __DIR__ . '/../../../../assets/module/DbOriginal/* ' . __DIR__ . '/../../../../assets/module/Db';
-        $this->assertFalse((bool)exec($run));
-
-        $run = 'rsync -a ' . __DIR__ . '/../../../../assets/module/DbApiOriginal/* ' . __DIR__ . '/../../../../assets/module/DbApi';
-        $this->assertFalse((bool)exec($run));
     }
 
-    public function testBuildApi() {
+    public function testBuildOrmApi() {
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
@@ -43,8 +27,7 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
         $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         // Create DB
-        $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
-        $this->resource->setModuleName('DbApi');
+        $resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
 
         $artistResourceDefinition = [
             "objectManager"=> "doctrine.entitymanager.orm_default",
@@ -64,9 +47,9 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
             "routeMatch" => "/test/album",
         ];
 
-
-        $artistEntity = $this->resource->create($artistResourceDefinition);
-        $albumEntity = $this->resource->create($albumResourceDefinition);
+        $resource->setModuleName('DbApi');
+        $artistEntity = $resource->create($artistResourceDefinition);
+        $albumEntity = $resource->create($albumResourceDefinition);
 
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $artistEntity);
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $albumEntity);
@@ -88,7 +71,7 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
                 case 4:
                     $rpcServiceResource->create(array(
                         'service_name' => 'Artist' . $mapping['fieldName'],
-                        'route' => '/db-test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
+                        'route' => '/test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
                         'http_methods' => array(
                             'GET', 'PUT', 'POST'
                         ),
@@ -104,6 +87,17 @@ class ApigilitySetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpContr
                     break;
             }
         }
+#    }
 
+#    public function testBuildOdmApi() {
+#        $serviceManager = $this->getApplication()->getServiceManager();
+#        $dm = $serviceManager->get('doctrine.documentmanager.odm_default');
+
+        // Create DB
+#        $resource = $this->getApplication()->getServiceManager()->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
+
+
+
+#        $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $metaEntity);
     }
 }

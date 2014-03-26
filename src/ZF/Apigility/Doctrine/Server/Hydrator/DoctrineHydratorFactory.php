@@ -45,7 +45,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         }
 
         $serviceManager = $hydratorManager->getServiceLocator();
-        
+
         if (!$serviceManager->has('Config')) {
             return false;
         }
@@ -92,7 +92,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $hydratorManager, $name, $requestedName)
     {
-        
+
         $serviceManager = $hydratorManager->getServiceLocator();
 
         $config   = $serviceManager->get('Config');

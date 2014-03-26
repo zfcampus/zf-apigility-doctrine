@@ -10,3 +10,4 @@ composer.phar
 local.php
 test/code-coverage
 atlassian-ide-plugin.xml
+test/data
