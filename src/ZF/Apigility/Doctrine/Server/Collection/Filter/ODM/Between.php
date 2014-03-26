@@ -17,10 +17,6 @@ class Between extends AbstractFilter
             }
         }
 
-        if (!isset($option['format'])) {
-            $option['format'] = null;
-        }
-
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];

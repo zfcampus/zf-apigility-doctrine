@@ -56,12 +56,15 @@ class CollectionLink extends AbstractCollectionStrategy
                 ),
             ),
         ));
-#print_r($link);#die();
+
         return $link;
     }
 
     public function hydrate($value)
     {
-        throw new \Exception('Hydration of collection ' . $this->getCollectionName() . ' is not supported');
+        // Hydration is not supported for collections.
+        // A call to PATCH will use hydration to extract then hydrate
+        // an entity.  In this process a collection will be included
+        // so no error is thrown here.
     }
 }

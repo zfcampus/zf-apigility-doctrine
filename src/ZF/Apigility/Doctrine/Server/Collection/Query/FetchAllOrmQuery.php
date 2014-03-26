@@ -20,19 +20,7 @@ class FetchAllOrmQuery
 
     use ProvidesObjectManager;
 
-    protected $collectionClass;
     protected $filterManager;
-
-    public function getCollectionClass()
-    {
-        return $this->collectionClass;
-    }
-
-    public function setCollectionClass($value)
-    {
-        $this->collectionClass = $value;
-        return $this;
-    }
 
     public function setFilterManager(AbstractPluginManager $filterManager)
     {
@@ -75,14 +63,18 @@ class FetchAllOrmQuery
         if (isset($parameters['query'])) {
             foreach ($parameters['query'] as $option) {
                 if (!isset($option['type']) or !$option['type']) {
+                // @codeCoverageIgnoreStart
                     return new ApiProblem(500, 'Array element "type" is required for all filters');
                 }
+                // @codeCoverageIgnoreEnd
 
                 try {
                     $filter = $this->getFilterManager()->get(strtolower($option['type']));
                 } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
+                // @codeCoverageIgnoreStart
                     return new ApiProblem(500, $e->getMessage());
                 }
+                // @codeCoverageIgnoreEnd
                 $filter->filter($queryBuilder, $metadata, $option);
             }
         }

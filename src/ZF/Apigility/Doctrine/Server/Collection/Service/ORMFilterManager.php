@@ -23,10 +23,12 @@ class ORMFilterManager extends AbstractPluginManager
             return;
         }
 
+        // @codeCoverageIgnoreStart
         throw new Exception\RuntimeException(sprintf(
             'Plugin of type %s is invalid; must implement %s\Plugin\PluginInterface',
             (is_object($filter) ? get_class($filter) : gettype($filter)),
             __NAMESPACE__
         ));
+        // @codeCoverageIgnoreEnd
     }
 }

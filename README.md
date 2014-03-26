@@ -213,11 +213,17 @@ Is Not Null
 
 In
 
+Dates in this filter are not handled regularly.  Dates can only be specified as strings 
+most precisely in the format ``` Y-m-d H:i:s ```  Internally dates are not converted to 
+\Datetime objects for this filter so the 'format' parameter is ignored.
+
 ```php
     array('type' => 'in', 'field' => 'fieldName', 'values' => array(1, 2, 3))
 ```
 
 NotIn
+
+See notes on In filter
 
 ```php
     array('type' => 'notin', 'field' => 'fieldName', 'values' => array(1, 2, 3))
@@ -233,15 +239,6 @@ Like (% is used as a wildcard)
 
 ```php
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
-```
-
-ORM Only
---------
-
-Not Like (% is used as a wildcard)
-
-```php
-    array('type' => 'notlike', 'field' => 'fieldName', 'value' => 'notlike%search')
 ```
 
 

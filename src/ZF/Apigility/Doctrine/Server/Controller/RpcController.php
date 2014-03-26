@@ -12,10 +12,13 @@ abstract class RpcController extends AbstractActionController
     {
         $parentId = $this->params()->fromRoute('parent_id');
         if (!$parentId) {
+            // @codeCoverageIgnoreStart
             return new ApiProblemResponse(
                 new ApiProblem(400, "Parent ID is required")
             );
         }
+            // @codeCoverageIgnoreEnd
+
         $childId = $this->params()->fromRoute('child_id');
 
         $config = $this->getServiceLocator()->get('Config');
@@ -67,10 +70,12 @@ abstract class RpcController extends AbstractActionController
 
                 return $data;
             } else {
+                // @codeCoverageIgnoreStart
                 return new ApiProblemResponse(
                     new ApiProblem(400, 'Resource not found.')
                 );
             }
+                // @codeCoverageIgnoreEnd
 
         } else {
             $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
