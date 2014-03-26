@@ -4,18 +4,18 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Model;
+namespace ZFTest\Apigility\Doctrine\Admin\Server\ODM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
 use DbMongo\Document\Meta as MetaEntity;
 
-class ArtistODMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../../../config/ODM/application.config.php'
+            include __DIR__ . '/../../../../../../config/ODM/application.config.php'
         );
         parent::setUp();
     }

@@ -27,7 +27,7 @@ class NotIn extends AbstractFilter
 
         $queryValues = array();
         foreach ($option['values'] as $value) {
-            $queryValues[] = $this->typeCastField($metadata, $option['field'], $value, $format, $doNotTypecaseDatetime = true);
+            $queryValues[] = $this->typeCastField($metadata, $option['field'], $value, $format, $doNotTypecastDatetime = true);
         }
 
         $parameter = uniqid('a');

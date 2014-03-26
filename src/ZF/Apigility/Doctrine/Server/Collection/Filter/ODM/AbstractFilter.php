@@ -8,7 +8,7 @@ abstract class AbstractFilter implements FilterInterface
 {
     abstract function filter($queryBuilder, $metadata, $option);
 
-    protected function typeCastField($metadata, $field, $value, $format = null)
+    protected function typeCastField($metadata, $field, $value, $format = null, $doNotTypecastDatetime = false)
     {
         if (!isset($metadata['fieldMappings'][$field])) {
             return $value;
@@ -42,7 +42,7 @@ abstract class AbstractFilter implements FilterInterface
             case 'custom_id':
                 break;
             case 'date':
-                if ($value) {
+                if ($value and !$doNotTypecastDatetime) {
                     if (!$format) {
                         $format = 'Y-m-d H:i:s';
                     }

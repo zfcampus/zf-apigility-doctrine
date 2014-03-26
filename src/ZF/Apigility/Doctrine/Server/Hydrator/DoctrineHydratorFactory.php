@@ -124,6 +124,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      * @param $className
      *
      * @return string
+     * @codeCoverageIgnore
      */
     protected function normalizeClassname($className)
     {
@@ -142,8 +143,11 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         if ($serviceManager->has($config['object_manager'])) {
             $objectManager = $serviceManager->get($config['object_manager']);
         } else {
+            // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
+
+            // @codeCoverageIgnoreEnd
         return $objectManager;
     }
 
@@ -169,8 +173,10 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
             $hydrator = $hydratorFactory->getHydratorFor($config['entity_class']);
 
         } else {
+            // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
         }
+            // @codeCoverageIgnoreEnd
 
         // Configure hydrator:
         $this->configureHydratorStrategies($hydrator, $serviceManager, $config, $objectManager);
