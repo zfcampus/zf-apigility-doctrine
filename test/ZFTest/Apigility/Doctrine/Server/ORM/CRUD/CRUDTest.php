@@ -4,18 +4,18 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM;
+namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
 use Db\Entity\Artist as ArtistEntity;
 
-class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../../../config/ORM/application.config.php'
+            include __DIR__ . '/../../../../../../config/ORM/application.config.php'
         );
         parent::setUp();
 
@@ -206,7 +206,6 @@ class ArtistORMTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
 
         $albumId = $body['id'];
 
-#die("/test/artist/$artistId/album/$albumId");
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
         $this->dispatch("/test/artist/$artistId/album");

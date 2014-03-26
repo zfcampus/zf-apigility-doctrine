@@ -2,13 +2,15 @@
 <phpunit bootstrap="./test/Bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="orm">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM</directory>
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Setup</directory>
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/CRUD</directory>
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Collection</directory>
+        </testsuite>
+        <testsuite name="orm-filters">
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Setup</directory>
+            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Collection</directory>
         </testsuite>
         <testsuite name="odm">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM</directory>
-        </testsuite>
-        <testsuite name="all">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM</directory>
             <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM</directory>
         </testsuite>
     </testsuites>

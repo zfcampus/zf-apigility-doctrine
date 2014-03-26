@@ -1,17 +1,17 @@
 <?php
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM;
+namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\Collection;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
 use Db\Entity\Artist as ArtistEntity;
 
-class CollectionFilters extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
     {
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../../../config/ORM/application.config.php'
+            include __DIR__ . '/../../../../../../config/ORM/application.config.php'
         );
         parent::setUp();
 
@@ -201,6 +201,31 @@ class CollectionFilters extends \Zend\Test\PHPUnit\Controller\AbstractHttpContro
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(2, $body['count']);
+
+        // Test date field
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'createdAt', 'where' => 'and', 'type'=>'in', 'values' => array('2011-12-18 13:17:17')),
+                ),
+            )
+        );
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'createdAt', 'where' => 'or', 'type'=>'in', 'values' => array('2011-12-18 13:17:17'), 'format' => 'Y-m-d H:i:s'),
+                ),
+            )
+        );
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        // count is 2 because null is not counted in a notin
+        $this->assertEquals(1, $body['count']);
     }
 
     public function testNotIn()
@@ -215,6 +240,31 @@ class CollectionFilters extends \Zend\Test\PHPUnit\Controller\AbstractHttpContro
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(2, $body['count']);
+
+        // Test date field
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'createdAt', 'where' => 'and', 'type'=>'notin', 'values' => array('2011-12-18 13:17:17', null)),
+                ),
+            )
+        );
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(2, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'createdAt', 'where' => 'or', 'type'=>'notin', 'values' => array('2011-12-18 13:17:17'), 'format' => 'Y-m-d H:i:s'),
+                ),
+            )
+        );
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        // count is 2 because null is not counted in a notin
         $this->assertEquals(2, $body['count']);
     }
 
@@ -284,5 +334,4 @@ class CollectionFilters extends \Zend\Test\PHPUnit\Controller\AbstractHttpContro
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(1, $body['count']);
     }
-
 }
