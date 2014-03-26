@@ -251,3 +251,4 @@ Regex
     array('type' => 'regex', 'field' => 'fieldName', 'value' => '/.*search.*/i')
 ```
 
+
