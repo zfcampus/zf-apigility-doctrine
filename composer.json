@@ -20,18 +20,18 @@
         "phpunit/phpunit": "3.7.*",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "1.0.0-beta9@dev",
+        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
     },
     "require": {
         "php": ">=5.4",
         "zfcampus/zf-apigility": "dev-master",
-        "zfcampus/zf-configuration": "dev-master",
+        "zfcampus/zf-configuration": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
-            "ZF\\Apigility\\Doctrine\\Admin": "src/"
+            "ZF\\Apigility\\Doctrine\\Admin": "src/",
             "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }

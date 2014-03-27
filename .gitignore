@@ -3,6 +3,5 @@ composer.lock
 composer.phar
 test/data
 test/code-coverage
-# ignore modules unless they have Original suffix
 test/assets/module/*
 !test/assets/module/*Original
