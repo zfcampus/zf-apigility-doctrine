@@ -11,3 +11,6 @@ local.php
 test/code-coverage
 atlassian-ide-plugin.xml
 test/data
+# ignore modules unless they have Original suffix
+test/assets/module/*
+!test/assets/module/*Original
