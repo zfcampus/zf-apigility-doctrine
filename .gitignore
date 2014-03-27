@@ -1,12 +1,7 @@
-*.iml
-*.ipr
-*.iws
-.idea
 vendor
 composer.lock
 composer.phar
-*.tgz
-*.zip
-local.php
+test/data
 test/code-coverage
-atlassian-ide-plugin.xml
+test/assets/module/*
+!test/assets/module/*Original
