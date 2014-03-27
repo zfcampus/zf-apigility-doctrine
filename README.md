@@ -15,22 +15,29 @@ Installation of this module uses composer. For composer documentation, please re
 $ php composer.phar require zfcampus/zf-apigility-doctrine:dev-master
 ```
 
-Add `ZF\Apigility\Doctrine\Admin` and `ZF\Apigility\Doctrine\Server` to your `modules`
-
-For development add 
-`ZF\Apigility\Doctrine\Admin` and `ZF\Apigility\Doctrine\Server` to your `modules`
-This should generally not be in a production configuration.
-
+This library provides two modules.  The first, ZF\Apigility\Doctrine\Server provides
+the classes to serve data created by the second, ZF\Apigility\Doctrine\Admin.  The
+Admin module is used to create apigility resources and the Server serves those
+created resoruces.  Generally you would include Admin in your development.config.php
+and Server in your application.config.php
 
 
 API Resources
 -------------
 
+
+***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
+
+This will return metadata for the named entity which is a member of the
+named object manager.  Querying without a name will return all metadata
+for the object manager.
+
+
 ***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
 This is a Doctrine resource creation route like Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
+POST Parameters:
 
-POST Parameters
 ```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
@@ -45,12 +52,6 @@ POST Parameters
 }
 ```
 
-***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
-
-This will return metadata for the named entity which is a member of the
-named object manager.  Querying without a name will return all metadata
-for the object manager.
-
 
 Hydrating Entities by Value or Reference
 ----------------------------------------
@@ -62,8 +63,8 @@ Collections
 ===========
 
 The API created with this library implements full featured and paginated 
-collection resources.  A collection is returned from a GET call to a entity endpoint without
-specifying the id.  e.g. ```GET /api/data_module/entity/user_data```
+collection resources.  A collection is returned from a GET call to an entity endpoint without
+specifying the id.  e.g. ```GET /api/resource```
 
 Reserved GET variables
 
@@ -122,16 +123,16 @@ $(function() {
             'query': [
             {
                 'field': 'cycle',
-                'where': 'and',
+                'where': 'or',
                 'type': 'between',
                 'from': '1',
                 'to': '100'
             },
             {
                 'field': 'cycle',
-                'where': 'and',
-                'type': 'decimation',
-                'value': '10'
+                'where': 'or',
+                'type': 'gte',
+                'value': '1000'
             }
         ]
         },
@@ -172,22 +173,12 @@ class UserGroup {}
 ... we can find all users that belong to UserGroup id #1 with the following query:
 
 ````php
-    $url = 'http://localhost:8081/api/db/entity/user';
+    $url = 'http://localhost:8081/api/user';
     $query = http_build_query(array(
         array('type' => 'eq', 'field' => 'group', 'value' => '1')
     ));
 ````
 
-
-Expanding Collections * in development *
----------------------
-
-You may include in the _GET[zoom] an array of field names which are collections 
-to return instead of a link to the collection.
-
-```
-    /api/user_data?zoom%5B0%5D=UserGroup
-```
 
 Format of Date Fields
 ---------------------
@@ -254,19 +245,17 @@ Is Not Null
     array('type' => 'isnotnull', 'field' => 'fieldName')
 ```
 
-In
+Dates in the In and NotIn filters are not handled as dates.
+It is recommended you use multiple Equals statements instead of these
+filters.
 
-Dates in this filter are not handled regularly.  Dates can only be specified as strings 
-most precisely in the format ``` Y-m-d H:i:s ```  Internally dates are not converted to 
-\Datetime objects for this filter so the 'format' parameter is ignored.
+In
 
 ```php
     array('type' => 'in', 'field' => 'fieldName', 'values' => array(1, 2, 3))
 ```
 
 NotIn
-
-See notes on In filter
 
 ```php
     array('type' => 'notin', 'field' => 'fieldName', 'values' => array(1, 2, 3))
