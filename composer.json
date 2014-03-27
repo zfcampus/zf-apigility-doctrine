@@ -1,11 +1,11 @@
 {
-    "name": "zfcampus/zf-apigility-doctrine-admin",
+    "name": "zfcampus/zf-apigility-doctrine",
     "type": "library",
-    "description": "Doctrine for Apigility Administration",
+    "description": "Doctrine for Apigility",
     "keywords": [
         "apigility",
         "doctrine",
-        "api client"
+        "api"
     ],
     "homepage": "http://www.apigility.com/",
     "license": "Apache-2.0",
@@ -20,19 +20,19 @@
         "phpunit/phpunit": "3.7.*",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
+        "doctrine/mongodb-odm": "1.0.0-beta9@dev",
     },
     "require": {
         "php": ">=5.4",
         "zfcampus/zf-apigility": "dev-master",
         "zfcampus/zf-configuration": "dev-master",
-        "zfcampus/zf-apigility-doctrine-server": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
             "ZF\\Apigility\\Doctrine\\Admin": "src/"
+            "ZF\\Apigility\\Doctrine\\Server": "src/"
         }
     }
 }
