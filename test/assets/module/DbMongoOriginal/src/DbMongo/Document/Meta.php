@@ -33,7 +33,7 @@ class Meta
 
     public function setCreatedAt(\Datetime $value)
     {
-        $this->mediatype = $value;
+        $this->createdAt = $value;
     }
 
     public function getArrayCopy()

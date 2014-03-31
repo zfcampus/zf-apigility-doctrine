@@ -26,7 +26,7 @@ abstract class RpcController extends AbstractActionController
 
         $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
         $metadataConfig = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
-        $hydratorConfig = $config['zf-rest-doctrine-hydrator'][$metadataConfig['hydrator']];
+        $hydratorConfig = $config['doctrine-hydrator'][$metadataConfig['hydrator']];
 
         $objectManager = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
         $metadataFactory = $objectManager->getMetadataFactory();
