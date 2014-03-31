@@ -50,6 +50,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         if (!isset($config['zf-apigility']['doctrine-connected']) || !is_array($config['zf-apigility']['doctrine-connected']) || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
+
             return false;
         }
 
@@ -80,6 +81,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             // @codeCoverageIgnoreEnd
 
         $this->lookupCache[$requestedName] = true;
+
         return true;
     }
 
@@ -134,7 +136,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
         // @codeCoverageIgnoreEnd
-
         return $objectManager;
     }
 
@@ -160,7 +161,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             return null;
         }
         // @codeCoverageIgnoreEnd
-
         return $hydratorManager->get($config['hydrator']);
     }
 

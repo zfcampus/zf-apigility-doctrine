@@ -6,16 +6,10 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-use RuntimeException;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use ZF\Rest\Exception\CreationException;
-use ZF\Rest\Exception\PatchException;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceModel;
-use Zend\Filter\FilterChain;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
-use Zend\EventManager\EventManagerInterface;
 
 class DoctrineMetadataServiceResource
     extends AbstractResourceListener
@@ -26,6 +20,7 @@ class DoctrineMetadataServiceResource
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+
         return $this;
     }
 
@@ -37,14 +32,15 @@ class DoctrineMetadataServiceResource
     /**
      * @codeCoverageIgnore
      */
-    public function create($data) {
+    public function create($data)
+    {
         throw new \Exception('Not Implemented');
     }
 
     /**
      * Fetch REST metadata
      *
-     * @param  string $id
+     * @param  string                       $id
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($entityClassName)
@@ -65,7 +61,7 @@ class DoctrineMetadataServiceResource
 
         $entityClass = $this->getEntityClass();
         $metadataEntity = new $entityClass;
-        $metadataEntity->exchangeArray((array)$metadata);
+        $metadataEntity->exchangeArray((array) $metadata);
 
         return $metadataEntity;
     }
@@ -73,7 +69,7 @@ class DoctrineMetadataServiceResource
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array $params
+     * @param  array               $params
      * @return RestServiceEntity[]
      */
     public function fetchAll($params = array())
@@ -95,7 +91,7 @@ class DoctrineMetadataServiceResource
         foreach ($metadataFactory->getAllMetadata() as $metadata) {
             $entityClass = $this->getEntityClass();
             $metadataEntity = new $entityClass;
-            $metadataEntity->exchangeArray((array)$metadata);
+            $metadataEntity->exchangeArray((array) $metadata);
 
             $return[] = $metadataEntity;
         }

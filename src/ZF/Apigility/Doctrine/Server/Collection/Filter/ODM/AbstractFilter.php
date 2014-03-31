@@ -6,7 +6,7 @@ use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
 
 abstract class AbstractFilter implements FilterInterface
 {
-    abstract function filter($queryBuilder, $metadata, $option);
+    abstract public function filter($queryBuilder, $metadata, $option);
 
     protected function typeCastField($metadata, $field, $value, $format = null, $doNotTypecastDatetime = false)
     {

@@ -25,6 +25,7 @@ class FetchAllOrmQuery
     public function setFilterManager(AbstractPluginManager $filterManager)
     {
         $this->filterManager = $filterManager;
+
         return $this;
     }
 
@@ -35,7 +36,7 @@ class FetchAllOrmQuery
 
     /**
      * @param string $entityClass
-     * @param array $parameters
+     * @param array  $parameters
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
@@ -46,16 +47,15 @@ class FetchAllOrmQuery
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
 
-
         // Get metadata for type casting
         $cmf = $this->getObjectManager()->getMetadataFactory();
         $entityMetaData = $cmf->getMetadataFor($entityClass);
-        $metadata = (array)$entityMetaData;
+        $metadata = (array) $entityMetaData;
         // Orderby
         if (!isset($parameters['orderBy'])) {
             $parameters['orderBy'] = array($entityMetaData->getIdentifier()[0] => 'asc');
         }
-        foreach($parameters['orderBy'] as $fieldName => $sort) {
+        foreach ($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
         }
 
@@ -83,18 +83,19 @@ class FetchAllOrmQuery
     }
 
     /**
-     * @param       $queryBuilder
+     * @param   $queryBuilder
      *
      * @return AdapterInterface
      */
     public function getPaginatedQuery($queryBuilder)
     {
         $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
+
         return $adapter;
     }
 
     /**
-     * @param       $entityClass
+     * @param   $entityClass
      *
      * @return int
      */

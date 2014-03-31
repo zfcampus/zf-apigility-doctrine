@@ -4,7 +4,6 @@ namespace ZF\Apigility\Doctrine\Server\Hydrator\Strategy;
 
 use Zend\Stdlib\Hydrator\Strategy\StrategyInterface;
 use DoctrineModule\Stdlib\Hydrator\Strategy\AbstractCollectionStrategy;
-use ZF\Hal\Collection as HalCollection;
 use ZF\Hal\Link\Link;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -23,6 +22,7 @@ class CollectionLink extends AbstractCollectionStrategy
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+
         return $this;
     }
 

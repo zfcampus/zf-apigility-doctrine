@@ -2,8 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AbstractFilter;
-
 class Like extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)

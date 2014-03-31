@@ -30,6 +30,7 @@ class DoctrineResource extends AbstractResourceListener
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+
         return $this;
     }
 
@@ -65,11 +66,10 @@ class DoctrineResource extends AbstractResourceListener
         return $this->hydrator;
     }
 
-
     /**
      * Create a resource
      *
-     * @param  mixed $data
+     * @param  mixed            $data
      * @return ApiProblem|mixed
      */
     public function create($data)
@@ -77,7 +77,7 @@ class DoctrineResource extends AbstractResourceListener
         $entityClass = $this->getEntityClass();
         $entity = new $entityClass;
         $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array)$data, $entity);
+        $hydrator->hydrate((array) $data, $entity);
 
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
@@ -88,7 +88,7 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Delete a resource
      *
-     * @param  mixed $id
+     * @param  mixed            $id
      * @return ApiProblem|mixed
      */
     public function delete($id)
@@ -109,9 +109,9 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Delete a collection, or members of a collection
      *
-     * @param  mixed $data
+     * @param  mixed            $data
      * @return ApiProblem|mixed
-     * @codeCoverageIgnore
+     *                               @codeCoverageIgnore
      */
     public function deleteList($data)
     {
@@ -124,7 +124,7 @@ class DoctrineResource extends AbstractResourceListener
      * If the extractCollections array contains a collection for this resource
      * expand that collection instead of returning a link to the collection
      *
-     * @param  mixed $id
+     * @param  mixed            $id
      * @return ApiProblem|mixed
      */
     public function fetch($id)
@@ -155,7 +155,7 @@ class DoctrineResource extends AbstractResourceListener
      *
      *
      * @see Apigility/Doctrine/Server/Resource/AbstractResource.php
-     * @param  array $params
+     * @param  array            $params
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = array())
@@ -203,7 +203,7 @@ class DoctrineResource extends AbstractResourceListener
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
-            function($e) use ($fetchAllQuery, $entityClass, $parameters) {
+            function ($e) use ($fetchAllQuery, $entityClass, $parameters) {
                 $halCollection = $e->getParam('collection');
                 $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
                 $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
@@ -226,8 +226,8 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Patch (partial in-place update) a resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param  mixed            $id
+     * @param  mixed            $data
      * @return ApiProblem|mixed
      */
     public function patch($id, $data)
@@ -242,7 +242,7 @@ class DoctrineResource extends AbstractResourceListener
         // Load full data:
         $hydrator = $this->getHydrator();
         $originalData = $hydrator->extract($entity);
-        $patchedData = array_merge($originalData, (array)$data);
+        $patchedData = array_merge($originalData, (array) $data);
 
         // Hydrate entity
         $hydrator->hydrate($patchedData, $entity);
@@ -254,9 +254,9 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Replace a collection or members of a collection
      *
-     * @param  mixed $data
+     * @param  mixed            $data
      * @return ApiProblem|mixed
-     * @codeCoverageIgnore
+     *                               @codeCoverageIgnore
      */
     public function replaceList($data)
     {
@@ -266,8 +266,8 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * Update a resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param  mixed            $id
+     * @param  mixed            $data
      * @return ApiProblem|mixed
      */
     public function update($id, $data)
@@ -280,7 +280,7 @@ class DoctrineResource extends AbstractResourceListener
         }
 
         $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array)$data, $entity);
+        $hydrator->hydrate((array) $data, $entity);
         $this->getObjectManager()->flush();
 
         return $entity;

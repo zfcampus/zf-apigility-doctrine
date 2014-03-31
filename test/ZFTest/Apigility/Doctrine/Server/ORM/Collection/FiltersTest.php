@@ -4,7 +4,6 @@ namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\Collection;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
-use Db\Entity\Artist as ArtistEntity;
 
 class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {

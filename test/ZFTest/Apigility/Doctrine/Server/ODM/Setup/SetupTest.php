@@ -6,9 +6,6 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model\Server\ODM\Setup;
 
-use Doctrine\ORM\Tools\SchemaTool;
-use Zend\Filter\FilterChain;
-
 class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
     public function setUp()
@@ -20,7 +17,8 @@ class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTest
         parent::setUp();
     }
 
-    public function testBuildOdmApi() {
+    public function testBuildOdmApi()
+    {
         $serviceManager = $this->getApplication()->getServiceManager();
 
         // Create DB

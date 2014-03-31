@@ -14,6 +14,7 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
     public function setFilterManager(AbstractPluginManager $filterManager)
     {
         $this->filterManager = $filterManager;
+
         return $this;
     }
 
@@ -35,13 +36,13 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         if (!isset($parameters['orderBy'])) {
             $parameters['orderBy'] = array('id' => 'asc');
         }
-        foreach($parameters['orderBy'] as $fieldName => $sort) {
+        foreach ($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->sort($fieldName, $sort);
         }
 
         // Get metadata for type casting
         $cmf = $this->getObjectManager()->getMetadataFactory();
-        $metadata = (array)$cmf->getMetadataFor($entityClass);
+        $metadata = (array) $cmf->getMetadataFor($entityClass);
 
         // Run filters on query
         if (isset($parameters['query'])) {
@@ -67,18 +68,19 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
     }
 
     /**
-     * @param       $queryBuilder
+     * @param   $queryBuilder
      *
      * @return DoctrineOdmAdapter
      */
     public function getPaginatedQuery($queryBuilder)
     {
         $adapter = new DoctrineOdmAdapter($queryBuilder);
+
         return $adapter;
     }
 
     /**
-     * @param       $entityClass
+     * @param   $entityClass
      *
      * @return int
      */
