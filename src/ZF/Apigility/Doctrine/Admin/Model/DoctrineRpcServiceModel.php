@@ -45,9 +45,9 @@ class DoctrineRpcServiceModel
     protected $modules;
 
     /**
-     * @param  string $module
-     * @param  ModuleUtils $modules
-     * @param  ConfigResource $config
+     * @param string         $module
+     * @param ModuleUtils    $modules
+     * @param ConfigResource $config
      */
     public function __construct(ModuleEntity $moduleEntity, ModuleUtils $modules, ConfigResource $config)
     {
@@ -61,7 +61,7 @@ class DoctrineRpcServiceModel
      * Fetch a single RPC service
      *
      * @todo   get route details?
-     * @param  string $controllerServiceName
+     * @param  string                         $controllerServiceName
      * @return DoctrineRpcServiceEntity|false
      */
     public function fetch($controllerServiceName)
@@ -112,6 +112,7 @@ class DoctrineRpcServiceModel
 
         $service = new DoctrineRpcServiceEntity();
         $service->exchangeArray($data);
+
         return $service;
     }
 
@@ -174,10 +175,10 @@ class DoctrineRpcServiceModel
      * Creates the controller and all configuration, returning the full configuration as a tree.
      *
      * @todo   Return the controller service name
-     * @param  string $serviceName
-     * @param  string $route
-     * @param  array $httpMethods
-     * @param  null|string $selector
+     * @param  string                   $serviceName
+     * @param  string                   $route
+     * @param  array                    $httpMethods
+     * @param  null|string              $selector
      * @return DoctrineRpcServiceEntity
      */
     public function createService($serviceName, $route, $httpMethods, $selector, $options)
@@ -225,7 +226,7 @@ class DoctrineRpcServiceModel
     /**
      * Delete the files which were automatically created
      *
-     * @param  DoctrineRestServiceEntity $entity
+     * @param DoctrineRestServiceEntity $entity
      */
     public function deleteFiles(DoctrineRpcServiceEntity $entity)
     {
@@ -238,7 +239,7 @@ class DoctrineRpcServiceModel
     /**
      * Create a controller in the current module named for the given service
      *
-     * @param  string $serviceName
+     * @param  string   $serviceName
      * @return stdClass
      */
     public function createController($serviceName)
@@ -354,15 +355,16 @@ class DoctrineRpcServiceModel
         );
 
         $this->configResource->patch($config, true);
+
         return $routeName;
     }
 
     /*
      * Create the zf-rpc configuration for the controller service
      *
-     * @param  string $controllerService
-     * @param  string $routeName
-     * @param  array $httpMethods
+     * @param  string               $controllerService
+     * @param  string               $routeName
+     * @param  array                $httpMethods
      * @param  null|string|callable $callable
      * @return array
      */
@@ -378,9 +380,9 @@ class DoctrineRpcServiceModel
     /*
      * Create the zf-rpc configuration for the controller service
      *
-     * @param  string $controllerService
-     * @param  string $routeName
-     * @param  array $httpMethods
+     * @param  string               $controllerService
+     * @param  string               $routeName
+     * @param  array                $httpMethods
      * @param  null|string|callable $callable
      * @return array
      */
@@ -431,6 +433,7 @@ class DoctrineRpcServiceModel
                 ),
             ),
         ));
+
         return $this->configResource->patch($config, true);
     }
 
@@ -465,7 +468,7 @@ class DoctrineRpcServiceModel
      * Update the allowed HTTP methods for a given service
      *
      * @param  string $controllerService
-     * @param  array $httpMethods
+     * @param  array  $httpMethods
      * @return true
      */
     public function updateHttpMethods($controllerService, array $httpMethods)
@@ -473,6 +476,7 @@ class DoctrineRpcServiceModel
         $config = $this->configResource->fetch(true);
         $config['zf-rpc'][$controllerService]['http_methods'] = $httpMethods;
         $this->configResource->overwrite($config);
+
         return true;
     }
 
@@ -488,6 +492,7 @@ class DoctrineRpcServiceModel
         $config = $this->configResource->fetch(true);
         $config['zf-content-negotiation']['controllers'][$controllerService] = $selector;
         $this->configResource->overwrite($config);
+
         return true;
     }
 
@@ -496,7 +501,7 @@ class DoctrineRpcServiceModel
      *
      * @param  string $controllerService
      * @param  string $headerType
-     * @param  array $whitelist
+     * @param  array  $whitelist
      * @return true
      */
     public function updateContentNegotiationWhitelist($controllerService, $headerType, array $whitelist)
@@ -518,7 +523,7 @@ class DoctrineRpcServiceModel
     /**
      * Removes the route configuration for a named route
      *
-     * @param  string $routeName
+     * @param string $routeName
      */
     public function deleteRouteConfig($routeName)
     {
@@ -534,7 +539,7 @@ class DoctrineRpcServiceModel
     /**
      * Delete the RPC configuration for a named RPC service
      *
-     * @param  string $serviceName
+     * @param string $serviceName
      */
     public function deleteDoctrineRpcConfig($serviceName)
     {
@@ -558,7 +563,7 @@ class DoctrineRpcServiceModel
      * Delete the Content Negotiation configuration for a named RPC
      * service
      *
-     * @param  string $serviceName
+     * @param string $serviceName
      */
     public function deleteContentNegotiationConfig($serviceName)
     {
@@ -582,6 +587,7 @@ class DoctrineRpcServiceModel
     {
         $filter = $this->getNormalizationFilter();
         $string = str_replace('\\', '-', $string);
+
         return $filter->filter($string);
     }
 
@@ -598,14 +604,15 @@ class DoctrineRpcServiceModel
         $this->filter = new FilterChain();
         $this->filter->attachByName('WordCamelCaseToDash')
                      ->attachByName('StringToLower');
+
         return $this->filter;
     }
 
     /**
      * Retrieve the URL match for the given route name
      *
-     * @param  string $routeName
-     * @param  array $config
+     * @param  string       $routeName
+     * @param  array        $config
      * @return false|string
      */
     protected function getRouteMatchStringFromModuleConfig($routeName, array $config)
@@ -632,7 +639,6 @@ class DoctrineRpcServiceModel
             return false;
         }
         // @codeCoverageIgnoreEnd
-
         return $config['options']['route'];
     }
 }

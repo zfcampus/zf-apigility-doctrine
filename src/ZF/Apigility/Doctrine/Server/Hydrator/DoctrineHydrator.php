@@ -58,7 +58,7 @@ class DoctrineHydrator
     /**
      * Extract values from an object
      *
-     * @param  object $object
+     * @param object $object
      *
      * @return array
      */
@@ -70,8 +70,8 @@ class DoctrineHydrator
     /**
      * Hydrate $object with the provided $data.
      *
-     * @param  array  $data
-     * @param  object $object
+     * @param array  $data
+     * @param object $object
      *
      * @return object
      */

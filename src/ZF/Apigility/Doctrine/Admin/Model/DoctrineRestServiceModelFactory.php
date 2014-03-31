@@ -16,7 +16,7 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
     const TYPE_DEFAULT      = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 
     /**
-     * @param  string $module
+     * @param  string           $module
      * @return RestServiceModel
      */
     public function factory($module, $type = self::TYPE_DEFAULT)
@@ -40,6 +40,7 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
         switch ($type) {
             case self::TYPE_DEFAULT:
                 $this->models[$type][$module] = $restModel;
+
                 return $restModel;
             // @codeCoverageIgnoreStart
             default:
@@ -56,6 +57,7 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+
         return $this;
     }
 

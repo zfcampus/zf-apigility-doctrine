@@ -45,8 +45,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     protected $rpcFactory;
 
     /**
-     * @param  DoctrineRpcServiceModelFactory $rpcFactory
-     * @param  InputFilterModel $inputFilterModel
+     * @param DoctrineRpcServiceModelFactory $rpcFactory
+     * @param InputFilterModel               $inputFilterModel
      */
     public function __construct(DoctrineRpcServiceModelFactory $rpcFactory, InputFilterModel $inputFilterModel, ControllerManager $controllerManager)
     {
@@ -58,8 +58,10 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * @param string $moduleName
      */
-    public function setModuleName($moduleName) {
+    public function setModuleName($moduleName)
+    {
         $this->moduleName = $moduleName;
+
         return $this;
     }
 
@@ -104,7 +106,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * Create a new RPC service
      *
-     * @param  array|object $data
+     * @param  array|object             $data
      * @return DoctrineRpcServiceEntity
      * @throws CreationException
      */
@@ -161,7 +163,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             $creationData['selector'] = $data['selector'];
         }
 
-        $creationData['options'] = (array)$data['options'];
+        $creationData['options'] = (array) $data['options'];
 
         try {
             $service = $model->createService(
@@ -176,14 +178,13 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             throw new CreationException('Unable to create RPC service', $e->getCode(), $e);
         }
 // @codeCoverageIgnoreEnd
-
         return $service;
     }
 
     /**
      * Fetch RPC metadata
      *
-     * @param  string $id
+     * @param  string                              $id
      * @return DoctrineRpcServiceEntity|ApiProblem
      */
     public function fetch($id)
@@ -205,7 +206,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * Fetch metadata for all RPC services
      *
-     * @param  array $params
+     * @param  array                      $params
      * @return DoctrineRpcServiceEntity[]
      */
     public function fetchAll($params = array())
@@ -224,10 +225,10 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * Update an existing RPC service
      *
-     * @param  string $id
-     * @param  object|array $data
+     * @param  string                              $id
+     * @param  object|array                        $data
      * @return ApiProblem|DoctrineRpcServiceEntity
-     * @throws PatchException if unable to update configuration
+     * @throws PatchException                      if unable to update configuration
      */
     public function patch($id, $data)
     {

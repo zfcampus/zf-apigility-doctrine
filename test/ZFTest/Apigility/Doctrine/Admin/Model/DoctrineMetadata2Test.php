@@ -6,24 +6,9 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
-use Zend\Config\Writer\PhpArray;
-use ZF\Apigility\Admin\Model\ModuleEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
-use ZF\Configuration\ResourceFactory;
-use ZF\Configuration\ModuleUtils;
-use ZFTest\Util\ServiceManagerFactory;
-use Doctrine\ORM\Tools\SchemaTool;
 
-use Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter;
-use Application\Controller\IndexController;
 use Zend\Http\Request;
-use Zend\Http\Response;
-use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
 class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
@@ -92,7 +77,6 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         // Test get model returns cached model
         $this->assertEquals($this->rpcResource->getModel(), $this->rpcResource->getModel());
         $this->assertEquals($this->rpcResource->getModuleName(), $this->rpcResource->getModuleName());
-
 
         foreach ($body['_embedded']['doctrine'] as $service) {
             $this->resource->delete($service['controller_service_name']);

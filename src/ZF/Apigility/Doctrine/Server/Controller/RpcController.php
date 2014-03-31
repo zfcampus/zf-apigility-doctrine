@@ -50,7 +50,7 @@ abstract class RpcController extends AbstractActionController
             }
         }
 
-        $query = (array)$this->getRequest()->getQuery()->get('query');
+        $query = (array) $this->getRequest()->getQuery()->get('query');
         $orderBy = $this->getRequest()->getQuery()->get('orderBy');
 
         if ($childId) {

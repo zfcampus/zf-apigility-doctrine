@@ -2,8 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ODM;
 
-use ZF\Apigility\Doctrine\Server\Collection\Filter\ODM\AbstractFilter;
-
 class Between extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)

@@ -6,7 +6,6 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-use ZF\Rest\Exception\CreationException;
 use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 
 class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
@@ -46,6 +45,7 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
         $return['hydrator_name'] = $this->hydratorName;
         $return['hydrate_by_value'] = $this->hydrateByValue;
         $return['entity_identifier_name'] = $this->entityIdentifierName;
+
         return $return;
     }
 }

@@ -19,7 +19,8 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         parent::setUp();
     }
 
-    public function testBuildOrmApi() {
+    public function testBuildOrmApi()
+    {
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
