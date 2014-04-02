@@ -5,3 +5,4 @@ test/data
 test/code-coverage
 test/assets/module/*
 !test/assets/module/*Original
+test/build
