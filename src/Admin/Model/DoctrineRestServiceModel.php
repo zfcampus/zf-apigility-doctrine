@@ -726,7 +726,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
-            'zf-rest-doctrine-hydrator' => array(
+            'doctrine-hydrator' => array(
                 $details->hydratorName => array(
                     'entity_class' => $entityClass,
                     'object_manager' => $details->objectManager,
@@ -921,9 +921,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
          // Get hydrator name
          $config = $this->configResource->fetch(true);
          $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
-         $objectManagerClass = $config['zf-rest-doctrine-hydrator'][$hydratorName]['object_manager'];
+         $objectManagerClass = $config['doctrine-hydrator'][$hydratorName]['object_manager'];
 
-         $key = array('zf-rest-doctrine-hydrator', $hydratorName);
+         $key = array('doctrine-hydrator', $hydratorName);
          $this->configResource->deleteKey($key);
 
          $key = array('zf-apigility', 'doctrine-connected', $entity->resourceClass);

@@ -1,9 +1,9 @@
 Apigility for Doctrine
 ==============================
 
-[![Build status](https://api.travis-ci.org/soliantconsulting/zf-apigility-doctrine.svg)](http://travis-ci.org/soliantconsulting/zf-apigility-doctrine) 
+[![Build status](https://api.travis-ci.org/soliantconsulting/zf-apigility-doctrine.svg)](http://travis-ci.org/soliantconsulting/zf-apigility-doctrine)
 
-This module provides the classes for integrating Doctrine with Apigility.  
+This module provides the classes for integrating Doctrine with Apigility.
 
 Installation
 ------------
@@ -56,13 +56,13 @@ POST Parameters:
 Hydrating Entities by Value or Reference
 ----------------------------------------
 
-By default the admin tool hydrates entities by reference by setting `$config['zf-rest-doctrine-hydrator']['hydrator_class']['by_value']` to false.  
+By default the admin tool hydrates entities by reference by setting `$config['doctrine-hydrator']['hydrator_class']['by_value']` to false.
 
 
-Collections 
+Collections
 ===========
 
-The API created with this library implements full featured and paginated 
+The API created with this library implements full featured and paginated
 collection resources.  A collection is returned from a GET call to an entity endpoint without
 specifying the id.  e.g. ```GET /api/resource```
 
@@ -92,7 +92,7 @@ Sort by columnOne ascending then columnTwo decending
 Querying Collections
 --------------------
 
-Queries are not simple key=value pairs.  The query parameter is a key-less array of query 
+Queries are not simple key=value pairs.  The query parameter is a key-less array of query
 definitions.  Each query definition is an array and the array values vary for each query type.
 
 Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
@@ -188,7 +188,7 @@ using PHP date formatting options.  The default date format is ```Y-m-d H:i:s```
 If you have a date field which is just Y-m-d then add the format to the query.
 
 ```php
-    'format' => 'Y-m-d', 
+    'format' => 'Y-m-d',
     'value' => '2014-02-04',
 ```
 
