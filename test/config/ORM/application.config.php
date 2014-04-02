@@ -4,6 +4,7 @@ return array(
     'modules' => array(
         'DoctrineModule',
         'DoctrineORMModule',
+        'Phpro\DoctrineHydrationModule',
         'ZF\Apigility',
         'ZF\Apigility\Admin',
         'ZF\Hal',

@@ -6,9 +6,11 @@
 
 namespace ZF\Apigility\Doctrine\Server;
 
+use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManager;
 
 class Module
+    implements DependencyIndicatorInterface
 {
     public function getAutoloaderConfig()
     {
@@ -44,5 +46,15 @@ class Module
             'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
             'getZfOdmFilterConfig'
         );
+    }
+
+    /**
+     * Expected to return an array of modules on which the current one depends on
+     *
+     * @return array
+     */
+    public function getModuleDependencies()
+    {
+        return ['Phpro\DoctrineHydrationModule'];
     }
 }

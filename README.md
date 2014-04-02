@@ -56,7 +56,7 @@ POST Parameters:
 Hydrating Entities by Value or Reference
 ----------------------------------------
 
-By default the admin tool hydrates entities by reference by setting `$config['zf-rest-doctrine-hydrator']['hydrator_class']['by_value']` to false.  
+By default the admin tool hydrates entities by reference by setting `$config['doctrine-hydrator']['hydrator_class']['by_value']` to false.
 
 
 Collections 
