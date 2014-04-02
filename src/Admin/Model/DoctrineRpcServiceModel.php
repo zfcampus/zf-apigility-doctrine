@@ -282,7 +282,7 @@ class DoctrineRpcServiceModel
         ));
 
         $resolver = new Resolver\TemplateMapResolver(array(
-            'code-connected/rpc-controller' => __DIR__ . '/../../../../../../view/doctrine/rpc-controller.phtml'
+            'code-connected/rpc-controller' => __DIR__ . '/../../../view/doctrine/rpc-controller.phtml'
         ));
 
         $view->setTemplate('code-connected/rpc-controller');

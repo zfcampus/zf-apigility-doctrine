@@ -44,7 +44,7 @@ class Module
 
     public function getConfig()
     {
-        return include __DIR__ . '/../../../../../config/admin.config.php';
+        return include __DIR__ . '/../../config/admin.config.php';
     }
 
     public function getServiceConfig()

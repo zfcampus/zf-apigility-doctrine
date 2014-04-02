@@ -15,7 +15,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
     public function setUp()
     {
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../../../../config/ODM/application.config.php'
+            include __DIR__ . '/../../../../config/ODM/application.config.php'
         );
         parent::setUp();
     }

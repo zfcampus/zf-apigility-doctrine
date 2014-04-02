@@ -23,7 +23,7 @@ class Module
 
     public function getConfig()
     {
-        return include __DIR__ . '/../../../../../config/server.config.php';
+        return include __DIR__ . '/../../config/server.config.php';
     }
 
     public function init(ModuleManager $moduleManager)

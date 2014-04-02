@@ -14,7 +14,7 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
     public function setUp()
     {
         $this->setApplicationConfig(
-            include __DIR__ . '/../../../../../../config/ORM/application.config.php'
+            include __DIR__ . '/../../../../config/ORM/application.config.php'
         );
         parent::setUp();
     }

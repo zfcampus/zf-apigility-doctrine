@@ -30,9 +30,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
-        "psr-0": {
-            "ZF\\Apigility\\Doctrine\\Admin": "src/",
-            "ZF\\Apigility\\Doctrine\\Server": "src/"
+        "psr-4": {
+            "ZF\\Apigility\\Doctrine\\": "src/",
+            "ZFTest\\Apigility\\Doctrine\\": "test/src/"
         }
     }
 }
