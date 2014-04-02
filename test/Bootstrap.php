@@ -81,7 +81,7 @@ class Bootstrap
                 'Zend\Loader\StandardAutoloader' => array(
                     'autoregister_zf' => true,
                     'namespaces' => array(
-                        'ZF\Apigility\Admin' => __DIR__ . '/../src/',
+                        'ZF\Apigility\Doctrine' => __DIR__ . '/../src',
                         __NAMESPACE__ => __DIR__,
                         'Test' => __DIR__ . '/../vendor/Test/',
                     ),
