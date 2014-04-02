@@ -7,26 +7,18 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
-use Zend\Config\Writer\PhpArray;
-use ZF\Apigility\Admin\Model\ModuleEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
-use ZF\Configuration\ResourceFactory;
-use ZF\Configuration\ModuleUtils;
 use ZFTest\Util\ServiceManagerFactory;
 use Doctrine\ORM\Tools\SchemaTool;
 
 use Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter;
-use Application\Controller\IndexController;
 use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
-class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
+class DoctrineRestServiceResourceT-est extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase //TestCase
 {
     public function setUp()
     {
@@ -116,12 +108,11 @@ class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\Abst
 #        print_r(get_class_methods($router));
 
         $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
-        return;
 
+        return;
 
 #        $controller = new $controllerServiceName;
 #        $request    = new Request();
-
 
         $query = [];
         $query[] = array('type' => 'eq', 'field' => 'id', 'value' => $found->getId());
@@ -140,8 +131,6 @@ class DoctrineRestServiceResourceTest extends \Zend\Test\PHPUnit\Controller\Abst
         $data = json_decode($renderer->render($hal), true);
 
 print_r($data);
-
-
 
     }
 }

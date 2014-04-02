@@ -18,6 +18,7 @@
     "require-dev": {
         "zfcampus/zf-apigility-admin": "dev-master",
         "phpunit/phpunit": "3.7.*",
+        "fabpot/php-cs-fixer": "0.4.*@dev",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
         "doctrine/mongodb-odm": "1.0.0-beta9@dev"

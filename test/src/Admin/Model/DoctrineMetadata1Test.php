@@ -6,27 +6,13 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
-use Zend\Config\Writer\PhpArray;
-use ZF\Apigility\Admin\Model\ModuleEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
-use ZF\Configuration\ResourceFactory;
-use ZF\Configuration\ModuleUtils;
-use ZFTest\Util\ServiceManagerFactory;
 use Doctrine\ORM\Tools\SchemaTool;
 
-use Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter;
-use Application\Controller\IndexController;
 use Zend\Http\Request;
-use Zend\Http\Response;
-use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 use Zend\Filter\FilterChain;
-
 
 class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
@@ -82,7 +68,6 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
             "entityIdentifierName" => "id",
             "routeMatch" => "/db-test/artist",
         ];
-
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');

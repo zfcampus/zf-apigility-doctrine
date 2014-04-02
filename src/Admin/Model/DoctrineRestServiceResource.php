@@ -11,7 +11,6 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Rest\Exception\CreationException;
 use ZF\Rest\Exception\PatchException;
-use ZF\Apigility\Doctrine\Admin\Model\NewDoctrineServiceEntity;
 
 class DoctrineRestServiceResource extends AbstractResourceListener
 {
@@ -31,7 +30,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     protected $restFactory;
 
     /**
-     * @param  RestServiceModelFactory $restFactory
+     * @param RestServiceModelFactory $restFactory
      */
     public function __construct(DoctrineRestServiceModelFactory $restFactory)
     {
@@ -41,6 +40,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     public function setModuleName($value)
     {
         $this->moduleName = $value;
+
         return $this;
     }
 
@@ -64,6 +64,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             // @codeCoverageIgnoreEnd
         }
         $this->moduleName = $moduleName;
+
         return $moduleName;
     }
 
@@ -77,13 +78,14 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         }
         $moduleName = $this->getModuleName();
         $this->model = $this->restFactory->factory($moduleName, $type);
+
         return $this->model;
     }
 
     /**
      * Create a new REST service
      *
-     * @param  array|object $data
+     * @param  array|object      $data
      * @return RestServiceEntity
      * @throws CreationException
      */
@@ -116,7 +118,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Fetch REST metadata
      *
-     * @param  string $id
+     * @param  string                       $id
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($id)
@@ -133,22 +135,23 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array $params
+     * @param  array               $params
      * @return RestServiceEntity[]
      */
     public function fetchAll($params = array())
     {
         $version = $this->getEvent()->getQueryParam('version', null);
+
         return $this->getModel()->fetchAll($version);
     }
 
     /**
      * Update an existing REST service
      *
-     * @param  string $id
-     * @param  object|array $data
+     * @param  string                       $id
+     * @param  object|array                 $data
      * @return ApiProblem|RestServiceEntity
-     * @throws PatchException if unable to update configuration
+     * @throws PatchException               if unable to update configuration
      */
     public function patch($id, $data)
     {
@@ -199,7 +202,6 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             throw new \Exception('Error deleting REST service', 500, $e);
         }
             // @codeCoverageIgnoreEnd
-
         return true;
     }
 }

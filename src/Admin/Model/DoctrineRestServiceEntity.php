@@ -16,7 +16,6 @@ class DoctrineRestServiceEntity extends RestServiceEntity
 
     protected $hydrateByValue;
 
-
     public function exchangeArray(array $data)
     {
         parent::exchangeArray($data);
@@ -44,6 +43,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity
         $data['hydrator_name']      = $this->hydratorName;
         $data['object_manager']     = $this->objectManager;
         $data['hydrate_by_value']   = $this->hydrateByValue;
+
         return $data;
     }
 }

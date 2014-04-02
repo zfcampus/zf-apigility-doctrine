@@ -41,8 +41,8 @@ class DoctrineRpcServiceModelFactory
     protected $sharedEventManager;
 
     /**
-     * @param  ModuleUtils $modules
-     * @param  ConfigResource $config
+     * @param ModuleUtils    $modules
+     * @param ConfigResource $config
      */
     public function __construct(ModuleUtils $modules, ConfigResourceFactory $configFactory, SharedEventManagerInterface $sharedEvents, ModuleModel $moduleModel)
     {
@@ -53,7 +53,7 @@ class DoctrineRpcServiceModelFactory
     }
 
     /**
-     * @param  string $module
+     * @param  string          $module
      * @return RpcServiceModel
      */
     public function factory($module)

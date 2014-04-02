@@ -6,15 +6,7 @@
 
 namespace ZF\Apigility\Doctrine\Admin;
 
-use Zend\Config\Writer\PhpArray as PhpArrayWriter;
-use Zend\EventManager\EventInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Router\RouteMatch;
-use ZF\Configuration\ConfigResource;
-use ZF\Hal\Link\Link;
-use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Resource;
-use ZF\Hal\View\HalJsonModel;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use ZF\Apigility\Admin\Model\RestServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
@@ -97,9 +89,9 @@ class Module
                 $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
                 $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                 $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
+
                 return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
             },
-
 
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
                 if (!$services->has('ZF\Configuration\ModuleUtils')
@@ -117,6 +109,7 @@ class Module
                 $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
                 $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
                 $sharedEvents  = $services->get('SharedEventManager');
+
                 return new Model\DoctrineRpcServiceModelFactory($moduleUtils, $configFactory, $sharedEvents, $moduleModel);
             },
 
@@ -142,6 +135,7 @@ class Module
                 $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory');
                 $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                 $controllerManager = $services->get('ControllerManager');
+
                 return new Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
             },
         ));

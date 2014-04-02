@@ -21,6 +21,7 @@ class Artist
     public function setName($value)
     {
         $this->name = $value;
+
         return $this;
     }
 
@@ -34,6 +35,7 @@ class Artist
     public function setCreatedAt(\Datetime $value)
     {
         $this->createdAt = $value;
+
         return $this;
     }
 

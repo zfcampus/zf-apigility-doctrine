@@ -55,6 +55,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         $namespace = self::FACTORY_NAMESPACE;
         if (!isset($config[$namespace]) || !is_array($config[$namespace]) || !isset($config[$namespace][$requestedName])) {
             $this->lookupCache[$requestedName] = false;
+
             return false;
         }
 
@@ -78,6 +79,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
         }
 
         $this->lookupCache[$requestedName] = true;
+
         return true;
     }
 
@@ -124,7 +126,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
      * @param $className
      *
      * @return string
-     * @codeCoverageIgnore
+     *                @codeCoverageIgnore
      */
     protected function normalizeClassname($className)
     {
@@ -154,7 +156,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     /**
      * @param ServiceLocatorInterface $serviceManager
      * @param                         $config
-     * @param ObjectManager $objectManager
+     * @param ObjectManager           $objectManager
      *
      * @return mixed
      */
@@ -187,7 +189,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     /**
      * @param ServiceLocatorInterface $serviceManager
      * @param                         $config
-     * @param ObjectManager $objectManager
+     * @param ObjectManager           $objectManager
      *
      * @return HydratorInterface
      */
@@ -195,6 +197,7 @@ class DoctrineHydratorFactory implements AbstractFactoryInterface
     {
         $hydrator = new Hydrator\DoctrineObject($objectManager, $config['entity_class'], $config['by_value']);
         $this->configureHydratorStrategies($hydrator, $serviceManager, $config, $objectManager);
+
         return $hydrator;
     }
 

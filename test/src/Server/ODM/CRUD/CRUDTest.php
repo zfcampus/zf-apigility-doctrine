@@ -6,7 +6,6 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Server\ODM\CRUD;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
 use DbMongo\Document\Meta as MetaEntity;
 

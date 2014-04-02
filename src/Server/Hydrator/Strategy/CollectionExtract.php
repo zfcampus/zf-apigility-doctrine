@@ -17,6 +17,7 @@ class CollectionExtract extends AbstractCollectionStrategy
     public function extract($value)
     {
         $halCollection = new Collection($value);
+
         return $halCollection;
     }
 

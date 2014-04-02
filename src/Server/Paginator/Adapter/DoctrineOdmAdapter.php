@@ -5,7 +5,6 @@ namespace ZF\Apigility\Doctrine\Server\Paginator\Adapter;
 use Doctrine\Odm\MongoDB\Query\Builder;
 use Zend\Paginator\Adapter\AdapterInterface;
 
-
 /**
  * Class DoctrineOdmAdapter
  *

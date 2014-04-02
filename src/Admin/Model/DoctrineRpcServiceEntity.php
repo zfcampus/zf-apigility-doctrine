@@ -45,14 +45,15 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
                 $name
             ));
         }
+
         return $this->{$name};
     }
 
     /**
      * @todo   validation
-     * @param  array $data
+     * @param  array                    $data
      * @throws InvalidArgumentException if a particular value does not validate
-     * @throws RuntimeException if the object does not have a controller service name following population
+     * @throws RuntimeException         if the object does not have a controller service name following population
      */
     public function exchangeArray(array $data)
     {
@@ -149,6 +150,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
         if (null !== $this->controllerClass) {
             $array['controller_class'] = $this->controllerClass;
         }
+
         return $array;
     }
 }
