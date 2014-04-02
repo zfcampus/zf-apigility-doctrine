@@ -21,6 +21,7 @@ class Album
     public function setName($value)
     {
         $this->name = $value;
+
         return $this;
     }
 
@@ -34,6 +35,7 @@ class Album
     public function setCreatedAt(\Datetime $value)
     {
         $this->createdAt = $value;
+
         return $this;
     }
 
@@ -47,6 +49,7 @@ class Album
     public function setArtist($value)
     {
         $this->artist = $value;
+
         return $this;
     }
 }

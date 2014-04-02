@@ -2,17 +2,17 @@
 <phpunit bootstrap="./test/Bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="admin">
-            <directory>./test/ZFTest/Apigility/Doctrine/Admin</directory>
+            <directory>./test/Admin</directory>
         </testsuite>
         <testsuite name="server-orm">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Setup</directory>
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/CRUD</directory>
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ORM/Collection</directory>
+            <directory>./test/src/Server/ORM/Setup</directory>
+            <directory>./test/src/Server/ORM/CRUD</directory>
+            <directory>./test/src/Server/ORM/Collection</directory>
         </testsuite>
         <testsuite name="server-odm">
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM/Setup</directory>
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM/CRUD</directory>
-            <directory>./test/ZFTest/Apigility/Doctrine/Server/ODM/Collection</directory>
+            <directory>./test/src/Server/ODM/Setup</directory>
+            <directory>./test/src/Server/ODM/CRUD</directory>
+            <directory>./test/src/Server/ODM/Collection</directory>
         </testsuite>
     </testsuites>
 
@@ -27,6 +27,7 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-html" target="./test/code-coverage" charset="UTF-8" yui="true" lowUpperBound="35" highLowerBound="70" />
+        <log type="coverage-html" target="test/code-coverage" charset="UTF-8" yui="true" lowUpperBound="35" highLowerBound="70" />
+        <log type="coverage-clover" target="test/build/logs/clover.xml"/>
     </logging>
 </phpunit>
