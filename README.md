@@ -1,7 +1,7 @@
 Apigility for Doctrine
 ==============================
 
-[![Build status](https://api.travis-ci.org/soliantconsulting/zf-apigility-doctrine.svg)](http://travis-ci.org/soliantconsulting/zf-apigility-doctrine)
+[![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine) 
 
 This module provides the classes for integrating Doctrine with Apigility.
 
