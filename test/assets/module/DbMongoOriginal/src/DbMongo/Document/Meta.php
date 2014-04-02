@@ -21,6 +21,7 @@ class Meta
     public function setName($value)
     {
         $this->name = $value;
+
         return $this;
     }
 
