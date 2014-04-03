@@ -274,6 +274,10 @@ Like (% is used as a wildcard)
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
+
+ORM Only
+--------
+
 AndX 
 
 In AndX queries the ```conditions``` is an array of query types for any of those described
