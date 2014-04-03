@@ -3,10 +3,29 @@
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
 use ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface;
+use ZF\Apigility\Doctrine\Server\Collection\Service\ORMFilterManager;
 
 abstract class AbstractFilter implements FilterInterface
 {
     abstract public function filter($queryBuilder, $metadata, $option);
+
+    protected $filterManager;
+
+    public function __construct($params)
+    {
+        $this->setFilterManager($params[0]);
+    }
+
+    public function setFilterManager(ORMFilterManager $filterManager)
+    {
+        $this->filterManager = $filterManager;
+        return $this;
+    }
+
+    public function getFilterManager()
+    {
+        return $this->filterManager;
+    }
 
     protected function typeCastField($metadata, $field, $value, $format, $doNotTypecastDatetime = false)
     {
