@@ -96,7 +96,8 @@ Queries are not simple key=value pairs.  The query parameter is a key-less array
 definitions.  Each query definition is an array and the array values vary for each query type.
 
 Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
-a 'where' which can be either 'and' or 'or'.  Embedded logic such as and(x or y) is not supported.
+a 'where' which can be either 'and' or 'or'.  Embedded logic such as and(x or y) is supported
+through AndX and OrX query types.
 
 Building HTTP GET query with PHP.  Use this to help build your queries.
 
@@ -271,6 +272,68 @@ Like (% is used as a wildcard)
 
 ```php
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
+```
+
+
+ORM Only
+--------
+
+AndX 
+
+In AndX queries the ```conditions``` is an array of query types for any of those described
+here.  The join will always be ```and``` so the ```where``` parameter inside of conditions is
+ignored.  The ```where``` parameter on the AndX query type is not ignored.
+
+```php
+array(
+    'type' => 'andx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+    ),
+    'where' => 'and'
+)
+```
+
+OrX 
+
+In OrX queries the ```conditions``` is an array of query types for any of those described
+here.  The join will always be ```or``` so the ```where``` parameter inside of conditions is
+ignored.  The ```where``` parameter on the OrX query type is not ignored.
+
+```php
+array(
+    'type' => 'orx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+    ),
+    'where' => 'and'
+)
+```
+
+AndX and OrX are infinitly embeddable
+
+```php
+array(
+    'type' => 'orx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array(
+            'type' => 'andx',
+            'conditions' => array(
+                array(
+                    'type' => 'orx', 
+                    'conditions' => array(                    
+                        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                        array('field' =>'name', 'type'=>'like', 'value' => 'Artist%'),
+                    ),
+                ),
+                array('field' =>'createdAt', 'type'=>'eq', 'value' => '2014-12-18 13:17:17'),
+            ),
+        ),
+    ),
+)
 ```
 
 

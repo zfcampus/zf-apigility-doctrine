@@ -69,7 +69,7 @@ class FetchAllOrmQuery
                 // @codeCoverageIgnoreEnd
 
                 try {
-                    $filter = $this->getFilterManager()->get(strtolower($option['type']));
+                    $filter = $this->getFilterManager()->get(strtolower($option['type']), [$this->getFilterManager()]);
                 } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
                 // @codeCoverageIgnoreStart
                     return new ApiProblem(500, $e->getMessage());
