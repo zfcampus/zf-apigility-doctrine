@@ -28,7 +28,9 @@ class AndX extends AbstractFilter
         }
 
         $andX->addMultiple($qb->getDqlParts()['where']->getParts());
-        $queryBuilder->setParameters($qb->getParameters());
+        foreach ($qb->getParameters() as $key => $value) {
+            $queryBuilder->getParameters()->add($value);
+        }
 
         $queryBuilder->$queryType($andX);
     }
