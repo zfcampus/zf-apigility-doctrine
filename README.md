@@ -89,17 +89,18 @@ Sort by columnOne ascending then columnTwo decending
 ```
 
 
-Querying Collections
+Filtering Collections
 --------------------
 
-Queries are not simple key=value pairs.  The query parameter is a key-less array of query
-definitions.  Each query definition is an array and the array values vary for each query type.
+Filters are not simple key=value pairs.  The query parameter is a key-less array of filter
+definitions.  Each filter definition is an array and the array values vary for each filter.
 
-Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
-a 'where' which can be either 'and' or 'or'.  Embedded logic such as and(x or y) is supported
-through AndX and OrX query types.
+Each filter requires at a minimum a 'type'.  Each filter may also specify
+a ```where``` which can be either ```and``` or ```or```.  Embedded logic such as and(x or y) is supported
+through AndX and OrX filters.
 
 Building HTTP GET query with PHP.  Use this to help build your queries.
+-----------------------------------------------------------------------
 
 PHP Example
 ```php
@@ -142,9 +143,9 @@ $(function() {
 });
 ```
 
-Querying Relations
+Filtering Relations
 ---------------------
-It is possible to query collections by relations - just supply the relation name as `fieldName` and
+It is possible to filter collections by relations - just supply the relation name as `fieldName` and
 identifier as `value`.
 
 1. Using an RPC created by this module for each collection on each resource: /resource/id/childresource/child_id
@@ -184,16 +185,16 @@ class UserGroup {}
 Format of Date Fields
 ---------------------
 
-When a date field is involved in a query you may specify the format of the date
+When a date field is involved in a filter you may specify the format of the date
 using PHP date formatting options.  The default date format is ```Y-m-d H:i:s```
-If you have a date field which is just Y-m-d then add the format to the query.
+If you have a date field which is just Y-m-d then add the format to the filter.
 
 ```php
     'format' => 'Y-m-d',
     'value' => '2014-02-04',
 ```
 
-Available Query Types
+Available Filters
 ---------------------
 
 ORM and ODM
@@ -280,9 +281,9 @@ ORM Only
 
 AndX 
 
-In AndX queries the ```conditions``` is an array of query types for any of those described
+In AndX queries the ```conditions``` is an array of filters for any of those described
 here.  The join will always be ```and``` so the ```where``` parameter inside of conditions is
-ignored.  The ```where``` parameter on the AndX query type is not ignored.
+ignored.  The ```where``` parameter on the AndX filter is not ignored.
 
 ```php
 array(
@@ -297,9 +298,9 @@ array(
 
 OrX 
 
-In OrX queries the ```conditions``` is an array of query types for any of those described
+In OrX queries the ```conditions``` is an array of filters for any of those described
 here.  The join will always be ```or``` so the ```where``` parameter inside of conditions is
-ignored.  The ```where``` parameter on the OrX query type is not ignored.
+ignored.  The ```where``` parameter on the OrX filter is not ignored.
 
 ```php
 array(
