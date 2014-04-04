@@ -43,6 +43,82 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
         $this->getRequest()->setContent(null);
     }
 
+    public function testMathProd()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2),
+                        'type'=>'eq',
+                        'value' => 6,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testMathDiff()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'diff', 'field' => 'id', 'value' => 1),
+                        'type'=>'gte',
+                        'value' => 1,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(3, $body['count']);
+    }
+
+    public function testMathSum()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'sum', 'field' => 'id', 'value' => 5),
+                        'type'=>'eq',
+                        'value' => 6,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testMathQuot()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'quot', 'field' => 'id', 'value' => 2),
+                        'type'=>'eq',
+                        'value' => 2,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
     public function testOrX()
     {
         $queryString = http_build_query(

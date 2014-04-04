@@ -337,6 +337,31 @@ array(
 )
 ```
 
+Math
+
+You may substitue a math filter for any ```field```.  Available math operations
+
+row.id * 2
+array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2);
+
+row.id - 2
+array('type' => 'math', 'expr' => 'diff', 'field' => 'id', 'value' => 2);
+
+row.id + 2
+array('type' => 'math', 'expr' => 'sum', 'field' => 'id', 'value' => 2);
+
+row.id / 2
+array('type' => 'math', 'expr' => 'quot', 'field' => 'id', 'value' => 2);
+
+```php
+array(
+    array(
+        'field' => array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2),
+        'type'=>'eq',
+        'value' => 6,
+    ),
+),
+```
 
 ODM Only
 --------

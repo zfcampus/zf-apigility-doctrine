@@ -6,17 +6,7 @@ class AndX extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)
     {
-        if (isset($option['where'])) {
-            if ($option['where'] == 'and') {
-                $queryType = 'andWhere';
-            } elseif ($option['where'] == 'or') {
-                $queryType = 'orWhere';
-            }
-        }
-
-        if (!isset($queryType)) {
-            $queryType = 'andWhere';
-        }
+        $queryType = $this->normalizeQueryType($option);
 
         $andX = $queryBuilder->expr()->andX();
         $em = $queryBuilder->getEntityManager();
