@@ -33,6 +33,8 @@ return array(
             'between' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Between',
             'like' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Like',
             'notlike' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\Like',
+            'orx' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\OrX',
+            'andx' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AndX',
         ),
     ),
 

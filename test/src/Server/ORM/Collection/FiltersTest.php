@@ -43,6 +43,178 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
         $this->getRequest()->setContent(null);
     }
 
+    public function testMathProd()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2),
+                        'type'=>'eq',
+                        'value' => 6,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testMathDiff()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'diff', 'field' => 'id', 'value' => 1),
+                        'type'=>'gte',
+                        'value' => 1,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(3, $body['count']);
+    }
+
+    public function testMathSum()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'sum', 'field' => 'id', 'value' => 5),
+                        'type'=>'eq',
+                        'value' => 6,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testMathQuot()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'field' => array('type' => 'math', 'expr' => 'quot', 'field' => 'id', 'value' => 2),
+                        'type'=>'eq',
+                        'value' => 2,
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testOrX()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'type' => 'orx',
+                        'conditions' => array(
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(2, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'type' => 'orx',
+                        'conditions' => array(
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+                            array(
+                                'type' => 'andx',
+                                'conditions' => array(
+                                    array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                                    array('field' =>'createdAt', 'type'=>'eq', 'value' => '2014-12-18 13:17:17'),
+                                ),
+                            ),
+                        ),
+                    ),
+                    array(
+                        'where' => 'or',
+                        'type' => 'eq',
+                        'field' => 'createdAt',
+                        'value' => '2012-12-18 13:17:17',
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(3, $body['count']);
+    }
+
+    public function testAndX()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'type' => 'andx',
+                        'conditions' => array(
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(0, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array(
+                        'type' => 'andx',
+                        'conditions' => array(
+                            array('field' =>'createdAt', 'type'=>'eq', 'value' => '2014-12-18 13:17:17'),
+                            array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                        ),
+                    ),
+                    array(
+                        'where' => 'or',
+                        'type' => 'eq',
+                        'field' => 'name',
+                        'value' => 'ArtistOne',
+                    ),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(2, $body['count']);
+    }
+
     public function testEquals()
     {
         $queryString = http_build_query(

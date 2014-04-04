@@ -6,30 +6,15 @@ class Between extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)
     {
-        if (isset($option['where'])) {
-            if ($option['where'] == 'and') {
-                $queryType = 'andWhere';
-            } elseif ($option['where'] == 'or') {
-                $queryType = 'orWhere';
-            }
-        }
-
-        if (!isset($queryType)) {
-            $queryType = 'andWhere';
-        }
-
-        $format = null;
-        if (isset($option['format'])) {
-            $format = $option['format'];
-        }
-
-        $from = $this->typeCastField($metadata, $option['field'], $option['from'], $format);
-        $to = $this->typeCastField($metadata, $option['field'], $option['to'], $format);
+        $queryType = $this->normalizeQueryType($option);
+        $field = $this->normalizeField($option['field'], $queryBuilder, $metadata);
+        $from = $this->normalizeValue($field, $option['from'], $queryBuilder, $metadata, $this->normalizeFormat($option));
+        $to = $this->normalizeValue($field, $option['to'], $queryBuilder, $metadata, $this->normalizeFormat($option));
 
         $fromParameter = uniqid('a');
         $toParameter = uniqid('a');
 
-        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], ":$fromParameter", ":$toParameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->between($field, ":$fromParameter", ":$toParameter"));
         $queryBuilder->setParameters(array($fromParameter => $from, $toParameter => $to));
     }
 }
