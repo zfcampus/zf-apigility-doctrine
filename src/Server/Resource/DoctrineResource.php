@@ -203,18 +203,13 @@ class DoctrineResource extends AbstractResourceListener
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
-            function ($e) use ($fetchAllQuery, $entityClass, $parameters) {
-                $halCollection = $e->getParam('collection');
-                $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
-                $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
-
-                $halCollection->setAttributes(array(
-                   'count' => $halCollection->getCollection()->getCurrentItemCount(),
-                   'total' => $halCollection->getCollection()->getTotalItemCount(),
-                   'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
+            function ($e) use ($fetchAllQuery, $entityClass, $parameters)
+            {
+                $e->getParam('collection')->setAttributes(array(
+                   'resource_count' => $fetchAllQuery->getCollectionTotal($entityClass),
                 ));
 
-                $halCollection->setCollectionRouteOptions(array(
+                $e->getParam('collection')->setCollectionRouteOptions(array(
                     'query' => $parameters
                 ));
             }
