@@ -59,7 +59,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(1, $body['count']);
+        $this->assertEquals(1, $body['total_items']);
     }
 
     public function testMathDiff()
@@ -78,7 +78,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(3, $body['count']);
+        $this->assertEquals(3, $body['total_items']);
     }
 
     public function testMathSum()
@@ -97,7 +97,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(1, $body['count']);
+        $this->assertEquals(1, $body['total_items']);
     }
 
     public function testMathQuot()
@@ -116,7 +116,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(1, $body['count']);
+        $this->assertEquals(1, $body['total_items']);
     }
 
     public function testOrX()
@@ -137,7 +137,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(2, $body['count']);
+        $this->assertEquals(2, $body['total_items']);
 
         $queryString = http_build_query(
             array(
@@ -167,7 +167,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(3, $body['count']);
+        $this->assertEquals(3, $body['total_items']);
     }
 
     public function testAndX()
@@ -188,7 +188,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(0, $body['count']);
+        $this->assertEquals(0, $body['total_items']);
 
         $queryString = http_build_query(
             array(
@@ -212,7 +212,7 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(2, $body['count']);
+        $this->assertEquals(2, $body['total_items']);
     }
 
     public function testEquals()
