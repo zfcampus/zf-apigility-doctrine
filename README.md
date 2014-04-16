@@ -89,16 +89,18 @@ Sort by columnOne ascending then columnTwo decending
 ```
 
 
-Querying Collections
+Filtering Collections
 --------------------
 
-Queries are not simple key=value pairs.  The query parameter is a key-less array of query
-definitions.  Each query definition is an array and the array values vary for each query type.
+Filters are not simple key=value pairs.  The query parameter is a key-less array of filter
+definitions.  Each filter definition is an array and the array values vary for each filter.
 
-Each query type requires at a minimum a 'type' and a 'field'.  Each query may also specify
-a 'where' which can be either 'and' or 'or'.  Embedded logic such as and(x or y) is not supported.
+Each filter requires at a minimum a 'type'.  Each filter may also specify
+a ```where``` which can be either ```and``` or ```or```.  Embedded logic such as and(x or y) is supported
+through AndX and OrX filters.
 
 Building HTTP GET query with PHP.  Use this to help build your queries.
+-----------------------------------------------------------------------
 
 PHP Example
 ```php
@@ -141,9 +143,9 @@ $(function() {
 });
 ```
 
-Querying Relations
+Filtering Relations
 ---------------------
-It is possible to query collections by relations - just supply the relation name as `fieldName` and
+It is possible to filter collections by relations - just supply the relation name as `fieldName` and
 identifier as `value`.
 
 1. Using an RPC created by this module for each collection on each resource: /resource/id/childresource/child_id
@@ -183,16 +185,16 @@ class UserGroup {}
 Format of Date Fields
 ---------------------
 
-When a date field is involved in a query you may specify the format of the date
+When a date field is involved in a filter you may specify the format of the date
 using PHP date formatting options.  The default date format is ```Y-m-d H:i:s```
-If you have a date field which is just Y-m-d then add the format to the query.
+If you have a date field which is just Y-m-d then add the format to the filter.
 
 ```php
     'format' => 'Y-m-d',
     'value' => '2014-02-04',
 ```
 
-Available Query Types
+Available Filters
 ---------------------
 
 ORM and ODM
@@ -273,6 +275,93 @@ Like (% is used as a wildcard)
     array('type' => 'like', 'field' => 'fieldName', 'value' => 'like%search')
 ```
 
+
+ORM Only
+--------
+
+AndX 
+
+In AndX queries the ```conditions``` is an array of filters for any of those described
+here.  The join will always be ```and``` so the ```where``` parameter inside of conditions is
+ignored.  The ```where``` parameter on the AndX filter is not ignored.
+
+```php
+array(
+    'type' => 'andx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+    ),
+    'where' => 'and'
+)
+```
+
+OrX 
+
+In OrX queries the ```conditions``` is an array of filters for any of those described
+here.  The join will always be ```or``` so the ```where``` parameter inside of conditions is
+ignored.  The ```where``` parameter on the OrX filter is not ignored.
+
+```php
+array(
+    'type' => 'orx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+    ),
+    'where' => 'and'
+)
+```
+
+AndX and OrX are infinitly embeddable
+
+```php
+array(
+    'type' => 'orx',
+    'conditions' => array(
+        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistOne'),
+        array(
+            'type' => 'andx',
+            'conditions' => array(
+                array(
+                    'type' => 'orx', 
+                    'conditions' => array(                    
+                        array('field' =>'name', 'type'=>'eq', 'value' => 'ArtistTwo'),
+                        array('field' =>'name', 'type'=>'like', 'value' => 'Artist%'),
+                    ),
+                ),
+                array('field' =>'createdAt', 'type'=>'eq', 'value' => '2014-12-18 13:17:17'),
+            ),
+        ),
+    ),
+)
+```
+
+Math
+
+You may substitue a math filter for any ```field```.  Available math operations
+
+row.id * 2
+array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2);
+
+row.id - 2
+array('type' => 'math', 'expr' => 'diff', 'field' => 'id', 'value' => 2);
+
+row.id + 2
+array('type' => 'math', 'expr' => 'sum', 'field' => 'id', 'value' => 2);
+
+row.id / 2
+array('type' => 'math', 'expr' => 'quot', 'field' => 'id', 'value' => 2);
+
+```php
+array(
+    array(
+        'field' => array('type' => 'math', 'expr' => 'prod', 'field' => 'id', 'value' => 2),
+        'type'=>'eq',
+        'value' => 6,
+    ),
+),
+```
 
 ODM Only
 --------

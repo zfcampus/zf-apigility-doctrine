@@ -6,18 +6,9 @@ class IsNotNull extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)
     {
-        if (isset($option['where'])) {
-            if ($option['where'] == 'and') {
-                $queryType = 'andWhere';
-            } elseif ($option['where'] == 'or') {
-                $queryType = 'orWhere';
-            }
-        }
+        $queryType = $this->normalizeQueryType($option);
+        $field = $this->normalizeField($option['field'], $queryBuilder, $metadata);
 
-        if (!isset($queryType)) {
-            $queryType = 'andWhere';
-        }
-
-        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull('row.' . $option['field']));
+        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull($field));
     }
 }

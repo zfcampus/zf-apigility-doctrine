@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\CRUD;
+namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
@@ -210,7 +210,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->getRequest()->setContent(null);
         $this->dispatch("/test/artist/$artistId/album");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(2, $body['count']);
+        $this->assertEquals(2, $body['total_items']);
 
         $this->dispatch("/test/artist/$artistId/album/$albumId");
         $body = json_decode($this->getResponse()->getBody(), true);
