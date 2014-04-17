@@ -46,6 +46,13 @@ class Module
             'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
             'getZfOdmFilterConfig'
         );
+
+        $serviceListener->addServiceManager(
+            'ZfOdmCollectionQueryManager',
+            'zf-collection-query',
+            'ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery',
+            'getZfCollectionQueryConfig'
+        );
     }
 
     /**

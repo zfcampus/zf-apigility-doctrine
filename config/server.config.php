@@ -15,7 +15,15 @@ return array(
         'factories' => array(
             'ZfOrmCollectionFilterManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\ORMFilterManagerFactory',
             'ZfOdmCollectionFilterManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\ODMFilterManagerFactory',
+            'ZfOdmCollectionQueryManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\QueryManagerFactory',
         ),
+    ),
+
+    'zf-collection-query' => array(
+        'invokables' => array(
+            'default-orm-query' => 'ZF\Apigility\Doctrine\Server\Collection\Query\FetchAllOrmQuery',
+            'default-odm-query' => 'ZF\Apigility\Doctrine\Server\Collection\Query\FetchAllOdmQuery',
+        )
     ),
 
     'zf-orm-collection-filter' => array(
