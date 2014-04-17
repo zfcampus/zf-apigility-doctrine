@@ -15,7 +15,7 @@ return array(
         'factories' => array(
             'ZfOrmCollectionFilterManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\ORMFilterManagerFactory',
             'ZfOdmCollectionFilterManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\ODMFilterManagerFactory',
-            'ZfOdmCollectionQueryManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\QueryManagerFactory',
+            'ZfCollectionQueryManager' => 'ZF\Apigility\Doctrine\Server\Collection\Service\QueryManagerFactory',
         ),
     ),
 

@@ -48,7 +48,7 @@ class Module
         );
 
         $serviceListener->addServiceManager(
-            'ZfOdmCollectionQueryManager',
+            'ZfCollectionQueryManager',
             'zf-collection-query',
             'ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery',
             'getZfCollectionQueryConfig'

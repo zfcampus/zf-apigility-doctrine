@@ -181,7 +181,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     protected function loadQueryProvider(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        $queryManager = $serviceLocator->get('ZfOdmCollectionQueryManager');
+        $queryManager = $serviceLocator->get('ZfCollectionQueryManager');
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $fetchAllQuery = $queryManager->get('default-orm-query');
             $filterManager = $serviceLocator->get('ZfOrmCollectionFilterManager');
