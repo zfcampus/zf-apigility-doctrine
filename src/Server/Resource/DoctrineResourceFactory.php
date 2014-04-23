@@ -192,6 +192,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');
         }
+        // @codeCoverageIgnoreEnd
 
         // Use custom query provider
         if (isset($config['query_provider'])) {
