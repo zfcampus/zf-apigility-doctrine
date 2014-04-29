@@ -16,6 +16,7 @@ return array(
         'ZF\ApiProblem',
         'ZF\Apigility\Doctrine\Admin',
         'ZF\Apigility\Doctrine\Server',
+        'General',
         'Db',
         'DbApi',
     ),
@@ -24,6 +25,7 @@ return array(
             __DIR__ . '/testing.config.php',
         ),
         'module_paths' => array(
+            'General' => __DIR__ . '/../../assets/module/General',
             'Db' => __DIR__ . '/../assets/module/Db',
             'DbApi' => __DIR__ . '/../assets/module/DbApi',
         ),

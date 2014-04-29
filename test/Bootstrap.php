@@ -56,6 +56,15 @@ class Bootstrap
 
         $run = 'rsync -a ' . __DIR__ . '/assets/module/DbMongoApiOriginal/* ' . __DIR__ . '/assets/module/DbMongoApi';
         exec($run);
+
+        // Create General module
+        $run = "rm -rf " . __DIR__ . "/assets/module/General";
+        exec($run);
+
+        mkdir(__DIR__ . '/assets/module/General');
+
+        $run = 'rsync -a ' . __DIR__ . '/assets/module/GeneralOriginal/* ' . __DIR__ . '/assets/module/General';
+        exec($run);
     }
 
     protected static function initAutoloader()

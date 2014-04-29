@@ -6,8 +6,10 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Server\ODM\CRUD;
 
+use General\Listener\EventCatcher;
 use Zend\Http\Request;
 use DbMongo\Document\Meta as MetaEntity;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
@@ -29,6 +31,17 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $collection->remove();
     }
 
+    /**
+     * @param $expectedEvents
+     */
+    protected function validateTriggeredEvents($expectedEvents)
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $eventCatcher = $serviceManager->get('General\Listener\EventCatcher');
+
+        $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
+    }
+
     public function testCreate()
     {
         $this->getRequest()->getHeaders()->addHeaders(array(
@@ -42,6 +55,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_CREATE_PRE, DoctrineResourceEvent::EVENT_CREATE_POST]);
     }
 
     public function testFetch()
@@ -65,6 +79,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_POST]);
     }
 
     public function testFetchAll()
@@ -92,6 +107,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals(2, sizeof($body['_embedded']['meta']));
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_ALL_POST]);
     }
 /*
     public function testPatch()
@@ -117,6 +133,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistOnePatchEdit', $foundEntity->getName());
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_PATCH_PRE, DoctrineResourceEvent::EVENT_PATCH_POST]);
     }
 
     public function testPut()
@@ -142,6 +159,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistSevenPutEdit', $foundEntity->getName());
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_UPDATE_PRE, DoctrineResourceEvent::EVENT_UPDATE_POST]);
     }
 
     public function testDelete()
@@ -165,6 +183,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals(204, $this->getResponseStatusCode());
 
         $this->assertEmpty($em->getRepository('Db\Entity\Artist')->find($id));
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_DELETE_PRE, DoctrineResourceEvent::EVENT_DELETE_POST]);
 
         // Test DELETE: entity not found
 
