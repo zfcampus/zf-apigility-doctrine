@@ -7,11 +7,13 @@
         <testsuite name="server-orm">
             <directory>./test/src/Server/ORM/Setup</directory>
             <directory>./test/src/Server/ORM/CRUD</directory>
+            <directory>./test/src/Server/ORM/Event</directory>
             <directory>./test/src/Server/ORM/Collection</directory>
         </testsuite>
         <testsuite name="server-odm">
             <directory>./test/src/Server/ODM/Setup</directory>
             <directory>./test/src/Server/ODM/CRUD</directory>
+            <directory>./test/src/Server/ODM/Event</directory>
             <directory>./test/src/Server/ODM/Collection</directory>
         </testsuite>
     </testsuites>

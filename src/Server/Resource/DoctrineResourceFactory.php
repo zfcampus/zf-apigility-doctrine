@@ -107,12 +107,16 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $objectManager = $this->loadObjectManager($serviceLocator, $config);
         $hydrator = $this->loadHydrator($serviceLocator, $config, $objectManager);
         $fetchAllQuery = $this->loadQueryProvider($serviceLocator, $config, $objectManager);
+        $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $config);
 
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setFetchAllQuery($fetchAllQuery);
         $listener->setServiceManager($serviceLocator);
+        if (count($configuredListeners)) {
+            $listener->getEventManager()->attach($configuredListeners);
+        }
 
         return $listener;
     }
@@ -207,6 +211,25 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $fetchAllQuery->setObjectManager($objectManager);
         $fetchAllQuery->setFilterManager($filterManager);
         return $fetchAllQuery;
+    }
+
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param                         $config
+     *
+     * @return array
+     */
+    protected function loadConfiguredListeners(ServiceLocatorInterface $serviceLocator, $config)
+    {
+        if (!isset($config['listeners'])) {
+            return [];
+        }
+
+        $listeners = [];
+        foreach ($config['listeners'] as $listener) {
+            $listeners[] = $serviceLocator->get($listener);
+        }
+        return $listeners;
     }
 
 }

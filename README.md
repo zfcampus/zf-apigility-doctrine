@@ -58,6 +58,44 @@ Hydrating Entities by Value or Reference
 
 By default the admin tool hydrates entities by reference by setting `$config['doctrine-hydrator']['hydrator_class']['by_value']` to false.
 
+Custom Events
+=============
+It is possible to hook in on specific doctrine events of the type `DoctrineResourceEvent`.
+This way, it is possible to alter the doctrine entities or collections before or after a specific action is performed.
+
+A list of all supported events:
+```
+EVENT_FETCH_POST = 'fetch.post';
+EVENT_FETCH_ALL_POST = 'fetch-all.post';
+EVENT_CREATE_PRE = 'create.pre';
+EVENT_CREATE_POST = 'create.post';
+EVENT_UPDATE_PRE = 'update.pre';
+EVENT_UPDATE_POST = 'update.post';
+EVENT_PATCH_PRE = 'patch.pre';
+EVENT_PATCH_POST = 'patch.post';
+EVENT_DELETE_PRE = 'delete.pre';
+EVENT_DELETE_POST = 'delete.post';
+```
+
+The EventManager is available through the StaticEventManager:
+
+```php
+StaticEventManager::getInstance()->attach('ZF\Apigility\Doctrine\DoctrineResource', 'create.post', $callable);
+```
+
+It is also possible to add custom event listeners to the configuration of a single doctrine-connected resource:
+```php
+'zf-apigility' => array(
+    'doctrine-connected' => array(
+        'Api\\V1\\Rest\\User\\UserResource' => array(
+            // ...
+            'listeners' => array(
+                'key.of.aggregate.listener.in.service_manager'
+            ),
+        ),
+    ),
+),
+```
 
 Collections
 ===========
