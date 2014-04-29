@@ -77,13 +77,13 @@ EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 ```
 
-The EventManager is available through the static event manager:
+The EventManager is available through the StaticEventManager:
 
 ```php
 StaticEventManager::getInstance()->attach('ZF\Apigility\Doctrine\DoctrineResource', 'create.post', $callable);
 ```
 
-It is also possible to add custom event listeners to the configuration of the doctrine-connected resource:
+It is also possible to add custom event listeners to the configuration of a single doctrine-connected resource:
 ```php
 'zf-apigility' => array(
     'doctrine-connected' => array(
