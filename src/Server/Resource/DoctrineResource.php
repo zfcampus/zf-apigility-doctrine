@@ -97,12 +97,10 @@ class DoctrineResource extends AbstractResourceListener
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
 
-
-        $events = $this->getEventManager();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
 
         return $entity;
     }
@@ -122,11 +120,10 @@ class DoctrineResource extends AbstractResourceListener
         }
             // @codeCoverageIgnoreEnd
 
-        $events = $this->getEventManager();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
 
         return true;
     }
@@ -172,9 +169,8 @@ class DoctrineResource extends AbstractResourceListener
         }
         */
 
-        $events = $this->getEventManager();
         $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
 
         return $entity;
     }
@@ -229,8 +225,7 @@ class DoctrineResource extends AbstractResourceListener
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        $events = $this->getEventManager();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
 
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
@@ -279,10 +274,9 @@ class DoctrineResource extends AbstractResourceListener
         // Hydrate entity
         $hydrator->hydrate($patchedData, $entity);
 
-        $events = $this->getEventManager();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
         $this->getObjectManager()->flush();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
 
         return $entity;
     }
@@ -318,29 +312,34 @@ class DoctrineResource extends AbstractResourceListener
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
 
-        $events = $this->getEventManager();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
         $this->getObjectManager()->flush();
-        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity));
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
 
         return $entity;
     }
 
     /**
+     * This method will give custom listeners te chance to alter entities / collections.
+     * The listeners are not allowed to give an early result.
+     * It is possible to throw Exceptions, which will result in an ApiProblem eventually.
+     *
      * @param      $name
      * @param      $entity
      * @param null $collection
      *
-     * @return DoctrineResourceEvent
+     * @return \Zend\EventManager\ResponseCollection
      */
-    protected function createEvent($name, $entity, $collection = null)
+    protected function triggerDoctrineEvent($name, $entity, $collection = null)
     {
         $event = new DoctrineResourceEvent($name, $this);
         $event->setEntity($entity);
         $event->setCollection($collection);
         $event->setResourceEvent($this->getEvent());
 
-        return $event;
+        $eventManager = $this->getEventManager();
+        $response = $eventManager->trigger($event);
+        return $response;
     }
 
 }
