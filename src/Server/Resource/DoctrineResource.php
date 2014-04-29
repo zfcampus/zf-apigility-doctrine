@@ -5,13 +5,14 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerAwareTrait;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
-use ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
@@ -21,12 +22,26 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener
-    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface
+    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface, EventManagerAwareInterface
 {
     use ProvidesObjectManager;
+    use EventManagerAwareTrait;
 
+    /**
+     * @var array
+     */
+    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
+
+    /**
+     * @var ServiceManager
+     */
     protected $serviceManager;
 
+    /**
+     * @param ServiceManager $serviceManager
+     *
+     * @return $this
+     */
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
@@ -34,6 +49,9 @@ class DoctrineResource extends AbstractResourceListener
         return $this;
     }
 
+    /**
+     * @return ServiceManager
+     */
     public function getServiceManager()
     {
         return $this->serviceManager;
@@ -79,8 +97,12 @@ class DoctrineResource extends AbstractResourceListener
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
 
+
+        $events = $this->getEventManager();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity));
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity));
 
         return $entity;
     }
@@ -100,8 +122,11 @@ class DoctrineResource extends AbstractResourceListener
         }
             // @codeCoverageIgnoreEnd
 
+        $events = $this->getEventManager();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity));
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity));
 
         return true;
     }
@@ -147,7 +172,11 @@ class DoctrineResource extends AbstractResourceListener
         }
         */
 
-        return $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $events = $this->getEventManager();
+        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity));
+
+        return $entity;
     }
 
     /**
@@ -200,6 +229,9 @@ class DoctrineResource extends AbstractResourceListener
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
+        $events = $this->getEventManager();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection));
+
         // Add event to set extra HAL parameters
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
@@ -246,7 +278,11 @@ class DoctrineResource extends AbstractResourceListener
 
         // Hydrate entity
         $hydrator->hydrate($patchedData, $entity);
+
+        $events = $this->getEventManager();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity));
         $this->getObjectManager()->flush();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity));
 
         return $entity;
     }
@@ -281,9 +317,30 @@ class DoctrineResource extends AbstractResourceListener
 
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
+
+        $events = $this->getEventManager();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity));
         $this->getObjectManager()->flush();
+        $events->trigger($this->createEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity));
 
         return $entity;
+    }
+
+    /**
+     * @param      $name
+     * @param      $entity
+     * @param null $collection
+     *
+     * @return DoctrineResourceEvent
+     */
+    protected function createEvent($name, $entity, $collection = null)
+    {
+        $event = new DoctrineResourceEvent($name, $this);
+        $event->setEntity($entity);
+        $event->setCollection($collection);
+        $event->setResourceEvent($this->getEvent());
+
+        return $event;
     }
 
 }
