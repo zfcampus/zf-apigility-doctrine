@@ -115,7 +115,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener->setFetchAllQuery($fetchAllQuery);
         $listener->setServiceManager($serviceLocator);
         if (count($configuredListeners)) {
-            $listener->getEventManager()->attach($configuredListeners);
+            foreach ($configuredListeners as $configuredListener) {
+                $listener->getEventManager()->attach($configuredListener);
+            }
         }
 
         return $listener;
