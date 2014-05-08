@@ -110,7 +110,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener->setHydrator($this->loadHydrator($serviceLocator, $config));
         $listener->setServiceManager($serviceLocator);
         if (count($configuredListeners)) {
-            $listener->getEventManager()->attach($configuredListeners);
+            foreach ($configuredListeners as $configuredListener) {
+                $listener->getEventManager()->attach($configuredListener);
+            }
         }
 
         return $listener;
