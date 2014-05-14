@@ -17,6 +17,10 @@
     ],
     "require-dev": {
         "zfcampus/zf-apigility-admin": "dev-master",
+        "zendframework/zend-test": ">=2.3",
+        "zendframework/zend-form": ">=2.3",
+        "zendframework/zend-serializer": ">=2.3",
+        "zendframework/zend-log": ">=2.3",
         "phpunit/phpunit": "3.7.*",
         "fabpot/php-cs-fixer": "0.4.*@dev",
         "satooshi/php-coveralls": "dev-master",
@@ -27,8 +31,8 @@
     "require": {
         "php": ">=5.4",
         "phpro/zf-doctrine-hydration-module": "dev-master",
-        "zfcampus/zf-apigility": "dev-master",
-        "zfcampus/zf-configuration": "dev-master"
+        "zfcampus/zf-apigility": "dev-develop",
+        "zfcampus/zf-configuration": "dev-develop"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
