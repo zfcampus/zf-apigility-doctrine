@@ -24,7 +24,10 @@ class DoctrineResource extends AbstractResourceListener
     implements ObjectManagerAwareInterface, ServiceManagerAwareInterface
 {
     use ProvidesObjectManager;
-
+    
+    /**
+     * @var ServiceManager 
+     */
     protected $serviceManager;
 
     public function setServiceManager(ServiceManager $serviceManager)
@@ -34,6 +37,9 @@ class DoctrineResource extends AbstractResourceListener
         return $this;
     }
 
+    /**
+     * @return ServiceManager
+     */
     public function getServiceManager()
     {
         return $this->serviceManager;
