@@ -31,7 +31,7 @@
     "require": {
         "php": ">=5.4",
         "phpro/zf-doctrine-hydration-module": "dev-master",
-        "zfcampus/zf-apigility": "~1.0"
+        "zfcampus/zf-apigility": "~1.0",
         "zfcampus/zf-configuration": "dev-develop"
     },
     "minimum-stability": "dev",
