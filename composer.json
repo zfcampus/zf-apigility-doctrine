@@ -26,11 +26,11 @@
         "satooshi/php-coveralls": "dev-master",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
+        "doctrine/mongodb-odm": "~1.0.0-beta9@dev"
     },
     "require": {
         "php": ">=5.4",
-        "phpro/zf-doctrine-hydration-module": "0.1.0",
+        "phpro/zf-doctrine-hydration-module": "~0.1.0",
         "zfcampus/zf-apigility": "~1.0",
         "zfcampus/zf-configuration": "dev-develop"
     },
