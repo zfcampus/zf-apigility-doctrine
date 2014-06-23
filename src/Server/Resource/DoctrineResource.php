@@ -158,24 +158,11 @@ class DoctrineResource extends AbstractResourceListener
      * @param  array            $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = array())
+    public function fetchAll($data = array())
     {
-        // Load parameters
-        $parameters = array_merge($this->getEvent()->getQueryParams()->toArray(), $params);
-
-        // @codeCoverageIgnoreStart
-        if ($this->getEvent()->getRouteParam('query')) {
-            $parameters['query'] = $this->getEvent()->getRouteParam('query');
-        }
-
-        if ($this->getEvent()->getRouteParam('orderBy')) {
-            $parameters['orderBy'] = $this->getEvent()->getRouteParam('orderBy');
-        }
-        // @codeCoverageIgnoreEnd
+        $objectManager = $this->getObjectManager();
 
         // Load the correct queryFactory:
-        $objectManager = $this->getObjectManager();
-        /** @var Query\ApigilityFetchAllQuery $fetchAllQuery */
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $fetchAllQuery = new Query\FetchAllOrmQuery();
             $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
@@ -190,7 +177,7 @@ class DoctrineResource extends AbstractResourceListener
 
         // Create collection
         $fetchAllQuery->setObjectManager($objectManager);
-        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $parameters);
+        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $data);
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $queryBuilder;
@@ -200,10 +187,10 @@ class DoctrineResource extends AbstractResourceListener
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        // Add event to set extra HAL parameters
+        // Add event to set extra HAL data
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
-            function ($e) use ($fetchAllQuery, $entityClass, $parameters) {
+            function ($e) use ($fetchAllQuery, $entityClass, $data) {
                 $halCollection = $e->getParam('collection');
                 $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
                 $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
@@ -215,7 +202,7 @@ class DoctrineResource extends AbstractResourceListener
                 ));
 
                 $halCollection->setCollectionRouteOptions(array(
-                    'query' => $parameters
+                    'query' => $data
                 ));
             }
         );
