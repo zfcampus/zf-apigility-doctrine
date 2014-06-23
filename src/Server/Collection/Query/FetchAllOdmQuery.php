@@ -26,7 +26,7 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
     /**
      * {@inheritDoc}
      */
-    public function createQuery($entityClass, array $parameters)
+    public function createQuery($entityClass, $parameters)
     {
         /** @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder */
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
