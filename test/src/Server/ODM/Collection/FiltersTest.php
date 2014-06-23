@@ -1,6 +1,6 @@
 <?php
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ODM\Collection;
+namespace ZFTest\Apigility\Doctrine\Server\ODM\Collection;
 
 use Zend\Http\Request;
 

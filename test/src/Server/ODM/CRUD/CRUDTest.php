@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ODM\CRUD;
+namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use General\Listener\EventCatcher;
 use Zend\Http\Request;
