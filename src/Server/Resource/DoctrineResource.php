@@ -28,6 +28,11 @@ class DoctrineResource extends AbstractResourceListener
 
     protected $serviceManager;
 
+    /**
+     * @var Query\ApigilityFetchAllQuery
+     */
+    protected $fetchAllQuery;
+
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
@@ -38,6 +43,22 @@ class DoctrineResource extends AbstractResourceListener
     public function getServiceManager()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * @param \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery $fetchAllQuery
+     */
+    public function setFetchAllQuery($fetchAllQuery)
+    {
+        $this->fetchAllQuery = $fetchAllQuery;
+    }
+
+    /**
+     * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
+     */
+    public function getFetchAllQuery()
+    {
+        return $this->fetchAllQuery;
     }
 
     /**
@@ -163,27 +184,16 @@ class DoctrineResource extends AbstractResourceListener
     {
         $objectManager = $this->getObjectManager();
 
-        // Load the correct queryFactory:
-        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $fetchAllQuery = new Query\FetchAllOrmQuery();
-            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
-        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
-            $fetchAllQuery = new Query\FetchAllOdmQuery();
-            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
-        } else {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
-        }
-            // @codeCoverageIgnoreEnd
-
-        // Create collection
-        $fetchAllQuery->setObjectManager($objectManager);
+        // Build query
+        $fetchAllQuery = $this->getFetchAllQuery();
         $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $data);
+
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $queryBuilder;
-            // @codeCoverageIgnoreEnd
         }
+            // @codeCoverageIgnoreEnd
+
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);

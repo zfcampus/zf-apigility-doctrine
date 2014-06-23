@@ -73,6 +73,37 @@ Reserved GET variables
     query
 ```
 
+Providing a base query
+----------------------
+
+This module uses an empty Doctrine query-builder to create the base query for a collection.
+In some cases you want to have more control over the query-builder.
+For example: When using soft deletes, you want to make sure that the end-user can only see the active records.
+Therefore it is also possible to use your own query provider.
+
+A custom plugin manager is available to register your own query providers.
+This can be done through following configuration:
+
+```php
+'zf-collection-query' => array(
+    'invokables' => array(
+        'custom-query-provider' => 'Application\My\Custom\QueryProvider',
+    )
+),
+```
+
+You have to make sure that this registered class implements the `ApigilityFetchAllQuery` interface.
+When the query provider is registered, you have to attach it to the doctrine-connected resource configuration:
+```php
+'zf-apigility' => array(
+    'doctrine-connected' => array(
+        'Api\\V1\\Rest\\....' => array(
+            'query_provider' => 'custom-query-provider',
+        ),
+    ),
+),
+```
+
 Sorting Collections
 -------------------
 
