@@ -161,7 +161,7 @@ class DoctrineResource extends AbstractResourceListener
     public function fetchAll($params = array())
     {
         // Load parameters
-        $parameters = $this->getEvent()->getQueryParams()->toArray();
+        $parameters = array_merge($this->getEvent()->getQueryParams()->toArray(), $params);
 
         // @codeCoverageIgnoreStart
         if ($this->getEvent()->getRouteParam('query')) {
