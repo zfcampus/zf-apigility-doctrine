@@ -14,6 +14,7 @@ use Zend\EventManager\StaticEventManager;
 use ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class DoctrineResource
@@ -202,7 +203,7 @@ class DoctrineResource extends AbstractResourceListener
                 ));
 
                 $halCollection->setCollectionRouteOptions(array(
-                    'query' => $data
+                    'query' => ArrayUtils::iteratorToArray($data)
                 ));
             }
         );
