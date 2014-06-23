@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\CRUD;
+namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
