@@ -7,6 +7,7 @@ use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
+use ZF\Apigility\Doctrine\Server\Resource\Query\FetchOrmQuery;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use ZF\Hal\Collection;
@@ -157,25 +158,21 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        /**
-         * Zoom would be a nice-to-have
-        $parameters = $this->getEvent()->getQueryParams()->toArray();
+        $objectManager = $this->getObjectManager();
 
-        if ($this->getEvent()->getRouteParam('zoom')) {
-            $parameters['zoom'] = $this->getEvent()->getRouteParam('zoom');
+        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
+            $parameters = $this->getEvent()->getQueryParams()->toArray();
+
+            $fetchQuery = new FetchOrmQuery();
+            $fetchQuery->setServiceLocator($this->getServiceManager());
+            $fetchQuery->setObjectManager($objectManager);
+
+            $query = $fetchQuery->createQuery($this->getEntityClass(), $id, $parameters);
+
+            return $query->getSingleResult();
+        } else {
+            return $this->getObjectManager()->find($this->getEntityClass(), $id);
         }
-
-        if (isset($parameters['zoom'])) {
-            foreach ($parameters['zoom'] as $collectionName) {
-                if ($this->getHydrator()->getExtractService()->hasStrategy($collectionName)) {
-                    $this->getHydrator()->getExtractService()->removeStrategy($collectionName);
-                    $this->getHydrator()->getExtractService()->addStrategy($collectionName, new CollectionExtract());
-                }
-            }
-        }
-        */
-
-        return $this->getObjectManager()->find($this->getEntityClass(), $id);
     }
 
     /**
