@@ -16,19 +16,23 @@
         }
     ],
     "require-dev": {
-        "zfcampus/zf-apigility-admin": "dev-master",
+        "zfcampus/zf-apigility-admin": "~1.0",
+        "zendframework/zend-test": ">=2.3",
+        "zendframework/zend-form": ">=2.3",
+        "zendframework/zend-serializer": ">=2.3",
+        "zendframework/zend-log": ">=2.3",
         "phpunit/phpunit": "3.7.*",
         "fabpot/php-cs-fixer": "0.4.*@dev",
         "satooshi/php-coveralls": "dev-master",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "1.0.0-beta9@dev"
+        "doctrine/mongodb-odm": "~1.0.0-beta9@dev"
     },
     "require": {
         "php": ">=5.4",
-        "phpro/zf-doctrine-hydration-module": "dev-master",
-        "zfcampus/zf-apigility": "dev-master",
-        "zfcampus/zf-configuration": "dev-master"
+        "phpro/zf-doctrine-hydration-module": "~0.1.0",
+        "zfcampus/zf-apigility": "~1.0",
+        "zfcampus/zf-configuration": "dev-develop"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
