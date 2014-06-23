@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Model\Server\ORM\Setup;
+namespace ZFTest\Apigility\Doctrine\Server\ORM\Setup;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
