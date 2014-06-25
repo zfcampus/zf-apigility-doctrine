@@ -14,7 +14,11 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
 
     protected $hydratorName;
 
-    protected $hydrateByValue = true;
+    protected $byValue;
+
+    protected $hydratorStrategies = array();
+
+    protected $useGeneratedHydrator;
 
     public function exchangeArray(array $data)
     {
@@ -29,8 +33,14 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
                 case 'hydratorname':
                     $this->hydratorName = $value;
                     break;
-                case 'hydratebyvalue':
-                    $this->hydrateByValue = $value;
+                case 'byvalue':
+                    $this->byValue = $value;
+                    break;
+                case 'hydratorstrategies':
+                    $this->hydratorStrategies = $value;
+                    break;
+                case 'usegeneratedhydrator':
+                    $this->useGeneratedHydrator = $value;
                     break;
                 default:
                     break;
@@ -40,12 +50,14 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
 
     public function getArrayCopy()
     {
-        $return = parent::getArrayCopy();
-        $return['object_manager'] = $this->objectManager;
-        $return['hydrator_name'] = $this->hydratorName;
-        $return['hydrate_by_value'] = $this->hydrateByValue;
-        $return['entity_identifier_name'] = $this->entityIdentifierName;
+        $data = parent::getArrayCopy();
+        $data['object_manager'] = $this->objectManager;
+        $data['hydrator_name'] = $this->hydratorName;
+        $data['by_value'] = $this->byValue;
+        $data['entity_identifier_name'] = $this->entityIdentifierName;
+        $data['hydrator_strategies'] = $this->hydratorStrategies;
+        $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 
-        return $return;
+        return $data;
     }
 }
