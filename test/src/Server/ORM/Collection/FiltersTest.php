@@ -55,7 +55,6 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
 
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
-print_r($body);die();
         $this->assertEquals(1, $body['count']);
 
         $queryString = http_build_query(
