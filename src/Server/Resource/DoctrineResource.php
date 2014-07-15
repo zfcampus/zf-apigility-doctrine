@@ -302,8 +302,7 @@ class DoctrineResource extends AbstractResourceListener
             // @codeCoverageIgnoreEnd
         }
 
-        $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array) $data, $entity);
+        $this->getHydrator()->hydrate((array) $data, $entity);
 
         $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
         $this->getObjectManager()->flush();
