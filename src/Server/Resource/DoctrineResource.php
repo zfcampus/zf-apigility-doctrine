@@ -135,7 +135,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->getEntityByIdAndRouteParams($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -191,7 +191,7 @@ class DoctrineResource extends AbstractResourceListener
         }
         */
 
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->getEntityByIdAndRouteParams($id);
         $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
 
         return $entity;
@@ -257,7 +257,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->getEntityByIdAndRouteParams($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -295,7 +295,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->getEntityByIdAndRouteParams($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -333,5 +333,47 @@ class DoctrineResource extends AbstractResourceListener
         $response = $eventManager->trigger($event);
         return $response;
     }
+    
+    /**
+     * Gets an entity by route params and the specified id
+     *
+     * @param $id
+     *
+     * @return object
+     */
+    protected function getEntityByIdAndRouteParams($id)
+    {
+        $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
+        $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
 
+        $criteria = array();
+
+        // Check if ID is a composite ID
+        if (strpos($id, '__') !== false) {
+            $compositeIdParts = explode('__', $id);
+            foreach ($compositeIdParts as $index => $compositeIdPart) {
+                $criteria[$identifierFieldNames[$index]] = $compositeIdPart;
+            }
+        } else {
+            $criteria[$identifierFieldNames[0]] = $id;
+        }
+
+        $routeMatch = $this->getEvent()->getRouteMatch();
+        $associationMappings = $classMetaData->getAssociationNames();
+        $fieldNames = $classMetaData->getFieldNames();
+
+        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
+            $fieldWithoutIdSuffix = substr($routeMatchParam, 0, strrpos($routeMatchParam, 'Id'));
+            if (in_array($fieldWithoutIdSuffix, $associationMappings)) {
+                $criteria[$fieldWithoutIdSuffix] = $value;
+            } elseif (in_array($routeMatchParam, $fieldNames)) {
+                $criteria[$routeMatchParam] = $value;
+            }
+        }
+
+        $entity = $this->getObjectManager()->getRepository($this->getEntityClass())
+            ->findOneBy($criteria);
+
+        return $entity;
+    }
 }
