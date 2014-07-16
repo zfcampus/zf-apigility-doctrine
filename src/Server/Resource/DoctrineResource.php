@@ -80,6 +80,23 @@ class DoctrineResource extends AbstractResourceListener
     }
 
     /**
+     * @var string
+     */
+    protected $multiKeyDelimiter = '.';
+
+    public function setMultiKeyDelimiter($value)
+    {
+        $this->multiKeyDelimiter = $value;
+
+        return $this;
+    }
+
+    public function getMultiKeyDelimiter()
+    {
+        return $this->multiKeyDelimiter;
+    }
+
+    /**
      * @var HydratorInterface
      */
     protected $hydrator;
@@ -135,7 +152,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -191,7 +208,7 @@ class DoctrineResource extends AbstractResourceListener
         }
         */
 
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
 
         return $entity;
@@ -257,7 +274,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -295,7 +312,7 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -334,4 +351,45 @@ class DoctrineResource extends AbstractResourceListener
         return $response;
     }
 
+    /**
+     * Gets an entity by route params and/or the specified id
+     *
+     * @param $id
+     *
+     * @return object
+     */
+    protected function findEntity($id)
+    {
+        $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
+        $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
+
+        $criteria = array();
+
+        // Check if ID is a composite ID
+        if (strpos($id, $this->getMultiKeyDelimiter()) !== false) {
+            $compositeIdParts = explode($this->getMultiKeyDelimiter(), $id);
+            foreach ($compositeIdParts as $index => $compositeIdPart) {
+                $criteria[$identifierFieldNames[$index]] = $compositeIdPart;
+            }
+        } else {
+            $criteria[$identifierFieldNames[0]] = $id;
+        }
+
+        $routeMatch = $this->getEvent()->getRouteMatch();
+        $associationMappings = $classMetaData->getAssociationNames();
+        $fieldNames = $classMetaData->getFieldNames();
+
+        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
+            if (in_array($routeMatchParam, $associationMappings)) {
+                $criteria[$routeMatchParam] = $value;
+            } elseif (in_array($routeMatchParam, $fieldNames)) {
+                $criteria[$routeMatchParam] = $value;
+            }
+        }
+
+        $entity = $this->getObjectManager()->getRepository($this->getEntityClass())
+            ->findOneBy($criteria);
+
+        return $entity;
+    }
 }
