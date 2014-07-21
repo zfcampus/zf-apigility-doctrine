@@ -97,6 +97,34 @@ class DoctrineResource extends AbstractResourceListener
     }
 
     /**
+     * For /multi/1/keyed/2/routes/3 the route parameter
+     * names may include an id suffix (e.g. id, _id, Id)
+     * and this will be striped to create criteria
+     *
+     * Example
+     * $objectManager->getRepository(...)->findOneBy(
+         'multi' => 1,
+         'keyed' => 2,
+         'routes' => 3
+      );
+     *
+     * @var string
+     */
+    protected $stripRouteParameterSuffix = '_id';
+
+    public function setStripRouteParameterSuffix($value)
+    {
+        $this->stripRouteParameterSuffix = $value;
+
+        return $this;
+    }
+
+    public function getStripRouteParameterSuffix()
+    {
+        return $this->stripRouteParameterSuffix;
+    }
+
+    /**
      * @var HydratorInterface
      */
     protected $hydrator;
@@ -380,9 +408,17 @@ class DoctrineResource extends AbstractResourceListener
         $fieldNames = $classMetaData->getFieldNames();
 
         foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
-            if (in_array($routeMatchParam, $associationMappings)) {
-                $criteria[$routeMatchParam] = $value;
-            } elseif (in_array($routeMatchParam, $fieldNames)) {
+
+            if (substr($routeMatchParam,
+                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix()))) {
+
+                $routeMatchParam = substr($routeMatchParam, 0,
+                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix()));
+            }
+
+            if (in_array($routeMatchParam, $associationMappings)
+                or in_array($routeMatchParam, $fieldNames)) {
+
                 $criteria[$routeMatchParam] = $value;
             }
         }

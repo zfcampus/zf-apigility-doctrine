@@ -58,6 +58,7 @@ Hydrating Entities by Value or Reference
 
 By default the admin tool hydrates entities by reference by setting `$config['doctrine-hydrator']['hydrator_class']['by_value']` to false.
 
+
 Custom Events
 =============
 It is possible to hook in on specific doctrine events of the type `DoctrineResourceEvent`.
@@ -96,6 +97,39 @@ It is also possible to add custom event listeners to the configuration of a sing
     ),
 ),
 ```
+
+Querying Single Entities
+========================
+
+Multi-keyed entities
+--------------------
+
+You may delimit multi keys through the route parameter.  The default
+delimter is a period . (e.g. 1.2.3).  You may change the delimiter by
+setting the DoctrineResource::setMultiKeyDelimiter($value)
+
+
+Complex queries through route parameters
+----------------------------------------
+
+You may specify multiple route parameters and as long as the route
+matches then the route parameter names will be matched to the entity.
+
+For instance, a route of ```/api/artist/:artist_id/album/:album_id``` mapped to the Album
+entity will filter the Album for field names.  So, given an album with id, name, and artist
+fields the album_id matches to the resoruce configuration and will be queried by key
+and the artist is a field on album and will be queried by criteria so the final query
+would be 
+
+```
+$objectManager->getRepository('Album')->findOneBy(
+    'id' => :album_id,
+    'artist' => :artist_id
+);
+```
+
+The album(_id) is not a field on the Album entity and will be ignored.
+
 
 Collections
 ===========
