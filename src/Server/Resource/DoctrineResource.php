@@ -396,6 +396,11 @@ class DoctrineResource extends AbstractResourceListener
         // Check if ID is a composite ID
         if (strpos($id, $this->getMultiKeyDelimiter()) !== false) {
             $compositeIdParts = explode($this->getMultiKeyDelimiter(), $id);
+
+            if (sizeof($compositeIdParts) != sizeof($identifierFieldNames)) {
+                return new ApiProblem(500, 'Invalid multi identifier count.  ' . sizeof($compositeIdParts) . " must equal " . sizeof($identifierFieldNames));
+            }
+
             foreach ($compositeIdParts as $index => $compositeIdPart) {
                 $criteria[$identifierFieldNames[$index]] = $compositeIdPart;
             }
