@@ -125,7 +125,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             // No DB-connected configuration for this service; nothing to do
             return;
         }
-        $config = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
+        
+        //TODO : Move hydrators handling into separate model ?
+        $configResource = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
+        
+        if (isset($config['doctrine-hydrator']) && isset($config['doctrine-hydrator'][$configResource['hydrator']])) {
+        	$configHydrator = $config['doctrine-hydrator'][$configResource['hydrator']];
+	        $config = $configResource + $configHydrator;
+        } else {
+        	$config = $configResource;
+        }
 
         $doctrineEntity = new DoctrineRestServiceEntity();
         $doctrineEntity->exchangeArray(array_merge($entity->getArrayCopy(), $config));
@@ -418,6 +427,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $this->updateRoute($original, $update);
         $this->updateRestConfig($original, $update);
+        $this->updateDoctrineConfig($original, $update);
         $this->updateContentNegotiationConfig($original, $update);
 
         return $this->fetch($controllerService);
@@ -886,6 +896,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $key = $baseKey . 'content-type-whitelist.' . $service;
             $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
+    }
+    
+    public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
+    {
+    	$patch = array();
+    	$patch['object_manager'] = $update->objectManager;
+    	$basekey = 'zf-apigility.doctrine-connected.';
+    	$resource = $update->resourceClass;
+    	
+    	$this->configResource->patchKey($basekey . $resource, $patch);
     }
 
     /**
