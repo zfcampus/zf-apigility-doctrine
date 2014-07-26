@@ -14,11 +14,11 @@ class DoctrineRestServiceEntity extends RestServiceEntity
 
     protected $objectManager;
 
-    protected $byValue;
+    protected $byValue = true;
 
     protected $hydratorStrategies = array();
 
-    protected $useGeneratedHydrator;
+    protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
     {

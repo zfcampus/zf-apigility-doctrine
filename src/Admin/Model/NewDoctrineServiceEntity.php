@@ -14,11 +14,11 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
 
     protected $hydratorName;
 
-    protected $byValue;
+    protected $byValue = true;
 
     protected $hydratorStrategies = array();
 
-    protected $useGeneratedHydrator;
+    protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
     {
