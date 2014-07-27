@@ -756,7 +756,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Verify the object manager exists
         $objectManager = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = (isset($entityValue['hydratorStrategies'])) ? $entityValue['hydratorStrategies']: array();
+        $hydratorStrategies = (isset($entityValue['hydrator_strategies'])) ? $entityValue['hydrator_strategies']: array();
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
