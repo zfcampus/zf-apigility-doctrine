@@ -262,6 +262,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if ($eventResults->stopped()) {
             return $eventResults->last();
         }
+        
+        if (!isset($entity->serviceName)
+        		|| empty($entity->serviceName)
+        ) {
+        	$serviceName = $controllerService;
+        	$q = preg_quote('\\');
+        	if (preg_match('#' . $q . 'V[^' . $q . ']+' . $q . 'Rest' . $q . '(?<service>[^' . $q . ']+)' . $q . 'Controller#', $controllerService, $matches)) {
+        		$serviceName = $matches['service'];
+        	}
+        	$entity->exchangeArray(array(
+        		'service_name' => $serviceName,
+        	));
+        }
 
         // @codeCoverageIgnoreEnd
         return $entity;
