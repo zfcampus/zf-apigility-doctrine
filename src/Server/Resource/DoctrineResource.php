@@ -252,8 +252,6 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function fetchAll($data = array())
     {
-        $objectManager = $this->getObjectManager();
-
         // Build query
         $fetchAllQuery = $this->getFetchAllQuery();
         $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $data);
@@ -277,7 +275,7 @@ class DoctrineResource extends AbstractResourceListener
                 $halCollection = $e->getParam('collection');
                 $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
                 $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
-
+                
                 $halCollection->setAttributes(array(
                    'count' => $halCollection->getCollection()->getCurrentItemCount(),
                    'total' => $halCollection->getCollection()->getTotalItemCount(),
