@@ -247,7 +247,7 @@ class DoctrineResource extends AbstractResourceListener
      *
      *
      * @see Apigility/Doctrine/Server/Resource/AbstractResource.php
-     * @param  array            $params
+     * @param  array            $data
      * @return ApiProblem|mixed
      */
     public function fetchAll($data = array())
