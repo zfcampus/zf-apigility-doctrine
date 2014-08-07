@@ -14,7 +14,11 @@ class DoctrineRestServiceEntity extends RestServiceEntity
 
     protected $objectManager;
 
-    protected $hydrateByValue;
+    protected $byValue = true;
+
+    protected $hydratorStrategies = array();
+
+    protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
     {
@@ -30,8 +34,14 @@ class DoctrineRestServiceEntity extends RestServiceEntity
                 case 'objectmanager':
                     $this->objectManager = $value;
                     break;
-                case 'hydratebyvalue':
-                    $this->hydrateByValue = $value;
+                case 'byvalue':
+                    $this->byValue = $value;
+                    break;
+                case 'hydratorstrategies':
+                    $this->hydratorStrategies = $value;
+                    break;
+                case 'usegeneratedhydrator':
+                    $this->useGeneratedHydrator = $value;
                     break;
             }
         }
@@ -42,7 +52,9 @@ class DoctrineRestServiceEntity extends RestServiceEntity
         $data = parent::getArrayCopy();
         $data['hydrator_name']      = $this->hydratorName;
         $data['object_manager']     = $this->objectManager;
-        $data['hydrate_by_value']   = $this->hydrateByValue;
+        $data['by_value']   = $this->byValue;
+        $data['hydrator_strategies'] = $this->hydratorStrategies;
+        $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 
         return $data;
     }

@@ -5,15 +5,17 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerAwareTrait;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use ZF\Hal\Collection;
 use Zend\EventManager\StaticEventManager;
-use ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionExtract;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class DoctrineResource
@@ -21,12 +23,31 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener
-    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface
+    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface, EventManagerAwareInterface
 {
     use ProvidesObjectManager;
+    use EventManagerAwareTrait;
 
+    /**
+     * @var array
+     */
+    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
+
+    /**
+     * @var ServiceManager
+     */
     protected $serviceManager;
 
+    /**
+     * @var Query\ApigilityFetchAllQuery
+     */
+    protected $fetchAllQuery;
+
+    /**
+     * @param ServiceManager $serviceManager
+     *
+     * @return $this
+     */
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
@@ -34,9 +55,73 @@ class DoctrineResource extends AbstractResourceListener
         return $this;
     }
 
+    /**
+     * @return ServiceManager
+     */
     public function getServiceManager()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * @param \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery $fetchAllQuery
+     */
+    public function setFetchAllQuery($fetchAllQuery)
+    {
+        $this->fetchAllQuery = $fetchAllQuery;
+    }
+
+    /**
+     * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
+     */
+    public function getFetchAllQuery()
+    {
+        return $this->fetchAllQuery;
+    }
+
+    /**
+     * @var string
+     */
+    protected $multiKeyDelimiter = '.';
+
+    public function setMultiKeyDelimiter($value)
+    {
+        $this->multiKeyDelimiter = $value;
+
+        return $this;
+    }
+
+    public function getMultiKeyDelimiter()
+    {
+        return $this->multiKeyDelimiter;
+    }
+
+    /**
+     * For /multi/1/keyed/2/routes/3 the route parameter
+     * names may include an id suffix (e.g. id, _id, Id)
+     * and this will be striped to create criteria
+     *
+     * Example
+     * $objectManager->getRepository(...)->findOneBy(
+         'multi' => 1,
+         'keyed' => 2,
+         'routes' => 3
+      );
+     *
+     * @var string
+     */
+    protected $stripRouteParameterSuffix = '_id';
+
+    public function setStripRouteParameterSuffix($value)
+    {
+        $this->stripRouteParameterSuffix = $value;
+
+        return $this;
+    }
+
+    public function getStripRouteParameterSuffix()
+    {
+        return $this->stripRouteParameterSuffix;
     }
 
     /**
@@ -79,8 +164,10 @@ class DoctrineResource extends AbstractResourceListener
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
 
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
 
         return $entity;
     }
@@ -93,15 +180,17 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
             // @codeCoverageIgnoreEnd
 
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
 
         return true;
     }
@@ -147,7 +236,10 @@ class DoctrineResource extends AbstractResourceListener
         }
         */
 
-        return $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
+
+        return $entity;
     }
 
     /**
@@ -155,67 +247,45 @@ class DoctrineResource extends AbstractResourceListener
      *
      *
      * @see Apigility/Doctrine/Server/Resource/AbstractResource.php
-     * @param  array            $params
+     * @param  array            $data
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = array())
+    public function fetchAll($data = array())
     {
-        // Load parameters
-        $parameters = $this->getEvent()->getQueryParams()->toArray();
+        // Build query
+        $fetchAllQuery = $this->getFetchAllQuery();
+        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $data);
 
-        // @codeCoverageIgnoreStart
-        if ($this->getEvent()->getRouteParam('query')) {
-            $parameters['query'] = $this->getEvent()->getRouteParam('query');
-        }
-
-        if ($this->getEvent()->getRouteParam('orderBy')) {
-            $parameters['orderBy'] = $this->getEvent()->getRouteParam('orderBy');
-        }
-        // @codeCoverageIgnoreEnd
-
-        // Load the correct queryFactory:
-        $objectManager = $this->getObjectManager();
-        /** @var Query\ApigilityFetchAllQuery $fetchAllQuery */
-        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $fetchAllQuery = new Query\FetchAllOrmQuery();
-            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOrmCollectionFilterManager'));
-        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
-            $fetchAllQuery = new Query\FetchAllOdmQuery();
-            $fetchAllQuery->setFilterManager($this->getServiceManager()->get('ZfOdmCollectionFilterManager'));
-        } else {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No valid doctrine module is found for objectManager ' . get_class($objectManager));
-        }
-            // @codeCoverageIgnoreEnd
-
-        // Create collection
-        $fetchAllQuery->setObjectManager($objectManager);
-        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $parameters);
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $queryBuilder;
-            // @codeCoverageIgnoreEnd
         }
+            // @codeCoverageIgnoreEnd
+
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        // Add event to set extra HAL parameters
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
+
+        // Add event to set extra HAL data
         $entityClass = $this->getEntityClass();
         StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
-            function ($e) use ($fetchAllQuery, $entityClass, $parameters) {
+            function ($e) use ($fetchAllQuery, $entityClass, $data) {
                 $halCollection = $e->getParam('collection');
-                $halCollection->getCollection()->setItemCountPerPage($halCollection->getPageSize());
-                $halCollection->getCollection()->setCurrentPageNumber($halCollection->getPage());
+                $collection = $halCollection->getCollection();
+                
+                $collection->setItemCountPerPage($halCollection->getPageSize());
+                $collection->setCurrentPageNumber($halCollection->getPage());
 
                 $halCollection->setAttributes(array(
-                   'count' => $halCollection->getCollection()->getCurrentItemCount(),
-                   'total' => $halCollection->getCollection()->getTotalItemCount(),
+                   'count' => $collection->getCurrentItemCount(),
+                   'total' => $collection->getTotalItemCount(),
                    'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
                 ));
 
                 $halCollection->setCollectionRouteOptions(array(
-                    'query' => $parameters
+                    'query' => ArrayUtils::iteratorToArray($data)
                 ));
             }
         );
@@ -232,21 +302,19 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
         }
             // @codeCoverageIgnoreEnd
 
-        // Load full data:
-        $hydrator = $this->getHydrator();
-        $originalData = $hydrator->extract($entity);
-        $patchedData = array_merge($originalData, (array) $data);
+        // Hydrate entity with patched data
+        $this->getHydrator()->hydrate((array) $data, $entity);
 
-        // Hydrate entity
-        $hydrator->hydrate($patchedData, $entity);
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
         $this->getObjectManager()->flush();
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
 
         return $entity;
     }
@@ -272,18 +340,97 @@ class DoctrineResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        $entity = $this->getObjectManager()->find($this->getEntityClass(), $id);
+        $entity = $this->findEntity($id);
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
             // @codeCoverageIgnoreEnd
         }
 
-        $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array) $data, $entity);
+        $this->getHydrator()->hydrate((array) $data, $entity);
+
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
         $this->getObjectManager()->flush();
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
 
         return $entity;
     }
 
+    /**
+     * This method will give custom listeners te chance to alter entities / collections.
+     * The listeners are not allowed to give an early result.
+     * It is possible to throw Exceptions, which will result in an ApiProblem eventually.
+     *
+     * @param      $name
+     * @param      $entity
+     * @param null $collection
+     *
+     * @return \Zend\EventManager\ResponseCollection
+     */
+    protected function triggerDoctrineEvent($name, $entity, $collection = null)
+    {
+        $event = new DoctrineResourceEvent($name, $this);
+        $event->setEntity($entity);
+        $event->setCollection($collection);
+        $event->setResourceEvent($this->getEvent());
+
+        $eventManager = $this->getEventManager();
+        $response = $eventManager->trigger($event);
+        return $response;
+    }
+
+    /**
+     * Gets an entity by route params and/or the specified id
+     *
+     * @param $id
+     *
+     * @return object
+     */
+    protected function findEntity($id)
+    {
+        $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
+        $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
+
+        $criteria = array();
+
+        // Check if ID is a composite ID
+        if (strpos($id, $this->getMultiKeyDelimiter()) !== false) {
+            $compositeIdParts = explode($this->getMultiKeyDelimiter(), $id);
+
+            if (sizeof($compositeIdParts) != sizeof($identifierFieldNames)) {
+                return new ApiProblem(500, 'Invalid multi identifier count.  ' . sizeof($compositeIdParts) . " must equal " . sizeof($identifierFieldNames));
+            }
+
+            foreach ($compositeIdParts as $index => $compositeIdPart) {
+                $criteria[$identifierFieldNames[$index]] = $compositeIdPart;
+            }
+        } else {
+            $criteria[$identifierFieldNames[0]] = $id;
+        }
+
+        $routeMatch = $this->getEvent()->getRouteMatch();
+        $associationMappings = $classMetaData->getAssociationNames();
+        $fieldNames = $classMetaData->getFieldNames();
+
+        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
+
+            if (substr($routeMatchParam,
+                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix()))) {
+
+                $routeMatchParam = substr($routeMatchParam, 0,
+                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix()));
+            }
+
+            if (in_array($routeMatchParam, $associationMappings)
+                or in_array($routeMatchParam, $fieldNames)) {
+
+                $criteria[$routeMatchParam] = $value;
+            }
+        }
+
+        $entity = $this->getObjectManager()->getRepository($this->getEntityClass())
+            ->findOneBy($criteria);
+
+        return $entity;
+    }
 }

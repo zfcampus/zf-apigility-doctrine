@@ -40,7 +40,7 @@ class FetchAllOrmQuery
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery($entityClass, array $parameters)
+    public function createQuery($entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
 

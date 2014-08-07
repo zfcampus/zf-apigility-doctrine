@@ -381,6 +381,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->createContentNegotiationConfig($entity, $controllerService);
         $this->createHalConfig($entity, $entityClass, $collectionClass, $routeName);
         $this->createDoctrineConfig($entity, $entityClass, $collectionClass, $routeName);
+        $this->createDoctrineHydratorConfig($entity, $entityClass, $collectionClass, $routeName);
 
         $this->getEventManager()->trigger(
             __FUNCTION__,
@@ -653,7 +654,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                 'collection_name'            => $details->collectionName,
                 'entity_http_methods'        => $details->entityHttpMethods,
                 'collection_http_methods'    => $details->collectionHttpMethods,
-                'collection_query_whitelist' => $details->collectionQueryWhitelist,
+                'collection_query_whitelist'    => ($details->collectionQueryWhitelist) ?: array('query', 'orderBy'),
                 'page_size'                  => $details->pageSize,
                 'page_size_param'            => $details->pageSizeParam,
                 'entity_class'               => $details->entityClass,
@@ -726,20 +727,36 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
-            'doctrine-hydrator' => array(
-                $details->hydratorName => array(
-                    'entity_class' => $entityClass,
-                    'object_manager' => $details->objectManager,
-                    'by_value' => $entityValue['hydrate_by_value'],
-                    'strategies' => $hydratorStrategies,
-                ),
-            ),
             'zf-apigility' => array(
                 'doctrine-connected' => array(
                     $details->resourceClass => array(
                         'object_manager' => $details->objectManager,
                         'hydrator' => $details->hydratorName,
                     ),
+                ),
+            ),
+        );
+
+        $this->configResource->patch($config, true);
+    }
+
+    public function createDoctrineHydratorConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
+    {
+        $entityValue = $details->getArrayCopy();
+
+        // Verify the object manager exists
+        $objectManager = $this->getServiceManager()->get($details->objectManager);
+        $hydratorStrategies = (isset($entityValue['hydratorStrategies'])) ? $entityValue['hydratorStrategies']: array();
+
+        // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
+        $config = array(
+            'doctrine-hydrator' => array(
+                $details->hydratorName => array(
+                    'entity_class' => $entityClass,
+                    'object_manager' => $details->objectManager,
+                    'by_value' => $entityValue['by_value'],
+                    'strategies' => $hydratorStrategies,
+                    'use_generated_hydrator' => $entityValue['use_generated_hydrator'],
                 ),
             ),
         );

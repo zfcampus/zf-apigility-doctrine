@@ -4,7 +4,7 @@
 // to reset the output of this test if the unit tests
 // fail the application.
 
-namespace ZFTest\Apigility\Doctrine\Admin\Model\Server\ODM\Setup;
+namespace ZFTest\Apigility\Doctrine\Server\Model\Server\ODM\Setup;
 
 class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {

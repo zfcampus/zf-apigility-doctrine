@@ -1,6 +1,6 @@
 <?php
 
-namespace ZFTest\Apigility\Doctrine\Admin\Server\ORM\Collection;
+namespace ZFTest\Apigility\Doctrine\Server\ORM\Collection;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;

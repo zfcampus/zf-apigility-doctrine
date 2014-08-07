@@ -1,2 +1,3 @@
 rm -rf ./test/assets/module/Db
 rm -rf ./test/assets/module/DbApi
+rm -rf ./test/assets/module/General
