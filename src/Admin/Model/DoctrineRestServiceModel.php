@@ -81,7 +81,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         'collectionQueryWhitelist' => 'collection_query_whitelist',
         'entityHttpMethods'      => 'entity_http_methods',
     );
-
+    
+    protected $doctrineHydratorOptions = array(
+    	'entityClass'              => 'entity_class',
+    	'objectManager'            => 'object_manager',
+    	'byValue'                  => 'by_value',
+    	'useGeneratedHydrator'     => 'use_generated_hydrator',
+    	'hydratorStrategies'       => 'hydrator_strategies',
+    );
+    
     /**
      * @var FilterChain
      */
@@ -125,7 +133,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             // No DB-connected configuration for this service; nothing to do
             return;
         }
-        $config = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
+        
+        //TODO : Move hydrators handling into separate model ?
+        $configResource = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
+        
+        if (isset($config['doctrine-hydrator']) && isset($config['doctrine-hydrator'][$configResource['hydrator']])) {
+        	$configHydrator = $config['doctrine-hydrator'][$configResource['hydrator']];
+	        $config = array_merge($configResource,$configHydrator);
+        } else {
+        	$config = $configResource;
+        }
 
         $doctrineEntity = new DoctrineRestServiceEntity();
         $doctrineEntity->exchangeArray(array_merge($entity->getArrayCopy(), $config));
@@ -226,7 +243,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $restConfig['module']                = $this->module;
         $restConfig['resource_class']        = $restConfig['listener'];
         unset($restConfig['listener']);
-
         $entity = new DoctrineRestServiceEntity();
         $entity->exchangeArray($restConfig);
 
@@ -245,6 +261,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         });
         if ($eventResults->stopped()) {
             return $eventResults->last();
+        }
+        
+        if (!isset($entity->serviceName)
+        		|| empty($entity->serviceName)
+        ) {
+        	$serviceName = $controllerService;
+        	$q = preg_quote('\\');
+        	if (preg_match('#' . $q . 'V[^' . $q . ']+' . $q . 'Rest' . $q . '(?<service>[^' . $q . ']+)' . $q . 'Controller#', $controllerService, $matches)) {
+        		$serviceName = $matches['service'];
+        	}
+        	$entity->exchangeArray(array(
+        		'service_name' => $serviceName,
+        	));
         }
 
         // @codeCoverageIgnoreEnd
@@ -339,6 +368,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             // @codeCoverageIgnoreEnd
         }
 
+        if (!$this->getServiceManager()->has($details->objectManager)) {
+        	// @codeCoverageIgnoreStart
+        	throw new CreationException('Invalid object manager specified. Must be declared in the service manager.', 422);
+        	// @codeCoverageIgnoreEnd
+        }
+
         $entity       = new DoctrineRestServiceEntity();
         $entity->exchangeArray($details->getArrayCopy());
 
@@ -418,6 +453,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $this->updateRoute($original, $update);
         $this->updateRestConfig($original, $update);
+        $this->updateDoctrineConfig($original, $update);
+        $this->updateDoctrineHydratorConfig($original, $update);
         $this->updateContentNegotiationConfig($original, $update);
 
         return $this->fetch($controllerService);
@@ -746,7 +783,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Verify the object manager exists
         $objectManager = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = (isset($entityValue['hydratorStrategies'])) ? $entityValue['hydratorStrategies']: array();
+        $hydratorStrategies = (isset($entityValue['hydrator_strategies'])) ? $entityValue['hydrator_strategies']: array();
+        
+        foreach ($hydratorStrategies as $strategy) {
+	        if (!$this->getServiceManager()->has($strategy)) {
+	    		// @codeCoverageIgnoreStart
+	    		throw new CreationException('Invalid strategy specified. Must be declared in the service manager.');
+	    		// @codeCoverageIgnoreEnd
+	    	}
+        }
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
@@ -755,7 +800,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     'entity_class' => $entityClass,
                     'object_manager' => $details->objectManager,
                     'by_value' => $entityValue['by_value'],
-                    'strategies' => $hydratorStrategies,
+                    'hydrator_strategies' => $hydratorStrategies,
                     'use_generated_hydrator' => $entityValue['use_generated_hydrator'],
                 ),
             ),
@@ -846,12 +891,24 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         updateArrayOptions:
 
         foreach ($this->restArrayUpdateOptions as $property => $configKey) {
-            if (!$update->$property) {
+            if ($update->$property === null) {
                 continue;
             }
             $key = sprintf('zf-rest.%s.%s', $original->controllerServiceName, $configKey);
             $this->configResource->patchKey($key, $update->$property);
         }
+    }
+    
+    public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
+    {
+    	$patch = array();
+    	foreach ($this->doctrineHydratorOptions as $property => $configKey) {
+    		if ($update->$property === null) {
+    			continue;
+    		}
+    		$key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
+    		$this->configResource->patchKey($key, $update->$property);
+    	}
     }
 
     /**
@@ -886,6 +943,17 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $key = $baseKey . 'content-type-whitelist.' . $service;
             $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
+    }
+    
+    public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
+    {
+    	$patch = array();
+    	$patch['object_manager'] = $update->objectManager;
+    	$patch['hydrator'] = $update->hydratorName;
+    	$basekey = 'zf-apigility.doctrine-connected.';
+    	$resource = $update->resourceClass;
+    	
+    	$this->configResource->patchKey($basekey . $resource, $patch);
     }
 
     /**
