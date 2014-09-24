@@ -300,15 +300,21 @@ If you have a date field which is just Y-m-d then add the format to the query.
 Joining Entities and Aliasing Queries 
 -------------------------------------
 
-There is an available Query Type for Inner Join so for every query type there is an optional ```alias```.
+There is an available ORM Query Type for Inner Join so for every query type there is an optional ```alias```.
 The default alias is 'row' and refers to the entity at the heart of the Rest resource.
 
 This example joins the report field through the inner join already defined on the row entity then filters
 for r.id = 2
 
 ```php
-    array('type' => 'innerjoin', 'parentAlias' => 'row', 'field' => 'report', 'alias' => 'r'),
+    array('type' => 'innerjoin', 'field' => 'report', 'alias' => 'r'),
     array('type' => 'eq', 'alias' => 'r', 'field' => 'id', 'value' => '2')
+```
+
+You can inner join tables from an inner join using parentAlias
+
+```php
+    array('type' => 'innerjoin', 'parentAlias' => 'r', 'field' => 'owner', 'alias' => 'o'),
 ```
 
 
