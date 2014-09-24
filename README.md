@@ -296,6 +296,22 @@ If you have a date field which is just Y-m-d then add the format to the query.
     'value' => '2014-02-04',
 ```
 
+
+Joining Entities and Aliasing Queries 
+-------------------------------------
+
+There is an available Query Type for Inner Join so for every query type there is an optional ```alias```.
+The default alias is 'row' and refers to the entity at the heart of the Rest resource.
+
+This example joins the report field through the inner join already defined on the row entity then filters
+for r.id = 2
+
+```php
+    array('type' => 'innerjoin', 'parentAlias' => 'row', 'field' => 'report', 'alias' => 'r'),
+    array('type' => 'eq', 'alias' => 'r', 'field' => 'id', 'value' => '2')
+```
+
+
 Available Query Types
 ---------------------
 

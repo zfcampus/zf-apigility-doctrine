@@ -18,6 +18,10 @@ class Between extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];
@@ -29,7 +33,7 @@ class Between extends AbstractFilter
         $fromParameter = uniqid('a');
         $toParameter = uniqid('a');
 
-        $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], ":$fromParameter", ":$toParameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->between($option['alias'] . '.' . $option['field'], ":$fromParameter", ":$toParameter"));
         $queryBuilder->setParameters(array($fromParameter => $from, $toParameter => $to));
     }
 }

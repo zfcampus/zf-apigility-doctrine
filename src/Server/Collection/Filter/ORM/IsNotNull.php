@@ -18,6 +18,10 @@ class IsNotNull extends AbstractFilter
             $queryType = 'andWhere';
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull('row.' . $option['field']));
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
+        $queryBuilder->$queryType($queryBuilder->expr()->isNotNull($option['alias'] . '.' . $option['field']));
     }
 }

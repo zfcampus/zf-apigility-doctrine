@@ -18,6 +18,10 @@ class LessThan extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];
@@ -26,7 +30,7 @@ class LessThan extends AbstractFilter
         $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
 
         $parameter = uniqid('a');
-        $queryBuilder->$queryType($queryBuilder->expr()->lt('row.' . $option['field'], ":$parameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->lt($option['alias'] . '.' . $option['field'], ":$parameter"));
         $queryBuilder->setParameter($parameter, $value);
     }
 }

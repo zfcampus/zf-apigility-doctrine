@@ -18,6 +18,10 @@ class NotIn extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];
@@ -29,7 +33,7 @@ class NotIn extends AbstractFilter
         }
 
         $parameter = uniqid('a');
-        $queryBuilder->$queryType($queryBuilder->expr()->notIn('row.' . $option['field'], ":$parameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->notIn($option['alias'] . '.' . $option['field'], ":$parameter"));
         $queryBuilder->setParameter($parameter, $queryValues);
     }
 }

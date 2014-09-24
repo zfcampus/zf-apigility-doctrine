@@ -18,6 +18,10 @@ class In extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];
@@ -29,7 +33,7 @@ class In extends AbstractFilter
         }
 
         $parameter = uniqid('a');
-        $queryBuilder->$queryType($queryBuilder->expr()->in('row.' . $option['field'], ":$parameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->in($option['alias'] . '.' . $option['field'], ":$parameter"));
         $queryBuilder->setParameter($parameter, $queryValues);
     }
 }

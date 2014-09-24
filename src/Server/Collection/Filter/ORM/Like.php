@@ -18,6 +18,10 @@ class Like extends AbstractFilter
             $queryType = 'andWhere';
         }
 
-        $queryBuilder->$queryType($queryBuilder->expr()->like('row.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
+        $queryBuilder->$queryType($queryBuilder->expr()->like($option['alias'] . '.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
     }
 }
