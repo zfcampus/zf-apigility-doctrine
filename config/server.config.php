@@ -43,7 +43,6 @@ return array(
             'notlike' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\NotLike',
             'orx' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\OrX',
             'andx' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\AndX',
-            'innerjoin' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\InnerJoin',
         ),
     ),
 
