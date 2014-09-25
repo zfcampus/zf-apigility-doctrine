@@ -317,10 +317,10 @@ You can inner join tables from an inner join using parentAlias
     array('type' => 'innerjoin', 'parentAlias' => 'r', 'field' => 'owner', 'alias' => 'o'),
 ```
 
-The InnerJoin Query Type is not enabled by default.  
+The Inner Join Query Type is not enabled by default.  
 To enable it add this to your configuration (e.g. ```config/autoload/global.php```)
 
-```
+```php
     'zf-orm-collection-filter' => array(
         'invokables' => array(
             'innerjoin' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\InnerJoin',
@@ -330,7 +330,7 @@ To enable it add this to your configuration (e.g. ```config/autoload/global.php`
 
 To disable any filters do the same but set the value to null
 
-```
+```php
     'zf-orm-collection-filter' => array(
         'invokables' => array(
             'notlike' => null,
