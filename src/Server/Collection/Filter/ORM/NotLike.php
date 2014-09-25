@@ -2,7 +2,7 @@
 
 namespace ZF\Apigility\Doctrine\Server\Collection\Filter\ORM;
 
-class GreaterThan extends AbstractFilter
+class NotLike extends AbstractFilter
 {
     public function filter($queryBuilder, $metadata, $option)
     {
@@ -22,15 +22,6 @@ class GreaterThan extends AbstractFilter
             $option['alias'] = 'row';
         }
 
-        $format = null;
-        if (isset($option['format'])) {
-            $format = $option['format'];
-        }
-
-        $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
-
-        $parameter = uniqid('a');
-        $queryBuilder->$queryType($queryBuilder->expr()->gt($option['alias'] . '.' . $option['field'], ":$parameter"));
-        $queryBuilder->setParameter($parameter, $value);
+        $queryBuilder->$queryType($queryBuilder->expr()->notlike($option['alias'] . '.' . $option['field'], $queryBuilder->expr()->literal($option['value'])));
     }
 }

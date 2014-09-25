@@ -18,6 +18,10 @@ class GreaterThanOrEquals extends AbstractFilter
             $queryType = 'andWhere';
         }
 
+        if (!isset($option['alias'])) {
+            $option['alias'] = 'row';
+        }
+
         $format = null;
         if (isset($option['format'])) {
             $format = $option['format'];
@@ -26,7 +30,7 @@ class GreaterThanOrEquals extends AbstractFilter
         $value = $this->typeCastField($metadata, $option['field'], $option['value'], $format);
 
         $parameter = uniqid('a');
-        $queryBuilder->$queryType($queryBuilder->expr()->gte('row.' . $option['field'], ":$parameter"));
+        $queryBuilder->$queryType($queryBuilder->expr()->gte($option['alias'] . '.' . $option['field'], ":$parameter"));
         $queryBuilder->setParameter($parameter, $value);
     }
 }
