@@ -30,6 +30,7 @@ class Between extends AbstractFilter
         $toParameter = uniqid('a');
 
         $queryBuilder->$queryType($queryBuilder->expr()->between('row.' . $option['field'], ":$fromParameter", ":$toParameter"));
-        $queryBuilder->setParameters(array($fromParameter => $from, $toParameter => $to));
+        $queryBuilder->setParameter($fromParameter, $from);
+        $queryBuilder->setParameter($toParameter, $to);
     }
 }
