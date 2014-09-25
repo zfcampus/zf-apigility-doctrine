@@ -39,6 +39,21 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
         $this->getRequest()->setContent('{"name": "ArtistFour","createdAt": "2013-12-18 13:17:17"}');
         $this->dispatch('/test/artist');
 
+        $this->getRequest()->setContent('{"name": "AlbumOne", "artist": "1", "createdAt": "2013-12-18 13:17:17"}');
+        $this->dispatch('/test/album');
+
+        $this->getRequest()->setContent('{"name": "AlbumTwo", "artist": "1", "createdAt": "2013-12-18 13:17:17"}');
+        $this->dispatch('/test/album');
+
+        $this->getRequest()->setContent('{"name": "AlbumThree", "artist": "1", "createdAt": "2013-12-18 13:17:17"}');
+        $this->dispatch('/test/album');
+
+        $this->getRequest()->setContent('{"name": "AlbumFour", "artist": "2", "createdAt": "2013-12-18 13:17:17"}');
+        $this->dispatch('/test/album');
+
+        $this->getRequest()->setContent('{"name": "AlbumFive", "artist": "2", "createdAt": "2013-12-18 13:17:17"}');
+        $this->dispatch('/test/album');
+
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
     }
@@ -669,5 +684,78 @@ class FiltersTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTe
         $this->dispatch("/test/artist?$queryString");
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(3, $body['count']);
+    }
+
+    public function testNotLike()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'name', 'type'=>'notlike', 'value' => '%Two'),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(3, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'name', 'where' => 'and', 'type'=>'notlike', 'value' => '%Art%'),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertEquals(0, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('field' =>'name', 'where' => 'and', 'type' => 'notlike', 'value' => 'ArtistT%'),
+                    array('field' =>'name', 'where' => 'and', 'type' => 'notlike', 'value'=>'ArtistF%'),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/artist?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(1, $body['count']);
+    }
+
+    public function testInnerJoin()
+    {
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('type' => 'innerjoin', 'alias' => 'a', 'field' => 'artist'),
+                    array('alias' => 'a', 'field' => 'name', 'type' => 'eq', 'value' => 'ArtistOne'),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/album?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(3, $body['count']);
+
+        $queryString = http_build_query(
+            array(
+                'query' => array(
+                    array('type' => 'innerjoin', 'parentAlias' => 'row', 'alias' => 'a', 'field' => 'artist'),
+                    array('alias' => 'a', 'field' => 'name', 'type' => 'eq', 'value' => 'ArtistTwo'),
+                ),
+            )
+        );
+
+        $this->dispatch("/test/album?$queryString");
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(2, $body['count']);
     }
 }
