@@ -301,7 +301,7 @@ Joining Entities and Aliasing Queries
 -------------------------------------
 
 There is an available ORM Query Type for Inner Join so for every query type there is an optional ```alias```.
-The default alias is 'row' and refers to the entity at the heart of the Rest resource.
+The default alias is 'row' and refers to the entity at the heart of the Rest resource.  
 
 This example joins the report field through the inner join already defined on the row entity then filters
 for r.id = 2
@@ -317,13 +317,14 @@ You can inner join tables from an inner join using parentAlias
     array('type' => 'innerjoin', 'parentAlias' => 'r', 'field' => 'owner', 'alias' => 'o'),
 ```
 
-The Inner Join Query Type is not enabled by default.  
-To enable it add this to your configuration (e.g. ```config/autoload/global.php```)
+The Inner Join and On Query Type is not enabled by default.  
+To enable it add this to your configuration (e.g. ```config/autoload/global.php```).  There is also an optional On filter used to join two columns (e.g. row.id = other.id)
 
 ```php
     'zf-orm-collection-filter' => array(
         'invokables' => array(
             'innerjoin' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\InnerJoin',
+            'on' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\On',
         ),
     ),
 ```
