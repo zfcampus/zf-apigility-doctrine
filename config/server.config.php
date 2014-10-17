@@ -8,6 +8,7 @@ return array(
     'service_manager' => array(
         'invokables' => array(
             'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink' => 'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionLink',
+            'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract' => 'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract',
         ),
         'abstract_factories' => array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
