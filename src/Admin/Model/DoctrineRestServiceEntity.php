@@ -53,7 +53,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity
         $data['hydrator_name']      = $this->hydratorName;
         $data['object_manager']     = $this->objectManager;
         $data['by_value']   = $this->byValue;
-        $data['hydrator_strategies'] = $this->hydratorStrategies;
+        $data['strategies'] = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 
         return $data;

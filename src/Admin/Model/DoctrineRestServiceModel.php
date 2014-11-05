@@ -87,7 +87,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     	'objectManager'            => 'object_manager',
     	'byValue'                  => 'by_value',
     	'useGeneratedHydrator'     => 'use_generated_hydrator',
-    	'hydratorStrategies'       => 'hydrator_strategies',
+    	'hydratorStrategies'       => 'strategies',
     );
     
     /**
@@ -783,7 +783,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         // Verify the object manager exists
         $objectManager = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = (isset($entityValue['hydrator_strategies'])) ? $entityValue['hydrator_strategies']: array();
+        $hydratorStrategies = (isset($entityValue['strategies'])) ? $entityValue['strategies']: array();
         
         foreach ($hydratorStrategies as $strategy) {
 	        if (!$this->getServiceManager()->has($strategy)) {
@@ -800,7 +800,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                     'entity_class' => $entityClass,
                     'object_manager' => $details->objectManager,
                     'by_value' => $entityValue['by_value'],
-                    'hydrator_strategies' => $hydratorStrategies,
+                    'strategies' => $hydratorStrategies,
                     'use_generated_hydrator' => $entityValue['use_generated_hydrator'],
                 ),
             ),

@@ -55,7 +55,7 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity
         $data['hydrator_name'] = $this->hydratorName;
         $data['by_value'] = $this->byValue;
         $data['entity_identifier_name'] = $this->entityIdentifierName;
-        $data['hydrator_strategies'] = $this->hydratorStrategies;
+        $data['strategies'] = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 
         return $data;
