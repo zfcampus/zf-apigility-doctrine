@@ -190,10 +190,8 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $queryManager = $serviceLocator->get('ZfCollectionQueryManager');
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $fetchAllQuery = $queryManager->get('default-orm-query');
-            $filterManager = $serviceLocator->get('ZfOrmCollectionFilterManager');
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
             $fetchAllQuery = $queryManager->get('default-odm-query');
-            $filterManager = $serviceLocator->get('ZfOdmCollectionFilterManager');
         } else {
             // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');
@@ -211,7 +209,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         /** @var $fetchAllQuery Query\ApigilityFetchAllQuery */
         $fetchAllQuery->setObjectManager($objectManager);
-        $fetchAllQuery->setFilterManager($filterManager);
+
         return $fetchAllQuery;
     }
 

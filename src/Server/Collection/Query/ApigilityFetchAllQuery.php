@@ -8,9 +8,6 @@ use Zend\ServiceManager\AbstractPluginManager;
 
 interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
 {
-    public function setFilterManager(AbstractPluginManager $filterManager);
-    public function getFilterManager();
-
     /**
      * @param string $entityClass
      * @param array  $parameters

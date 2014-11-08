@@ -20,20 +20,6 @@ class FetchAllOrmQuery
 
     use ProvidesObjectManager;
 
-    protected $filterManager;
-
-    public function setFilterManager(AbstractPluginManager $filterManager)
-    {
-        $this->filterManager = $filterManager;
-
-        return $this;
-    }
-
-    public function getFilterManager()
-    {
-        return $this->filterManager;
-    }
-
     /**
      * @param string $entityClass
      * @param array  $parameters
@@ -57,26 +43,6 @@ class FetchAllOrmQuery
         }
         foreach ($parameters['orderBy'] as $fieldName => $sort) {
             $queryBuilder->addOrderBy("row.$fieldName", $sort);
-        }
-
-        // Run filters on query
-        if (isset($parameters['query'])) {
-            foreach ($parameters['query'] as $option) {
-                if (!isset($option['type']) or !$option['type']) {
-                // @codeCoverageIgnoreStart
-                    return new ApiProblem(500, 'Array element "type" is required for all filters');
-                }
-                // @codeCoverageIgnoreEnd
-
-                try {
-                    $filter = $this->getFilterManager()->get(strtolower($option['type']), [$this->getFilterManager()]);
-                } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
-                // @codeCoverageIgnoreStart
-                    return new ApiProblem(500, $e->getMessage());
-                }
-                // @codeCoverageIgnoreEnd
-                $filter->filter($queryBuilder, $metadata, $option);
-            }
         }
 
         return $queryBuilder;

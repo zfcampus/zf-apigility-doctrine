@@ -34,20 +34,6 @@ class Module
         $serviceListener = $sm->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            'ZfOrmCollectionFilterManager',
-            'zf-orm-collection-filter',
-            'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
-            'getZfOrmFilterConfig'
-        );
-
-        $serviceListener->addServiceManager(
-            'ZfOdmCollectionFilterManager',
-            'zf-odm-collection-filter',
-            'ZF\Apigility\Doctrine\Server\Collection\Filter\FilterInterface',
-            'getZfOdmFilterConfig'
-        );
-
-        $serviceListener->addServiceManager(
             'ZfCollectionQueryManager',
             'zf-collection-query',
             'ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery',
