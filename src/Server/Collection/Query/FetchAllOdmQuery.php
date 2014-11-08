@@ -11,18 +11,6 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
 {
     use ProvidesObjectManager;
 
-    public function setFilterManager(AbstractPluginManager $filterManager)
-    {
-        $this->filterManager = $filterManager;
-
-        return $this;
-    }
-
-    public function getFilterManager()
-    {
-        return $this->filterManager;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -43,26 +31,6 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         // Get metadata for type casting
         $cmf = $this->getObjectManager()->getMetadataFactory();
         $metadata = (array) $cmf->getMetadataFor($entityClass);
-
-        // Run filters on query
-        if (isset($parameters['query'])) {
-            foreach ($parameters['query'] as $option) {
-                if (!isset($option['type']) or !$option['type']) {
-                // @codeCoverageIgnoreStart
-                     return new ApiProblem(500, 'Array element "type" is required for all filters');
-                }
-                // @codeCoverageIgnoreEnd
-
-                try {
-                    $filter = $this->getFilterManager()->get(strtolower($option['type']));
-                } catch (\Zend\ServiceManager\Exception\ServiceNotFoundException $e) {
-                // @codeCoverageIgnoreStart
-                    return new ApiProblem(500, $e->getMessage());
-                }
-                // @codeCoverageIgnoreEnd
-                $filter->filter($queryBuilder, $metadata, $option);
-            }
-        }
 
         return $queryBuilder;
     }
