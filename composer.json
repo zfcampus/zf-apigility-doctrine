@@ -37,7 +37,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "ZF\\Apigility\\Doctrine\\": "src/",
+            "ZF\\Apigility\\Doctrine\\": "src/"
         }
     }
 }
