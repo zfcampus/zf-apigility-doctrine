@@ -38,7 +38,6 @@
     "autoload": {
         "psr-4": {
             "ZF\\Apigility\\Doctrine\\": "src/",
-            "ZFTest\\Apigility\\Doctrine\\": "test/src/"
         }
     }
 }
