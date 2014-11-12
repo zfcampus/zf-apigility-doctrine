@@ -12,8 +12,8 @@ use ZF\Rest\ResourceEvent;
  */
 class DoctrineResourceEvent extends Event
 {
-
     const EVENT_FETCH_POST = 'fetch.post';
+    const EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
     const EVENT_FETCH_ALL_POST = 'fetch-all.post';
     const EVENT_CREATE_PRE = 'create.pre';
     const EVENT_CREATE_POST = 'create.post';
@@ -40,11 +40,36 @@ class DoctrineResourceEvent extends Event
     protected $collection;
 
     /**
+     * @var Doctrine\ORM\QueryBuilder
+     */
+    protected $queryBuilder;
+
+    /**
+     * @param Doctrine\ORM\QueryBuilder $queryBuilder
+     */
+    public function setQueryBuilder($queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
+
+        return $this;
+    }
+
+    /**
+     * @return Doctrine\ORM\QueryBuilder
+     */
+    public function getQueryBuilder()
+    {
+        return $this->queryBuilder;
+    }
+
+    /**
      * @param mixed $collection
      */
     public function setCollection($collection)
     {
         $this->collection = $collection;
+
+        return $this;
     }
 
     /**
@@ -61,6 +86,8 @@ class DoctrineResourceEvent extends Event
     public function setEntity($entity)
     {
         $this->entity = $entity;
+
+        return $this;
     }
 
     /**
@@ -77,6 +104,8 @@ class DoctrineResourceEvent extends Event
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
+
+        return $this;
     }
 
     /**

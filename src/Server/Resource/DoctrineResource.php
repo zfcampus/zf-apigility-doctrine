@@ -262,6 +262,13 @@ class DoctrineResource extends AbstractResourceListener
         }
             // @codeCoverageIgnoreEnd
 
+        // Run fetch all pre with query builder
+        $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, $this);
+        $event->setQueryBuilder($queryBuilder);
+        $event->setResourceEvent($this->getEvent());
+        $eventManager = $this->getEventManager();
+        $response = $eventManager->trigger($event);
+
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
@@ -274,7 +281,7 @@ class DoctrineResource extends AbstractResourceListener
             function ($e) use ($fetchAllQuery, $entityClass, $data) {
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
-                
+
                 $collection->setItemCountPerPage($halCollection->getPageSize());
                 $collection->setCurrentPageNumber($halCollection->getPage());
 
