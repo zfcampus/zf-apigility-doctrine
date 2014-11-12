@@ -1,7 +1,7 @@
 Apigility for Doctrine
 ==============================
 
-[![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine) 
+[![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
 
 This module provides the classes for integrating Doctrine with Apigility.
 
@@ -63,10 +63,12 @@ Custom Events
 =============
 It is possible to hook in on specific doctrine events of the type `DoctrineResourceEvent`.
 This way, it is possible to alter the doctrine entities or collections before or after a specific action is performed.
+The EVENT_FETCH_ALL_PRE works on the Query Builder from the fetch all query.  This allows you to modify the Query Builder before a fetch is performed.
 
 A list of all supported events:
 ```
 EVENT_FETCH_POST = 'fetch.post';
+EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
 EVENT_FETCH_ALL_POST = 'fetch-all.post';
 EVENT_CREATE_PRE = 'create.pre';
 EVENT_CREATE_POST = 'create.post';
@@ -119,7 +121,7 @@ For instance, a route of ```/api/artist/:artist_id/album/:album_id``` mapped to 
 entity will filter the Album for field names.  So, given an album with id, name, and artist
 fields the album_id matches to the resoruce configuration and will be queried by key
 and the artist is a field on album and will be queried by criteria so the final query
-would be 
+would be
 
 ```
 $objectManager->getRepository('Album')->findOneBy(
