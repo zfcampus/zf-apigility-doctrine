@@ -16,18 +16,18 @@ return array(
         'ZF\ApiProblem',
         'ZF\Apigility\Doctrine\Admin',
         'ZF\Apigility\Doctrine\Server',
-        'General',
-        'Db',
-        'DbApi',
+        'ZFTestApigilityGeneral',
+        'ZFTestApigilityDb',
+        'ZFTestApigilityDbApi',
     ),
     'module_listener_options' => array(
         'config_glob_paths' => array(
             __DIR__ . '/local.php',
         ),
         'module_paths' => array(
-            'General' => __DIR__ . '/../../assets/module/General',
-            'Db' => __DIR__ . '/../../assets/module/Db',
-            'DbApi' => __DIR__ . '/../../assets/module/DbApi',
+            'ZFTestApigilityGeneral' => __DIR__ . '/../../assets/module/General',
+            'ZFTestApigilityDb' => __DIR__ . '/../../assets/module/Db',
+            'ZFTestApigilityDbApi' => __DIR__ . '/../../assets/module/DbApi',
         ),
     ),
 );

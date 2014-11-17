@@ -6,9 +6,9 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
-use General\Listener\EventCatcher;
+use ZFTestApigilityGeneral\Listener\EventCatcher;
 use Zend\Http\Request;
-use DbMongo\Document\Meta as MetaEntity;
+use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
@@ -37,7 +37,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
     protected function validateTriggeredEvents($expectedEvents)
     {
         $serviceManager = $this->getApplication()->getServiceManager();
-        $eventCatcher = $serviceManager->get('General\Listener\EventCatcher');
+        $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
 
         $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
     }

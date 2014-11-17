@@ -1,5 +1,5 @@
 <?php
-namespace Db;
+namespace ZFTestApigilityDbMongoApi;
 
 use ZF\Apigility\Provider\ApigilityProviderInterface;
 

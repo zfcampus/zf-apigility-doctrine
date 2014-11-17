@@ -1,11 +1,11 @@
 <?php
 
-namespace Db;
+namespace ZFTestApigilityGeneral;
 
 return [
     'service_manager' => [
         'invokables' => [
-            'General\Listener\EventCatcher' => 'General\Listener\EventCatcher',
+            'ZFTestApigilityGeneral\Listener\EventCatcher' => 'ZFTestApigilityGeneral\Listener\EventCatcher',
         ]
     ]
 ];

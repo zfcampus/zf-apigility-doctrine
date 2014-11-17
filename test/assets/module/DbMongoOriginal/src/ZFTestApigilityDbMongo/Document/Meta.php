@@ -1,8 +1,8 @@
 <?php
 
-namespace Db\Entity;
+namespace ZFTestApigilityDbMongo\Document;
 
-class Album
+class Meta
 {
     protected $id;
 
@@ -35,21 +35,19 @@ class Album
     public function setCreatedAt(\Datetime $value)
     {
         $this->createdAt = $value;
-
-        return $this;
     }
 
-    protected $artist;
-
-    public function getArtist()
+    public function getArrayCopy()
     {
-        return $this->artist;
+        return array(
+            'name' => $this->getName(),
+            'createdAt' => $this->getCreatedAt(),
+        );
     }
 
-    public function setArtist($value)
+    public function exchangeArray($values)
     {
-        $this->artist = $value;
-
-        return $this;
+        $this->setName((isset($values['name'])) ? $values['name']: null);
+        $this->setCreatedAt((isset($values['createdAt'])) ? $values['createdAt']: null);
     }
 }

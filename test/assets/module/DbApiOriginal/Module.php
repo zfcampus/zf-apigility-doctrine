@@ -1,2 +1,2 @@
 <?php
-require __DIR__ . '/src/DbApi/Module.php';
+require __DIR__ . '/src/ZFTestApigilityDbApi/Module.php';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Db\Entity;
+namespace ZFTestApigilityDb\Entity;
 
 use \Doctrine\Common\Collections\ArrayCollection;
 
@@ -64,11 +64,11 @@ class Artist
      */
     public function addAlbum($album)
     {
-        if ($album instanceof \Db\Entity\Album) {
+        if ($album instanceof \ZFTestApigilityDb\Entity\Album) {
             $this->album[] = $album;
         } elseif ($album instanceof ArrayCollection) {
             foreach ($album as $a) {
-                if ( ! $a instanceof \Db\Entity\Album) {
+                if ( ! $a instanceof \ZFTestApigilityDb\Entity\Album) {
                     throw new \Exception('Invalid type in addAlbum');
                 }
                 $this->album->add($a);
@@ -85,11 +85,11 @@ class Artist
      */
     public function removeAlbum($album)
     {
-        if ($album instanceof \Db\Entity\Album) {
+        if ($album instanceof \ZFTestApigilityDb\Entity\Album) {
             $this->album[] = $album;
         } elseif ($album instanceof ArrayCollection) {
             foreach ($album as $a) {
-                if ( ! $a instanceof \Db\Entity\Album) {
+                if ( ! $a instanceof \ZFTestApigilityDb\Entity\Album) {
                     throw new \Exception('Invalid type remove addAlbum');
                 }
                 $this->album->removeElement($a);

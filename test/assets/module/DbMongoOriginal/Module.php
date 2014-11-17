@@ -1,2 +1,2 @@
 <?php
-require __DIR__ . '/src/DbMongo/Module.php';
+require __DIR__ . '/src/ZFTestApigilityDbMongo/Module.php';

@@ -27,13 +27,13 @@ class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTest
         $metaResourceDefinition = [
             "objectManager"=> "doctrine.documentmanager.odm_default",
             "serviceName" => "Meta",
-            "entityClass" => "DbMongo\\Document\\Meta",
+            "entityClass" => "ZFTestApigilityDbMongo\\Document\\Meta",
             "routeIdentifierName" => "meta_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/meta",
         ];
 
-        $resource->setModuleName('DbMongoApi');
+        $resource->setModuleName('ZFTestApigilityDbMongoApi');
         $metaEntity = $resource->create($metaResourceDefinition);
 
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $metaEntity);

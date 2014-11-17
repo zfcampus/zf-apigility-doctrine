@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZFTest\Apigility\Admin;
+namespace ZFTest\Apigility;
 
 use Zend\Loader\AutoloaderFactory;
 use RuntimeException;

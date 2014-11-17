@@ -8,7 +8,7 @@ namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
-use Db\Entity\Artist as ArtistEntity;
+use ZFTestApigilityDb\Entity\Artist as ArtistEntity;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
@@ -33,7 +33,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
     protected function validateTriggeredEvents($expectedEvents)
     {
         $serviceManager = $this->getApplication()->getServiceManager();
-        $eventCatcher = $serviceManager->get('General\Listener\EventCatcher');
+        $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
 
         $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
     }
@@ -124,7 +124,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('ArtistOnePatchEdit', $body['name']);
 
-        $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
+        $foundEntity = $em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistOnePatchEdit', $foundEntity->getName());
         $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_PATCH_PRE, DoctrineResourceEvent::EVENT_PATCH_POST]);
     }
@@ -150,7 +150,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('ArtistSevenPutEdit', $body['name']);
 
-        $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
+        $foundEntity = $em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistSevenPutEdit', $foundEntity->getName());
         $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_UPDATE_PRE, DoctrineResourceEvent::EVENT_UPDATE_POST]);
     }
@@ -175,7 +175,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->dispatch('/test/artist/' . $artist->getId());
         $this->assertEquals(204, $this->getResponseStatusCode());
 
-        $this->assertEmpty($em->getRepository('Db\Entity\Artist')->find($id));
+        $this->assertEmpty($em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($id));
         $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_DELETE_PRE, DoctrineResourceEvent::EVENT_DELETE_POST]);
 
         // Test DELETE: entity not found

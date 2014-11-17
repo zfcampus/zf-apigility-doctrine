@@ -33,7 +33,7 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         $artistResourceDefinition = [
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
-            "entityClass" => "Db\\Entity\\Artist",
+            "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/artist",
@@ -42,13 +42,13 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         $albumResourceDefinition = [
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Album",
-            "entityClass" => "Db\\Entity\\Album",
+            "entityClass" => "ZFTestApigilityDb\\Entity\\Album",
             "routeIdentifierName" => "album_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/album",
         ];
 
-        $resource->setModuleName('DbApi');
+        $resource->setModuleName('ZFTestApigilityDbApi');
         $artistEntity = $resource->create($artistResourceDefinition);
         $albumEntity = $resource->create($albumResourceDefinition);
 
@@ -62,10 +62,10 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
 
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $em->getMetadataFactory();
-        $entityMetadata = $metadataFactory->getMetadataFor("Db\\Entity\\Artist");
+        $entityMetadata = $metadataFactory->getMetadataFor("ZFTestApigilityDb\\Entity\\Artist");
 
         $rpcServiceResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
-        $rpcServiceResource->setModuleName('DbApi');
+        $rpcServiceResource->setModuleName('ZFTestApigilityDbApi');
 
         foreach ($entityMetadata->associationMappings as $mapping) {
             switch ($mapping['type']) {
