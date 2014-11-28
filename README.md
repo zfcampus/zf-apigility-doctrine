@@ -41,7 +41,7 @@ POST Parameters:
 ```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
-    "resourceName": "Artist",
+    "serviceName": "Artist",
     "entityClass": "Db\\Entity\\Artist",
     "routeIdentifierName": "artist_id",
     "entityIdentifierName": "id",
