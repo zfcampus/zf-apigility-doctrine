@@ -266,6 +266,7 @@ class DoctrineResource extends AbstractResourceListener
         $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, $this);
         $event->setQueryBuilder($queryBuilder);
         $event->setResourceEvent($this->getEvent());
+        $event->setEntity($this->getEntityClass());
         $eventManager = $this->getEventManager();
         $response = $eventManager->trigger($event);
 
