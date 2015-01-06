@@ -77,4 +77,11 @@ return array(
             'zf-apigility-doctrine-server' => __DIR__ . '/../view',
         ),
     ),
+
+    'validators' => array(
+        'factories' => array(
+            'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' => 'ZF\Apigility\Doctrine\Server\Validator\NoObjectExistsFactory',
+            'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' => 'ZF\Apigility\Doctrine\Server\Validator\ObjectExistsFactory',
+        ),
+    ),
 );

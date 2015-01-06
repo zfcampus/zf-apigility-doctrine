@@ -131,4 +131,14 @@ return array(
             'collection_query_whitelist' => array('version'),
         ),
     ),
+    'validator_metadata' => array(
+        'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' => array(
+            'entity_class' => 'string',
+            'fields' => 'string',
+        ),
+        'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' => array(
+            'entity_class' => 'string',
+            'fields' => 'string',
+        ),
+    ),
 );
