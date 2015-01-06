@@ -83,11 +83,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     );
     
     protected $doctrineHydratorOptions = array(
-    	'entityClass'              => 'entity_class',
-    	'objectManager'            => 'object_manager',
-    	'byValue'                  => 'by_value',
-    	'useGeneratedHydrator'     => 'use_generated_hydrator',
-    	'hydratorStrategies'       => 'strategies',
+        'entityClass'              => 'entity_class',
+        'objectManager'            => 'object_manager',
+        'byValue'                  => 'by_value',
+        'useGeneratedHydrator'     => 'use_generated_hydrator',
+        'hydratorStrategies'       => 'strategies',
     );
     
     /**
@@ -138,10 +138,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $configResource = $config['zf-apigility']['doctrine-connected'][$entity->resourceClass];
         
         if (isset($config['doctrine-hydrator']) && isset($config['doctrine-hydrator'][$configResource['hydrator']])) {
-        	$configHydrator = $config['doctrine-hydrator'][$configResource['hydrator']];
-	        $config = array_merge($configResource,$configHydrator);
+            $configHydrator = $config['doctrine-hydrator'][$configResource['hydrator']];
+            $config = array_merge($configResource, $configHydrator);
         } else {
-        	$config = $configResource;
+            $config = $configResource;
         }
 
         $doctrineEntity = new DoctrineRestServiceEntity();
@@ -264,16 +264,23 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
         
         if (!isset($entity->serviceName)
-        		|| empty($entity->serviceName)
+                || empty($entity->serviceName)
         ) {
-        	$serviceName = $controllerService;
-        	$q = preg_quote('\\');
-        	if (preg_match('#' . $q . 'V[^' . $q . ']+' . $q . 'Rest' . $q . '(?<service>[^' . $q . ']+)' . $q . 'Controller#', $controllerService, $matches)) {
-        		$serviceName = $matches['service'];
-        	}
-        	$entity->exchangeArray(array(
-        		'service_name' => $serviceName,
-        	));
+            $serviceName = $controllerService;
+            $q = preg_quote('\\');
+            if (preg_match(
+                vsprintf(
+                    '#%sV[^%s]+%sRest%s(?<service>[^%s]+)%sController#',
+                    array_fill(0, 6, $q)
+                ),
+                $controllerService,
+                $matches
+            )) {
+                $serviceName = $matches['service'];
+            }
+            $entity->exchangeArray(array(
+                'service_name' => $serviceName,
+            ));
         }
 
         // @codeCoverageIgnoreEnd
@@ -369,9 +376,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         if (!$this->getServiceManager()->has($details->objectManager)) {
-        	// @codeCoverageIgnoreStart
-        	throw new CreationException('Invalid object manager specified. Must be declared in the service manager.', 422);
-        	// @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreStart
+            throw new CreationException(
+                'Invalid object manager specified. Must be declared in the service manager.',
+                422
+            );
+            // @codeCoverageIgnoreEnd
         }
 
         $entity       = new DoctrineRestServiceEntity();
@@ -388,8 +398,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $module = ($details->module) ?: $this->module;
 
         $controllerService = ($details->controllerServiceName) ?: $this->createControllerServiceName($resourceName);
-        $routeName = ($details->routeName) ?: $this->createRoute($resourceName, $details->routeMatch, $details->routeIdentifierName, $controllerService);
-        $hydratorName = ($details->hydratorName) ?: $this->createHydratorName($resourceName);
+        $routeName = ($details->routeName) ?: $this->createRoute(
+            $resourceName,
+            $details->routeMatch,
+            $details->routeIdentifierName,
+            $controllerService
+        );
+        $hydratorName  = ($details->hydratorName) ?: $this->createHydratorName($resourceName);
         $objectManager = ($details->objectManager) ?: 'doctrine.entitymanager.orm_default';
 
         $entity->exchangeArray(array(
@@ -777,8 +792,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->configResource->patch($config, true);
     }
 
-    public function createDoctrineHydratorConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
-    {
+    public function createDoctrineHydratorConfig(
+        DoctrineRestServiceEntity $details,
+        $entityClass,
+        $collectionClass,
+        $routeName
+    ) {
         $entityValue = $details->getArrayCopy();
 
         // Verify the object manager exists
@@ -786,11 +805,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $hydratorStrategies = (isset($entityValue['strategies'])) ? $entityValue['strategies']: array();
         
         foreach ($hydratorStrategies as $strategy) {
-	        if (!$this->getServiceManager()->has($strategy)) {
-	    		// @codeCoverageIgnoreStart
-	    		throw new CreationException('Invalid strategy specified. Must be declared in the service manager.');
-	    		// @codeCoverageIgnoreEnd
-	    	}
+            if (!$this->getServiceManager()->has($strategy)) {
+                // @codeCoverageIgnoreStart
+                throw new CreationException('Invalid strategy specified. Must be declared in the service manager.');
+                // @codeCoverageIgnoreEnd
+            }
         }
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
@@ -901,14 +920,14 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     
     public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-    	$patch = array();
-    	foreach ($this->doctrineHydratorOptions as $property => $configKey) {
-    		if ($update->$property === null) {
-    			continue;
-    		}
-    		$key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
-    		$this->configResource->patchKey($key, $update->$property);
-    	}
+        $patch = array();
+        foreach ($this->doctrineHydratorOptions as $property => $configKey) {
+            if ($update->$property === null) {
+                continue;
+            }
+            $key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
+            $this->configResource->patchKey($key, $update->$property);
+        }
     }
 
     /**
@@ -917,8 +936,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * @param DoctrineRestServiceEntity $original
      * @param DoctrineRestServiceEntity $update
      */
-    public function updateContentNegotiationConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
-    {
+    public function updateContentNegotiationConfig(
+        DoctrineRestServiceEntity $original,
+        DoctrineRestServiceEntity $update
+    ) {
         $baseKey = 'zf-content-negotiation.';
         $service = $original->controllerServiceName;
 
@@ -947,13 +968,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-    	$patch = array();
-    	$patch['object_manager'] = $update->objectManager;
-    	$patch['hydrator'] = $update->hydratorName;
-    	$basekey = 'zf-apigility.doctrine-connected.';
-    	$resource = $update->resourceClass;
-    	
-    	$this->configResource->patchKey($basekey . $resource, $patch);
+        $patch = array();
+        $patch['object_manager'] = $update->objectManager;
+        $patch['hydrator'] = $update->hydratorName;
+        $basekey = 'zf-apigility.doctrine-connected.';
+        $resource = $update->resourceClass;
+        
+        $this->configResource->patchKey($basekey . $resource, $patch);
     }
 
     /**
@@ -1175,8 +1196,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * @param DoctrineRestServiceEntity $metadata
      * @param array                     $config
      */
-    protected function mergeContentNegotiationConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
-    {
+    protected function mergeContentNegotiationConfig(
+        $controllerServiceName,
+        DoctrineRestServiceEntity $metadata,
+        array $config
+    ) {
         // @codeCoverageIgnoreStart
         if (!isset($config['zf-content-negotiation'])) {
             return;
@@ -1266,7 +1290,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
-        if (!preg_match('#' . preg_quote($module . '\\Rest\\') . '(?P<service>[^\\\\]+)' . preg_quote('\\Controller') . '#', $controllerServiceName, $matches)) {
+        $q = preg_quote('\\');
+        if (!preg_match(
+            sprintf(
+                '#%s%sRest%s(?P<service>[^%s]+)%sController#',
+                $module,
+                $q,
+                $q,
+                $q,
+                $q
+            ),
+            $controllerServiceName,
+            $matches
+        )) {
             return null;
         }
 
@@ -1295,7 +1331,15 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
 
         $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
-        if (!preg_match('#' . preg_quote($module . '\\Rest\\') . '(?P<service>[^\\\\]+)' . preg_quote('\\Controller') . '#', $controllerServiceName, $matches)) {
+        if (!preg_match(
+            '#'
+            . preg_quote($module . '\\Rest\\')
+            . '(?P<service>[^\\\\]+)'
+            . preg_quote('\\Controller')
+            . '#',
+            $controllerServiceName,
+            $matches
+        )) {
             return null;
         }
 

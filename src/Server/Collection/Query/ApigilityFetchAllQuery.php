@@ -29,5 +29,4 @@ interface ApigilityFetchAllQuery extends ObjectManagerAwareInterface
      * @return int
      */
     public function getCollectionTotal($entityClass);
-
 }

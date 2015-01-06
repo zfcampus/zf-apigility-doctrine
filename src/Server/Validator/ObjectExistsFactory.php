@@ -2,7 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Validator;
 
-
 use DoctrineModule\Validator\ObjectExists;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\MutableCreationOptionsInterface;
@@ -27,7 +26,12 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
         if (isset($this->options['entity_class'])) {
             return new ObjectExists(ArrayUtils::merge(
                 $this->options,
-                array('object_repository' => $validators->getServiceLocator()->get('Doctrine\ORM\EntityManager')->getRepository($this->options['entity_class']))
+                array(
+                    'object_repository' => $validators
+                        ->getServiceLocator()
+                        ->get('Doctrine\ORM\EntityManager')
+                        ->getRepository($this->options['entity_class'])
+                )
             ));
         }
         return new ObjectExists($this->options);
@@ -43,5 +47,4 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     {
         $this->options = $options;
     }
-
 }

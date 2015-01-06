@@ -48,8 +48,11 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      * @param DoctrineRpcServiceModelFactory $rpcFactory
      * @param InputFilterModel               $inputFilterModel
      */
-    public function __construct(DoctrineRpcServiceModelFactory $rpcFactory, InputFilterModel $inputFilterModel, ControllerManager $controllerManager)
-    {
+    public function __construct(
+        DoctrineRpcServiceModelFactory $rpcFactory,
+        InputFilterModel $inputFilterModel,
+        ControllerManager $controllerManager
+    ) {
         $this->rpcFactory = $rpcFactory;
         $this->inputFilterModel = $inputFilterModel;
         $this->controllerManager = $controllerManager;
@@ -122,61 +125,61 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             'selector'     => null,
         );
 
-        if (!isset($data['service_name'])
+if (!isset($data['service_name'])
             || !is_string($data['service_name'])
             || empty($data['service_name'])
         ) {
 // @codeCoverageIgnoreStart
             throw new CreationException('Unable to create RPC service; missing service_name');
-        }
+}
 // @codeCoverageIgnoreEnd
         $creationData['service_name'] = $data['service_name'];
 
         $model = $this->getModel();
-        if ($model->fetch($creationData['service_name'])) {
+if ($model->fetch($creationData['service_name'])) {
 // @codeCoverageIgnoreStart
-            throw new CreationException('Service by that name already exists', 409);
-        }
+    throw new CreationException('Service by that name already exists', 409);
+}
 // @codeCoverageIgnoreEnd
 
-        if (!isset($data['route'])
+if (!isset($data['route'])
             || !is_string($data['route'])
             || empty($data['route'])
         ) {
 // @codeCoverageIgnoreStart
             throw new CreationException('Unable to create RPC service; missing route');
-        }
+}
 // @codeCoverageIgnoreEnd
         $creationData['route'] = $data['route'];
 
-        if (isset($data['http_methods'])
+if (isset($data['http_methods'])
             && (is_string($data['http_methods']) || is_array($data['http_methods']))
             && !empty($data['http_methods'])
         ) {
             $creationData['http_methods'] = $data['http_methods'];
-        }
+}
 
-        if (isset($data['selector'])
+if (isset($data['selector'])
             && is_string($data['selector'])
             && !empty($data['selector'])
         ) {
             $creationData['selector'] = $data['selector'];
-        }
+}
 
         $creationData['options'] = (array) $data['options'];
 
-        try {
-            $service = $model->createService(
-                $creationData['service_name'],
-                $creationData['route'],
-                $creationData['http_methods'],
-                $creationData['selector'],
-                $creationData['options']
-            );
-        } catch (\Exception $e) {
+try {
+    $service = $model->createService(
+        $creationData['service_name'],
+        $creationData['route'],
+        $creationData['http_methods'],
+        $creationData['selector'],
+        $creationData['options']
+    );
+} catch (\Exception $e) {
 // @codeCoverageIgnoreStart
-            throw new CreationException('Unable to create RPC service', $e->getCode(), $e);
-        }
+    throw new CreationException('Unable to create RPC service', $e->getCode(), $e);
+}
 // @codeCoverageIgnoreEnd
         return $service;
     }

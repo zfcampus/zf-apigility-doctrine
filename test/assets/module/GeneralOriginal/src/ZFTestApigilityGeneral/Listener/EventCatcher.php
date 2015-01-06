@@ -11,8 +11,7 @@ use Zend\EventManager\SharedListenerAggregateInterface;
  *
  * @package DbMongo\Listener
  */
-class EventCatcher
-    implements  SharedListenerAggregateInterface
+class EventCatcher implements SharedListenerAggregateInterface
 {
 
     const EVENT_IDENTIFIER = 'ZF\Apigility\Doctrine\DoctrineResource';
@@ -62,5 +61,4 @@ class EventCatcher
     {
         return $this->caughtEvents;
     }
-
 }

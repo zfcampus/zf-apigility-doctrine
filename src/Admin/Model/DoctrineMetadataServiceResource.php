@@ -11,9 +11,7 @@ use ZF\Rest\AbstractResourceListener;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-class DoctrineMetadataServiceResource
-    extends AbstractResourceListener
-    implements ServiceManagerAwareInterface
+class DoctrineMetadataServiceResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
     protected $serviceManager;
 
@@ -48,7 +46,6 @@ class DoctrineMetadataServiceResource
         $objectManagerAlias = $this->getEvent()->getRouteParam('object_manager_alias');
 
         if (!$objectManagerAlias) {
-
             // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No objectManager manager specificed in request.');
             // @codeCoverageIgnoreEnd

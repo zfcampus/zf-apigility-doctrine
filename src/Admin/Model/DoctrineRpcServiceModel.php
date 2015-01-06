@@ -105,7 +105,8 @@ class DoctrineRpcServiceModel
             ) {
                 // @codeCoverageIgnoreStart
                 // Is this handled differently in recent versions of Apigility // FIXME: verify this\
-                $data['content_type_whitelist'] = $contentNegotiationConfig['content_type_whitelist'][$controllerServiceName];
+                $data['content_type_whitelist'] =
+                    $contentNegotiationConfig['content_type_whitelist'][$controllerServiceName];
             }
                 // @codeCoverageIgnoreEnd
         }
@@ -290,8 +291,10 @@ class DoctrineRpcServiceModel
         $renderer = new PhpRenderer();
         $renderer->setResolver($resolver);
 
-        if (!file_put_contents($classPath,
-            "<?php\n" . $renderer->render($view))) {
+        if (!file_put_contents(
+            $classPath,
+            "<?php\n" . $renderer->render($view)
+        )) {
             // @codeCoverageIgnoreStart
             return false;
         }

@@ -9,8 +9,7 @@ namespace ZF\Apigility\Doctrine\Server;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManager;
 
-class Module
-    implements DependencyIndicatorInterface
+class Module implements DependencyIndicatorInterface
 {
     public function getAutoloaderConfig()
     {

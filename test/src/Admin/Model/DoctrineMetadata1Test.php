@@ -19,7 +19,7 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
     public function setUp()
     {
         $this->setApplicationConfig(
-                include __DIR__ . '/../../../../../config/application.config.php'
+            include __DIR__ . '/../../../../../config/application.config.php'
         );
         parent::setUp();
     }
@@ -41,7 +41,10 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
             'Accept' => 'application/json',
         ));
 
-        $this->dispatch('/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist', Request::METHOD_GET);
+        $this->dispatch(
+            '/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist',
+            Request::METHOD_GET
+        );
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertArrayHasKey('name', $body);
         $this->assertEquals('Db\Entity\Artist', $body['name']);
@@ -90,7 +93,9 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         foreach ($entityMetadata->associationMappings as $mapping) {
             switch ($mapping['type']) {
                 case 4:
-                    $rpcServiceResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
+                    $rpcServiceResource = $serviceManager->get(
+                        'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource'
+                    );
                     $rpcServiceResource->setModuleName('DbApi');
                     $rpcServiceResource->create(array(
                         'service_name' => 'Artist' . $mapping['fieldName'],

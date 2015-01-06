@@ -37,5 +37,5 @@ class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTest
         $metaEntity = $resource->create($metaResourceDefinition);
 
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $metaEntity);
-   }
+    }
 }

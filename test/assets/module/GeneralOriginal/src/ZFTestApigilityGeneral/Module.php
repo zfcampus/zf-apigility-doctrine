@@ -40,5 +40,4 @@ class Module implements ApigilityProviderInterface, BootstrapListenerInterface
         $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
         $sharedEventManager->attachAggregate($eventCatcher);
     }
-
 }
