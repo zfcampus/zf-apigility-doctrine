@@ -50,7 +50,10 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // Validate object is set
         $config = $serviceLocator->get('Config');
 
-        if (!isset($config['zf-apigility']['doctrine-connected']) || !is_array($config['zf-apigility']['doctrine-connected']) || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])) {
+        if (!isset($config['zf-apigility']['doctrine-connected'])
+            || !is_array($config['zf-apigility']['doctrine-connected'])
+            || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])
+        ) {
             $this->lookupCache[$requestedName] = false;
 
             return false;
@@ -190,7 +193,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $queryManager = $serviceLocator->get('ZfCollectionQueryManager');
         if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
             $fetchAllQuery = $queryManager->get('default-orm-query');
-        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager') && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager) {
+        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager')
+            && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager
+        ) {
             $fetchAllQuery = $queryManager->get('default-odm-query');
         } else {
             // @codeCoverageIgnoreStart
@@ -222,14 +227,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     protected function loadConfiguredListeners(ServiceLocatorInterface $serviceLocator, $config)
     {
         if (!isset($config['listeners'])) {
-            return [];
+            return array();
         }
 
-        $listeners = [];
+        $listeners = array();
         foreach ($config['listeners'] as $listener) {
             $listeners[] = $serviceLocator->get($listener);
         }
         return $listeners;
     }
-
 }

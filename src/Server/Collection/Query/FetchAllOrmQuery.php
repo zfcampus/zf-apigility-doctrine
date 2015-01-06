@@ -14,8 +14,7 @@ use ZF\ApiProblem\ApiProblem;
  *
  * @package ZF\Apigility\Doctrine\Server\Resource\Query
  */
-class FetchAllOrmQuery
-    implements ObjectManagerAwareInterface, ApigilityFetchAllQuery
+class FetchAllOrmQuery implements ObjectManagerAwareInterface, ApigilityFetchAllQuery
 {
 
     use ProvidesObjectManager;

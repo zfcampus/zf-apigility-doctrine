@@ -115,5 +115,4 @@ class DoctrineResourceEvent extends Event
     {
         return $this->resourceEvent;
     }
-
 }

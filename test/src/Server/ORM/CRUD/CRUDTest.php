@@ -50,7 +50,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_CREATE_PRE, DoctrineResourceEvent::EVENT_CREATE_POST]);
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_CREATE_PRE,
+            DoctrineResourceEvent::EVENT_CREATE_POST,
+        ));
     }
 
     public function testFetch()
@@ -73,7 +76,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_POST]);
+        $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
     }
 
     public function testFetchAll()
@@ -99,8 +102,11 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->dispatch('/test/artist?orderBy%5Bname%5D=ASC');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
-        $this->assertEquals(2, sizeof($body['_embedded']['artist']));
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, DoctrineResourceEvent::EVENT_FETCH_ALL_POST]);
+        $this->assertEquals(2, count($body['_embedded']['artist']));
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
+        ));
     }
 
     public function testPatch()
@@ -126,7 +132,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistOnePatchEdit', $foundEntity->getName());
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_PATCH_PRE, DoctrineResourceEvent::EVENT_PATCH_POST]);
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_PATCH_PRE,
+            DoctrineResourceEvent::EVENT_PATCH_POST,
+        ));
     }
 
     public function testPut()
@@ -152,7 +161,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistSevenPutEdit', $foundEntity->getName());
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_UPDATE_PRE, DoctrineResourceEvent::EVENT_UPDATE_POST]);
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_UPDATE_PRE,
+            DoctrineResourceEvent::EVENT_UPDATE_POST,
+        ));
     }
 
     public function testDelete()
@@ -176,7 +188,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals(204, $this->getResponseStatusCode());
 
         $this->assertEmpty($em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($id));
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_DELETE_PRE, DoctrineResourceEvent::EVENT_DELETE_POST]);
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_DELETE_PRE,
+            DoctrineResourceEvent::EVENT_DELETE_POST,
+        ));
 
         // Test DELETE: entity not found
 
@@ -191,7 +206,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
         $this->dispatch('/test/artist/' . $artist->getId());
         $this->assertEquals(404, $this->getResponseStatusCode());
-        $this->validateTriggeredEvents([]);
+        $this->validateTriggeredEvents(array());
     }
 
     public function testRpcController()
@@ -210,13 +225,17 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $artistId = $body['id'];
 
-        $this->getRequest()->setContent('{"name": "AlbumOne","createdAt": "2011-12-18 13:17:17","artist": "' . $artistId . '"}');
+        $this->getRequest()->setContent(
+            '{"name": "AlbumOne","createdAt": "2011-12-18 13:17:17","artist": "' . $artistId . '"}'
+        );
         $this->dispatch('/test/album');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('AlbumOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
 
-        $this->getRequest()->setContent('{"name": "AlbumTwo","createdAt": "2011-12-18 13:17:17","artist": "' . $artistId . '"}');
+        $this->getRequest()->setContent(
+            '{"name": "AlbumTwo","createdAt": "2011-12-18 13:17:17","artist": "' . $artistId . '"}'
+        );
         $this->dispatch('/test/album');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('AlbumTwo', $body['name']);

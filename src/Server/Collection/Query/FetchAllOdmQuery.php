@@ -60,5 +60,4 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
 
         return $count;
     }
-
 }

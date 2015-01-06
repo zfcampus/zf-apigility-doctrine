@@ -22,8 +22,10 @@ use Zend\Stdlib\ArrayUtils;
  *
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
-class DoctrineResource extends AbstractResourceListener
-    implements ObjectManagerAwareInterface, ServiceManagerAwareInterface, EventManagerAwareInterface
+class DoctrineResource extends AbstractResourceListener implements
+    ObjectManagerAwareInterface,
+    ServiceManagerAwareInterface,
+    EventManagerAwareInterface
 {
     use ProvidesObjectManager;
     use EventManagerAwareTrait;
@@ -31,7 +33,7 @@ class DoctrineResource extends AbstractResourceListener
     /**
      * @var array
      */
-    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
+    protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
 
     /**
      * @var ServiceManager
@@ -278,7 +280,9 @@ class DoctrineResource extends AbstractResourceListener
 
         // Add event to set extra HAL data
         $entityClass = $this->getEntityClass();
-        StaticEventManager::getInstance()->attach('ZF\Rest\RestController', 'getList.post',
+        StaticEventManager::getInstance()->attach(
+            'ZF\Rest\RestController',
+            'getList.post',
             function ($e) use ($fetchAllQuery, $entityClass, $data) {
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
@@ -406,7 +410,13 @@ class DoctrineResource extends AbstractResourceListener
             $compositeIdParts = explode($this->getMultiKeyDelimiter(), $id);
 
             if (sizeof($compositeIdParts) != sizeof($identifierFieldNames)) {
-                return new ApiProblem(500, 'Invalid multi identifier count.  ' . sizeof($compositeIdParts) . " must equal " . sizeof($identifierFieldNames));
+                return new ApiProblem(
+                    500,
+                    'Invalid multi identifier count.  '
+                    . sizeof($compositeIdParts)
+                    . ' must equal '
+                    . sizeof($identifierFieldNames)
+                );
             }
 
             foreach ($compositeIdParts as $index => $compositeIdPart) {
@@ -421,17 +431,19 @@ class DoctrineResource extends AbstractResourceListener
         $fieldNames = $classMetaData->getFieldNames();
 
         foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
-
-            if (substr($routeMatchParam,
-                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix()))) {
-
-                $routeMatchParam = substr($routeMatchParam, 0,
-                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix()));
+            if (substr(
+                $routeMatchParam,
+                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix())
+            )) {
+                $routeMatchParam = substr(
+                    $routeMatchParam,
+                    0,
+                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix())
+                );
             }
 
             if (in_array($routeMatchParam, $associationMappings)
                 or in_array($routeMatchParam, $fieldNames)) {
-
                 $criteria[$routeMatchParam] = $value;
             }
         }

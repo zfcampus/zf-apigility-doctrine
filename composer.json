@@ -22,15 +22,14 @@
         "zendframework/zend-serializer": ">=2.3",
         "zendframework/zend-log": ">=2.3",
         "phpunit/phpunit": "3.7.*",
-        "fabpot/php-cs-fixer": "0.4.*@dev",
-        "satooshi/php-coveralls": "dev-master",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
-        "doctrine/mongodb-odm": "~1.0.0"
+        "doctrine/mongodb-odm": "~1.0.0",
+        "squizlabs/php_codesniffer": "~2.0"
     },
     "require": {
         "php": ">=5.4",
-        "phpro/zf-doctrine-hydration-module": "~0.1.0",
+        "phpro/zf-doctrine-hydration-module": "~0.1.0@dev",
         "zfcampus/zf-apigility": "~1.0"
     },
     "minimum-stability": "dev",

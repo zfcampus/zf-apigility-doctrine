@@ -30,23 +30,23 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         // Create DB
         $resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
 
-        $artistResourceDefinition = [
+        $artistResourceDefinition = array(
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/artist",
-        ];
+        );
 
-        $albumResourceDefinition = [
+        $albumResourceDefinition = array(
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Album",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Album",
             "routeIdentifierName" => "album_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/album",
-        ];
+        );
 
         $resource->setModuleName('ZFTestApigilityDbApi');
         $artistEntity = $resource->create($artistResourceDefinition);

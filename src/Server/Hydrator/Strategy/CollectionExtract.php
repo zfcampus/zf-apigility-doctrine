@@ -11,8 +11,7 @@ use ZF\Hal\Collection;
  *
  * @returns HalCollection
  */
-class CollectionExtract extends AbstractCollectionStrategy
-    implements StrategyInterface
+class CollectionExtract extends AbstractCollectionStrategy implements StrategyInterface
 {
     public function extract($value)
     {

@@ -16,7 +16,7 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
     public function setUp()
     {
         $this->setApplicationConfig(
-                include __DIR__ . '/../../../../../config/application.config.php'
+            include __DIR__ . '/../../../../../config/application.config.php'
         );
         parent::setUp();
     }
@@ -39,18 +39,27 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
             'Accept' => 'application/json',
         ));
 
-        $this->dispatch('/apigility/api/module/DbApi/doctrine/DbApi%5CV1%5CRest%5CArtist%5CController', Request::METHOD_GET);
+        $this->dispatch(
+            '/apigility/api/module/DbApi/doctrine/DbApi%5CV1%5CRest%5CArtist%5CController',
+            Request::METHOD_GET
+        );
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertArrayHasKey('controller_service_name', $body);
         $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['controller_service_name']);
 
         $this->dispatch('/apigility/api/module/DbApi/doctrine?version=1', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['_embedded']['doctrine'][0]['controller_service_name']);
+        $this->assertEquals(
+            'DbApi\V1\Rest\Artist\Controller',
+            $body['_embedded']['doctrine'][0]['controller_service_name']
+        );
 
         $this->dispatch('/apigility/api/module/DbApi/doctrine', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('DbApi\V1\Rest\Artist\Controller', $body['_embedded']['doctrine'][0]['controller_service_name']);
+        $this->assertEquals(
+            'DbApi\V1\Rest\Artist\Controller',
+            $body['_embedded']['doctrine'][0]['controller_service_name']
+        );
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
@@ -84,7 +93,10 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc?version=1', Request::METHOD_GET);
         $this->dispatch('/apigility/api/module/DbApi/doctrine-rpc', Request::METHOD_GET);
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('DbApi\V1\Rpc\Artistalbum\Controller', $body['_embedded']['doctrine-rpc'][0]['controller_service_name']);
+        $this->assertEquals(
+            'DbApi\V1\Rpc\Artistalbum\Controller',
+            $body['_embedded']['doctrine-rpc'][0]['controller_service_name']
+        );
 
         foreach ($body['_embedded']['doctrine-rpc'] as $rpc) {
             $this->rpcResource->delete($rpc['controller_service_name']);
