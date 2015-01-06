@@ -18,7 +18,7 @@ before_script:
 
 script:
   - ./vendor/bin/phpunit
-  - ./vendor/bin/phpcs --standard=PSR2 --ignore=test/Bootstrap.php --ignore=test/data/ src test
+  - ./vendor/bin/phpcs --standard=PSR2 --ignore=test/Bootstrap.php --ignore=test/data/ --ignore=test/assets/module src test
 
 services: 
   - mongodb
