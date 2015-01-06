@@ -19,12 +19,12 @@ class EventCatcher implements SharedListenerAggregateInterface
     /**
      * @var array
      */
-    protected $listeners = [];
+    protected $listeners = array();
 
     /**
      * @var array
      */
-    protected $caughtEvents = [];
+    protected $caughtEvents = array();
 
     /**
      * {@inheritDoc}

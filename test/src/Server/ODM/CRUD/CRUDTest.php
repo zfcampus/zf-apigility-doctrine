@@ -84,7 +84,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
-        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_POST]);
+        $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
     }
 
     public function testFetchAll()

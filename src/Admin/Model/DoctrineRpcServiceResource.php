@@ -315,36 +315,36 @@ try {
         }
 
         // @codeCoverageIgnoreStart
-        $collection = [];
+        $collection = array();
 
         foreach ($inputFilters as $inputFilter) {
             $resource = new HalResource($inputFilter, $inputFilter['input_filter_name']);
             $links    = $resource->getLinks();
-            $links->add(Link::factory([
+            $links->add(Link::factory(array(
                 'rel' => 'self',
-                'route' => [
+                'route' => array(
                     'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
-                    'params' => [
+                    'params' => array(
                         'name' => $this->moduleName,
                         'controller_service_name' => $service->controllerServiceName,
                         'input_filter_name' => $inputFilter['input_filter_name'],
-                    ],
-                ],
-            ]));
+                    ),
+                ),
+            )));
             $collection[] = $resource;
         }
 
         $collection = new HalCollection($collection);
         $collection->setCollectionName('input_filter');
         $collection->setCollectionRoute('zf-apigility-admin/module/rpc-service/inputfilter');
-        $collection->setCollectionRouteParams([
+        $collection->setCollectionRouteParams(array(
             'name' => $this->moduleName,
             'controller_service_name' => $service->controllerServiceName,
-        ]);
+        ));
 
-        $service->exchangeArray([
+        $service->exchangeArray(array(
             'input_filters' => $collection,
-        ]);
+        ));
     }
         // @codeCoverageIgnoreEnd
 
@@ -363,8 +363,8 @@ try {
         }
 
         $controller = $this->controllerManager->get($controllerServiceName);
-        $service->exchangeArray([
+        $service->exchangeArray(array(
             'controller_class' => get_class($controller),
-        ]);
+        ));
     }
 }

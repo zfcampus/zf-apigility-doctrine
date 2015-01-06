@@ -47,6 +47,6 @@ class Module implements DependencyIndicatorInterface
      */
     public function getModuleDependencies()
     {
-        return ['Phpro\DoctrineHydrationModule'];
+        return array('Phpro\DoctrineHydrationModule');
     }
 }

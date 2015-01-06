@@ -33,7 +33,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * @var array
      */
-    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
+    protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
 
     /**
      * @var ServiceManager

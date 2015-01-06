@@ -227,10 +227,10 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     protected function loadConfiguredListeners(ServiceLocatorInterface $serviceLocator, $config)
     {
         if (!isset($config['listeners'])) {
-            return [];
+            return array();
         }
 
-        $listeners = [];
+        $listeners = array();
         foreach ($config['listeners'] as $listener) {
             $listeners[] = $serviceLocator->get($listener);
         }

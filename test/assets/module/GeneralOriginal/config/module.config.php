@@ -2,10 +2,10 @@
 
 namespace ZFTestApigilityGeneral;
 
-return [
-    'service_manager' => [
-        'invokables' => [
+return array(
+    'service_manager' => array(
+        'invokables' => array(
             'ZFTestApigilityGeneral\Listener\EventCatcher' => 'ZFTestApigilityGeneral\Listener\EventCatcher',
-        ]
-    ]
-];
+        ),
+    ),
+);

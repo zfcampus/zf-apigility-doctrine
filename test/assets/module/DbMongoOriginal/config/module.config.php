@@ -2,18 +2,18 @@
 
 namespace ZFTestApigilityDbMongo;
 
-return [
-    'doctrine' => [
-        'driver' => [
-            'odm_driver' => [
+return array(
+    'doctrine' => array(
+        'driver' => array(
+            'odm_driver' => array(
                 'class' => 'Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver',
-                'paths' => [__DIR__ . '/yml'],
-            ],
-            'odm_default' => [
-                'drivers' => [
-                    __NAMESPACE__ . '\Document' => 'odm_driver'
-                ]
-            ],
-        ],
-    ],
-];
+                'paths' => array(__DIR__ . '/yml'),
+            ),
+            'odm_default' => array(
+                'drivers' => array(
+                    __NAMESPACE__ . '\Document' => 'odm_driver',
+                ),
+            ),
+        ),
+    ),
+);
