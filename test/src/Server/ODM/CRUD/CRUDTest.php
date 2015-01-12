@@ -68,10 +68,14 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->setUp();
 
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach('ZF\Apigility\Doctrine\DoctrineResource', DoctrineResourceEvent::EVENT_CREATE_PRE, function(DoctrineResourceEvent $e) {
-            $e->stopPropagation();
-            return new ApiProblem(400, 'ZFTestCreateFailure');
-        });
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_CREATE_PRE,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestCreateFailure');
+            }
+        );
 
         $this->getRequest()->getHeaders()->addHeaders(array(
             'Accept' => 'application/json',
@@ -114,10 +118,14 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->setUp();
 
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach('ZF\Apigility\Doctrine\DoctrineResource', DoctrineResourceEvent::EVENT_FETCH_POST, function(DoctrineResourceEvent $e) {
-            $e->stopPropagation();
-            return new ApiProblem(400, 'ZFTestFetchFailure');
-        });
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_FETCH_POST,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestFetchFailure');
+            }
+        );
 
         $this->dispatch('/test/meta/' . $meta->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
@@ -161,10 +169,14 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->setUp();
 
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach('ZF\Apigility\Doctrine\DoctrineResource', DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, function(DoctrineResourceEvent $e) {
-            $e->stopPropagation();
-            return new ApiProblem(400, 'ZFTestFetchAllFailure');
-        });
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestFetchAllFailure');
+            }
+        );
 
         $this->getRequest()->setContent(null);
         $this->dispatch('/test/meta?orderBy%5Bname%5D=ASC');
