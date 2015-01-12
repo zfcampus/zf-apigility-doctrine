@@ -370,8 +370,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
     /**
      * This method will give custom listeners te chance to alter entities / collections.
-     * The listeners are not allowed to give an early result.
-     * It is possible to throw Exceptions, which will result in an ApiProblem eventually.
+     * Listeners can also return an ApiProblem, which will be returned immediately.
+     * It is also possible to throw Exceptions, which will result in an ApiProblem eventually.
      *
      * @param      $name
      * @param      $entity
