@@ -706,7 +706,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                 'collection_name'            => $details->collectionName,
                 'entity_http_methods'        => $details->entityHttpMethods,
                 'collection_http_methods'    => $details->collectionHttpMethods,
-                'collection_query_whitelist'    => ($details->collectionQueryWhitelist) ?: array('query', 'orderBy'),
+                'collection_query_whitelist'    => ($details->collectionQueryWhitelist) ?: array(),
                 'page_size'                  => $details->pageSize,
                 'page_size_param'            => $details->pageSizeParam,
                 'entity_class'               => $details->entityClass,

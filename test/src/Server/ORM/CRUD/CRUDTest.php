@@ -99,7 +99,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         ));
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
-        $this->dispatch('/test/artist?orderBy%5Bname%5D=ASC');
+        $this->dispatch('/test/artist');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals(2, count($body['_embedded']['artist']));

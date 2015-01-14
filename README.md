@@ -35,7 +35,7 @@ for the object manager.
 
 ***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
-This is a Doctrine resource creation route like Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
+This is a Doctrine resource creation route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
 POST Parameters:
 
 ```json
@@ -52,7 +52,6 @@ POST Parameters:
 }
 ```
 
-
 Hydrating Entities by Value or Reference
 ----------------------------------------
 
@@ -61,6 +60,7 @@ By default the admin tool hydrates entities by reference by setting `$config['do
 
 Custom Events
 =============
+
 It is possible to hook in on specific doctrine events of the type `DoctrineResourceEvent`.
 This way, it is possible to alter the doctrine entities or collections before or after a specific action is performed.
 The EVENT_FETCH_ALL_PRE works on the Query Builder from the fetch all query.  This allows you to modify the Query Builder before a fetch is performed.
@@ -133,20 +133,6 @@ $objectManager->getRepository('Album')->findOneBy(
 The album(_id) is not a field on the Album entity and will be ignored.
 
 
-Collections
-===========
-
-The API created with this library implements full featured and paginated
-collection resources.  A collection is returned from a GET call to an entity endpoint without
-specifying the id.  e.g. ```GET /api/resource```
-
-Reserved GET variables
-
-```
-    orderBy
-    query
-```
-
 Providing a base query
 ----------------------
 
@@ -177,20 +163,3 @@ When the query provider is registered, you have to attach it to the doctrine-con
     ),
 ),
 ```
-
-Sorting Collections
--------------------
-
-Sort by columnOne ascending
-
-```
-    /api/user_data?orderBy%5BcolumnOne%5D=ASC
-```
-
-Sort by columnOne ascending then columnTwo decending
-
-```
-    /api/user_data?orderBy%5BcolumnOne%5D=ASC&orderBy%5BcolumnTwo%5D=DESC
-```
-
-

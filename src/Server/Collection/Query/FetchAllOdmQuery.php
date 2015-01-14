@@ -20,18 +20,6 @@ class FetchAllOdmQuery implements ApigilityFetchAllQuery
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->find($entityClass);
 
-        // Orderby
-        if (!isset($parameters['orderBy'])) {
-            $parameters['orderBy'] = array('id' => 'asc');
-        }
-        foreach ($parameters['orderBy'] as $fieldName => $sort) {
-            $queryBuilder->sort($fieldName, $sort);
-        }
-
-        // Get metadata for type casting
-        $cmf = $this->getObjectManager()->getMetadataFactory();
-        $metadata = (array) $cmf->getMetadataFor($entityClass);
-
         return $queryBuilder;
     }
 

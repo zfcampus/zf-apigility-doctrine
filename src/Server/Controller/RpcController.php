@@ -50,8 +50,7 @@ abstract class RpcController extends AbstractActionController
             }
         }
 
-        $query = (array) $this->getRequest()->getQuery()->get('query');
-        $orderBy = $this->getRequest()->getQuery()->get('orderBy');
+        $query = array();
 
         if ($childId) {
             // Verify child is a child of parent
@@ -81,10 +80,7 @@ abstract class RpcController extends AbstractActionController
             $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
 
             $this->getRequest()->setMethod('GET');
-            $hal = $this->forward()->dispatch($controllerName, array(
-                'query' => $query,
-                'orderBy' => $orderBy,
-            ));
+            $hal = $this->forward()->dispatch($controllerName, array());
             $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
             $data = json_decode($renderer->render($hal), true);
 

@@ -32,18 +32,6 @@ class FetchAllOrmQuery implements ObjectManagerAwareInterface, ApigilityFetchAll
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
 
-        // Get metadata for type casting
-        $cmf = $this->getObjectManager()->getMetadataFactory();
-        $entityMetaData = $cmf->getMetadataFor($entityClass);
-        $metadata = (array) $entityMetaData;
-        // Orderby
-        if (!isset($parameters['orderBy'])) {
-            $parameters['orderBy'] = array($entityMetaData->getIdentifier()[0] => 'asc');
-        }
-        foreach ($parameters['orderBy'] as $fieldName => $sort) {
-            $queryBuilder->addOrderBy("row.$fieldName", $sort);
-        }
-
         return $queryBuilder;
     }
 
