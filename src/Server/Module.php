@@ -33,17 +33,10 @@ class Module implements DependencyIndicatorInterface
         $serviceListener = $sm->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            'ZfApigilityDoctrineQueryProviderFetchManager',
-            'zf-apigility-doctrine-query-provider-fetch',
-            'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\FetchQueryProviderInterface',
-            'getZfApigilityDoctrineQueryProviderFetchConfig'
-        );
-
-        $serviceListener->addServiceManager(
-            'ZfApigilityDoctrineQueryProviderFetchAllManager',
-            'zf-apigility-doctrine-query-provider-fetch-all',
-            'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\FetchAllQueryProviderInterface',
-            'getZfApigilityDoctrineQueryProviderFetchAllConfig'
+            'ZfApigilityDoctrineQueryProviderManager',
+            'zf-apigility-doctrine-query-provider',
+            'ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface',
+            'getZfApigilityDoctrineQueryProviderConfig'
         );
     }
 

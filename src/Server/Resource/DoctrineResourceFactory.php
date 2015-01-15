@@ -113,15 +113,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         $objectManager = $this->loadObjectManager($serviceLocator, $config);
         $hydrator = $this->loadHydrator($serviceLocator, $config, $objectManager);
-        $fetchQuery = $this->loadFetchQueryProvider($serviceLocator, $config, $objectManager);
-        $fetchAllQuery = $this->loadFetchAllQueryProvider($serviceLocator, $config, $objectManager);
+        $queryProviders = $this->loadQueryProviders($serviceLocator, $config, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $config);
 
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
-        $listener->setFetchQuery($fetchQuery);
-        $listener->setFetchAllQuery($fetchAllQuery);
+        $listener->setQueryProviders($queryProviders);
         $listener->setServiceManager($serviceLocator);
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
@@ -194,80 +192,39 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      * @return ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
      * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
      */
-    protected function loadFetchAllQueryProvider(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function loadQueryProviders(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        $queryManager = $serviceLocator->get('ZfApigilityDoctrineQueryProviderFetchAllManager');
-        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $fetchAllQuery = $queryManager->get('default-orm');
+        $queryProviders = array();
+        $queryManager = $serviceLocator->get('ZfApigilityDoctrineQueryProviderManager');
+
+        // Load default query provider
+        if (class_exists('\\Doctrine\\ORM\\EntityManager')
+            && $objectManager instanceof \Doctrine\ORM\EntityManager
+        ) {
+            $queryProviders['default'] = $queryManager->get('default-orm');
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager')
             && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager
         ) {
-            $fetchAllQuery = $queryManager->get('default-odm');
+            $queryProviders['default'] = $queryManager->get('default-odm');
         } else {
             // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');
         }
         // @codeCoverageIgnoreEnd
 
-        // Use custom query provider
-        if (isset($config['query_providers']) && isset($config['query_providers']['fetch-all'])) {
-            if (!$queryManager->has($config['query_providers']['fetch-all'])) {
-                throw new ServiceNotCreatedException(
-                    sprintf('Invalid query provider %s.', $config['query_providers']['fetch-all'])
-                );
+        // Load custom query providers
+        if (isset($config['query_providers'])) {
+            foreach ($config['query_providers'] as $method => $plugin) {
+                $queryProviders[$method] = $queryManager->get($plugin);
             }
-
-            $fetchAllQuery = $queryManager->get($config['query_providers']['fetch-all']);
         }
 
-        /**
- * @var $fetchAllQuery ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
-*/
-        $fetchAllQuery->setObjectManager($objectManager);
-
-        return $fetchAllQuery;
-    }
-
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     * @param                         $objectManager
-     *
-     * @return ZF\Apigility\Doctrine\Query\Provider\Fetch\FetchQueryProviderInterface
-     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
-     */
-    protected function loadFetchQueryProvider(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
-    {
-        $queryManager = $serviceLocator->get('ZfApigilityDoctrineQueryProviderFetchManager');
-        if (class_exists('\\Doctrine\\ORM\\EntityManager') && $objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $fetchQuery = $queryManager->get('default-orm');
-        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager')
-            && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager
-        ) {
-            $fetchQuery = $queryManager->get('default-odm');
-        } else {
-            // @codeCoverageIgnoreStart
-            throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');
-        }
-        // @codeCoverageIgnoreEnd
-
-        // Use custom query provider
-        if (isset($config['query_providers']) && isset($config['query_providers']['fetch'])) {
-            if (!$queryManager->has($config['query_providers']['fetch'])) {
-                throw new ServiceNotCreatedException(
-                    sprintf('Invalid query provider %s.', $config['query_providers']['fetch'])
-                );
-            }
-
-            $fetchQuery = $queryManager->get($config['query_providers']['fetch']);
+        // Set object manager for all query providers
+        foreach ($queryProviders as $provider) {
+            $provider->setObjectManager($objectManager);
         }
 
-        /**
- * @var $fetchQuery ZF\Apigility\Doctrine\Query\Provider\Fetch\FetchQueryProviderInterface
-*/
-        $fetchQuery->setObjectManager($objectManager);
-
-        return $fetchQuery;
+        return $queryProviders;
     }
 
     /**

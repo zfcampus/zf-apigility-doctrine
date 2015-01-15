@@ -14,24 +14,15 @@ return array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
         ),
         'factories' => array(
-            'ZfApigilityDoctrineQueryProviderFetchManager'    =>
-                'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchManagerFactory',
-            'ZfApigilityDoctrineQueryProviderFetchAllManager' =>
-                'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchAllManagerFactory',
+            'ZfApigilityDoctrineQueryProviderManager'    =>
+                'ZF\Apigility\Doctrine\Server\Query\Provider\Service\QueryProviderManagerFactory',
         ),
     ),
 
-    'zf-apigility-doctrine-query-provider-fetch' => array(
+    'zf-apigility-doctrine-query-provider' => array(
         'invokables' => array(
-            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOrm',
-            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOdm',
-        )
-    ),
-
-    'zf-apigility-doctrine-query-provider-fetch-all' => array(
-        'invokables' => array(
-            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOrm',
-            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOdm',
+            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOrm',
+            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOdm',
         )
     ),
 

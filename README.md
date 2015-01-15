@@ -136,36 +136,38 @@ The album(_id) is not a field on the Album entity and will be ignored.
 Query Providers
 ===============
 
-Query Providers are available for find and find-all operations.  The find query provider is used to fetch an entity before it is acted upon for GET, POST, PUT, PATCH and DELETE.  The find-all query provider is used to fetch a collection on GET.  
+Query Providers are available for all find operations.  The find query provider is used to fetch an entity before it is acted upon for all DoctrineResource methods except create.
 
-A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = 1');``` in your query provider before returning the QueryBuilder created therein.
+A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = 1');``` in your query provider before returning the QueryBuilder created therein.  Other uses include soft deletes so the end user can only see the active records.
 
-Other uses include soft deletes so the end user can only see the active records.
-
-A custom plugin manager is available to register your own query providers.  This can be done through following configurations:
+A custom plugin manager is available to register your own query providers.  This can be done through following configuration:
 
 ```php
-'zf-apigility-doctrine-query-provider-fetch' => array(
+'zf-apigility-doctrine-query-provider' => array(
     'invokables' => array(
-        'custom-fetch-query-provider' => 'Application\Query\Provider\Fetch\QueryProvider',
-    )
-),
-
-'zf-apigility-doctrine-query-provider-fetch-all' => array(
-    'invokables' => array(
-        'custom-fetch-all-query-provider' => 'Application\Query\Provider\FetchAll\QueryProvider',
+        'custom-query-provider' => 'Application\Query\Provider\CustomQueryProvider',
     )
 ),
 ```
 
-When the query provider is registered attach it to the doctrine-connected resource configuration:
+When the query provider is registered attach it to the doctrine-connected resource configuration.  The default query provider is used if no specific query provider is set.  You may set query providers for these keys:
+```
+default
+fetch
+fetch-all
+update
+patch
+delete
+```
+
 ```php
 'zf-apigility' => array(
     'doctrine-connected' => array(
         'Api\\V1\\Rest\\....' => array(
             'query_providers' => array(
-                'fetch' => 'custom-fetch-query-provider',
-                'fetch-all' => 'custom-fetch-all-query-provider',
+                'default' => 'default-orm',
+                'fetch-all' => 'custom-query-provider',
+                // or fetch, update, patch, delete
             ),
         ),
     ),

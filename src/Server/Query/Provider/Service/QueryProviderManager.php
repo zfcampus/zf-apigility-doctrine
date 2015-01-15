@@ -2,11 +2,11 @@
 
 namespace ZF\Apigility\Doctrine\Server\Query\Provider\Service;
 
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\Exception;
-use ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\FetchQueryProviderInterface;
 
-class FetchManager extends AbstractPluginManager
+class QueryProviderManager extends AbstractPluginManager
 {
     protected $invokableClasses = array();
 
@@ -18,7 +18,7 @@ class FetchManager extends AbstractPluginManager
      */
     public function validatePlugin($plugin)
     {
-        if ($plugin instanceof FetchQueryProviderInterface) {
+        if ($plugin instanceof QueryProviderInterface) {
             // we're okay
             return;
         }
@@ -26,7 +26,7 @@ class FetchManager extends AbstractPluginManager
         // @codeCoverageIgnoreStart
         throw new Exception\RuntimeException(
             sprintf(
-                'Plugin of type %s is invalid; must implement FetchQueryProviderInterface',
+                'Plugin of type %s is invalid; must implement QueryProviderInterface',
                 (is_object($plugin) ? get_class($plugin) : gettype($plugin))
             )
         );

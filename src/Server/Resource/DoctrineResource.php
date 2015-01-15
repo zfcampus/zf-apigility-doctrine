@@ -118,14 +118,9 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
-     * @var Query\ApigilityFetchAllQuery
+     * @var queryProviders array
      */
-    protected $fetchAllQuery;
-
-    /**
-     * @var Query\ApigilityFetchQuery
-     */
-    protected $fetchQuery;
+    protected $queryProviders;
 
     /**
      * @param ServiceManager $serviceManager
@@ -148,35 +143,33 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery $fetchAllQuery
+     * @param ZF\Apigility\Doctrine\Query\Provider\QueryProviderInterface
      */
-    public function setFetchQuery($fetchQuery)
+    public function setQueryProviders(array $queryProviders)
     {
-        $this->fetchQuery = $fetchQuery;
+        $this->queryProviders = $queryProviders;
+    }
+
+    /**
+     * @param ZF\Apigility\Doctrine\Query\Provider\QueryProviderInterface
+     */
+    public function getQueryProviders()
+    {
+        return $this->queryProviders;
     }
 
     /**
      * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
      */
-    public function getFetchQuery()
+    public function getQueryProvider($method)
     {
-        return $this->fetchQuery;
-    }
+        $queryProviders = $this->getQueryProviders();
 
-    /**
-     * @param \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery $fetchAllQuery
-     */
-    public function setFetchAllQuery($fetchAllQuery)
-    {
-        $this->fetchAllQuery = $fetchAllQuery;
-    }
+        if (isset($queryProviders[$method])) {
+            return $queryProviders[$method];
+        }
 
-    /**
-     * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
-     */
-    public function getFetchAllQuery()
-    {
-        return $this->fetchAllQuery;
+        return $queryProviders['default'];
     }
 
     /**
@@ -280,7 +273,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function delete($id)
     {
-        $entity = $this->findEntity($id);
+        $entity = $this->findEntity($id, 'delete');
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -325,7 +318,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function fetch($id)
     {
-        $entity = $this->findEntity($id);
+        $entity = $this->findEntity($id, 'fetch');
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -353,8 +346,8 @@ class DoctrineResource extends AbstractResourceListener implements
     public function fetchAll($data = array())
     {
         // Build query
-        $fetchAllQuery = $this->getFetchAllQuery();
-        $queryBuilder = $fetchAllQuery->createQuery($this->getEntityClass(), $data);
+        $queryProvider = $this->getQueryProvider('fetch-all');
+        $queryBuilder = $queryProvider->createQuery($this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -370,7 +363,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $eventManager = $this->getEventManager();
         $response = $eventManager->trigger($event);
 
-        $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
+        $adapter = $queryProvider->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
@@ -381,7 +374,7 @@ class DoctrineResource extends AbstractResourceListener implements
         StaticEventManager::getInstance()->attach(
             'ZF\Rest\RestController',
             'getList.post',
-            function ($e) use ($fetchAllQuery, $entityClass, $data) {
+            function ($e) use ($queryProvider, $entityClass, $data) {
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
 
@@ -392,7 +385,7 @@ class DoctrineResource extends AbstractResourceListener implements
                     array(
                     'count' => $collection->getCurrentItemCount(),
                     'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
+                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass),
                     )
                 );
 
@@ -416,7 +409,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function patch($id, $data)
     {
-        $entity = $this->findEntity($id);
+        $entity = $this->findEntity($id, 'patch');
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -461,7 +454,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function update($id, $data)
     {
-        $entity = $this->findEntity($id);
+        $entity = $this->findEntity($id, 'update');
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -514,7 +507,7 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @return object
      */
-    protected function findEntity($id)
+    protected function findEntity($id, $method)
     {
         $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
         $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
@@ -566,8 +559,8 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         // Build query
-        $fetchQuery = $this->getFetchQuery();
-        $queryBuilder = $fetchQuery->createQuery($this->getEntityClass());
+        $queryProvider = $this->getQueryProvider($method);
+        $queryBuilder = $queryProvider->createQuery($this->getEntityClass(), null);
 
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -580,7 +573,7 @@ class DoctrineResource extends AbstractResourceListener implements
             if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
                 $queryBuilder->field($key)->equals($value);
             } else {
-                $queryBuilder->andwhere($queryBuilder->expr()->eq('entity.' . $key, $value));
+                $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key, $value));
             }
         }
 

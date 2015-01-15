@@ -1,12 +1,12 @@
 <?php
 
-namespace ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll;
+namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 
-interface FetchAllQueryProviderInterface extends ObjectManagerAwareInterface
+interface QueryProviderInterface extends ObjectManagerAwareInterface
 {
     /**
      * @param string $entityClass
@@ -17,6 +17,10 @@ interface FetchAllQueryProviderInterface extends ObjectManagerAwareInterface
     public function createQuery($entityClass, $parameters);
 
     /**
+     * This function is not necessary for any but fetch-all queries
+     * In order to provide a single QueryProvider service this is
+     * included in this interface.
+     *
      * @param   $queryBuilder
      *
      * @return AdapterInterface
@@ -24,6 +28,10 @@ interface FetchAllQueryProviderInterface extends ObjectManagerAwareInterface
     public function getPaginatedQuery($queryBuilder);
 
     /**
+     * This function is not necessary for any but fetch-all queries
+     * In order to provide a single QueryProvider service this is
+     * included in this interface.
+     *
      * @param   $entityClass
      *
      * @return int
