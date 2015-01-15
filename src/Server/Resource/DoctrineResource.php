@@ -281,6 +281,13 @@ class DoctrineResource extends AbstractResourceListener implements
     public function delete($id)
     {
         $entity = $this->findEntity($id);
+
+        if ($entity instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $entity;
+        }
+            // @codeCoverageIgnoreEnd
+
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -318,25 +325,19 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function fetch($id)
     {
-        /**
-         * Zoom would be a nice-to-have
-        $parameters = $this->getEvent()->getQueryParams()->toArray();
-
-        if ($this->getEvent()->getRouteParam('zoom')) {
-            $parameters['zoom'] = $this->getEvent()->getRouteParam('zoom');
-        }
-
-        if (isset($parameters['zoom'])) {
-            foreach ($parameters['zoom'] as $collectionName) {
-                if ($this->getHydrator()->getExtractService()->hasStrategy($collectionName)) {
-                    $this->getHydrator()->getExtractService()->removeStrategy($collectionName);
-                    $this->getHydrator()->getExtractService()->addStrategy($collectionName, new CollectionExtract());
-                }
-            }
-        }
-        */
-
         $entity = $this->findEntity($id);
+
+        if ($entity instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $entity;
+        }
+            // @codeCoverageIgnoreEnd
+
+        if (!$entity) {
+            // @codeCoverageIgnoreStart
+            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
+        }
+
         $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
 
         return $entity;
@@ -416,6 +417,13 @@ class DoctrineResource extends AbstractResourceListener implements
     public function patch($id, $data)
     {
         $entity = $this->findEntity($id);
+
+        if ($entity instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $entity;
+        }
+            // @codeCoverageIgnoreEnd
+
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
@@ -454,6 +462,13 @@ class DoctrineResource extends AbstractResourceListener implements
     public function update($id, $data)
     {
         $entity = $this->findEntity($id);
+
+        if ($entity instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $entity;
+        }
+            // @codeCoverageIgnoreEnd
+
         if (!$entity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
