@@ -80,10 +80,21 @@ EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 ```
 
-The EventManager is available through the StaticEventManager:
+Attach to events through the Shared Event Manager:
 
 ```php
-StaticEventManager::getInstance()->attach('ZF\Apigility\Doctrine\DoctrineResource', 'create.post', $callable);
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+
+$sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+
+$sharedEvents->attach(
+    'ZF\Apigility\Doctrine\DoctrineResource',
+    DoctrineResourceEvent::EVENT_CREATE_PRE,
+    function(DoctrineResourceEvent $e) {
+        $e->stopPropagation();
+        return new ApiProblem(400, 'Stop API Creation');
+    }
+);
 ```
 
 It is also possible to add custom event listeners to the configuration of a single doctrine-connected resource:
@@ -137,8 +148,7 @@ Collections
 ===========
 
 The API created with this library implements full featured and paginated
-collection resources.  A collection is returned from a GET call to an entity endpoint without
-specifying the id.  e.g. ```GET /api/resource```
+collection resources.  A collection is returned from a GET call to an entity endpoint without specifying the id.  e.g. ```GET /api/resource```
 
 Reserved GET variables
 
@@ -152,11 +162,9 @@ Providing a base query
 
 This module uses an empty Doctrine query-builder to create the base query for a collection.
 In some cases you want to have more control over the query-builder.
-For example: When using soft deletes, you want to make sure that the end-user can only see the active records.
-Therefore it is also possible to use your own query provider.
+For example: When using soft deletes, you want to make sure that the end-user can only see the active records.  Therefore it is also possible to use your own query provider.
 
-A custom plugin manager is available to register your own query providers.
-This can be done through following configuration:
+A custom plugin manager is available to register your own query providers.  This can be done through following configuration:
 
 ```php
 'zf-collection-query' => array(
@@ -166,8 +174,7 @@ This can be done through following configuration:
 ),
 ```
 
-You have to make sure that this registered class implements the `ApigilityFetchAllQuery` interface.
-When the query provider is registered, you have to attach it to the doctrine-connected resource configuration:
+You have to make sure that this registered class implements the `ApigilityFetchAllQuery` interface.  When the query provider is registered, you have to attach it to the doctrine-connected resource configuration:
 ```php
 'zf-apigility' => array(
     'doctrine-connected' => array(
@@ -192,5 +199,3 @@ Sort by columnOne ascending then columnTwo decending
 ```
     /api/user_data?orderBy%5BcolumnOne%5D=ASC&orderBy%5BcolumnTwo%5D=DESC
 ```
-
-

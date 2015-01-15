@@ -166,10 +166,17 @@ class DoctrineResource extends AbstractResourceListener implements
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);
 
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         $this->getObjectManager()->persist($entity);
         $this->getObjectManager()->flush();
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return $entity;
     }
@@ -189,10 +196,17 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return true;
     }
@@ -239,7 +253,10 @@ class DoctrineResource extends AbstractResourceListener implements
         */
 
         $entity = $this->findEntity($id);
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return $entity;
     }
@@ -271,12 +288,18 @@ class DoctrineResource extends AbstractResourceListener implements
         $event->setEntity($this->getEntityClass());
         $eventManager = $this->getEventManager();
         $response = $eventManager->trigger($event);
+        if ($response->last() instanceof ApiProblem) {
+            return $response->last();
+        }
 
         $adapter = $fetchAllQuery->getPaginatedQuery($queryBuilder);
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         // Add event to set extra HAL data
         $entityClass = $this->getEntityClass();
@@ -324,9 +347,16 @@ class DoctrineResource extends AbstractResourceListener implements
         // Hydrate entity with patched data
         $this->getHydrator()->hydrate((array) $data, $entity);
 
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         $this->getObjectManager()->flush();
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return $entity;
     }
@@ -361,17 +391,24 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getHydrator()->hydrate((array) $data, $entity);
 
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         $this->getObjectManager()->flush();
-        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return $entity;
     }
 
     /**
      * This method will give custom listeners te chance to alter entities / collections.
-     * The listeners are not allowed to give an early result.
-     * It is possible to throw Exceptions, which will result in an ApiProblem eventually.
+     * Listeners can also return an ApiProblem, which will be returned immediately.
+     * It is also possible to throw Exceptions, which will result in an ApiProblem eventually.
      *
      * @param      $name
      * @param      $entity
