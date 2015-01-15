@@ -254,7 +254,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Create a resource
      *
-     * @param  mixed            $data
+     * @param  mixed $data
      * @return ApiProblem|mixed
      */
     public function create($data)
@@ -275,7 +275,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Delete a resource
      *
-     * @param  mixed            $id
+     * @param  mixed $id
      * @return ApiProblem|mixed
      */
     public function delete($id)
@@ -298,8 +298,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Delete a collection, or members of a collection
      *
-     * @param  mixed            $data
-     * @return ApiProblem|mixed
+     * @param              mixed $data
+     * @return             ApiProblem|mixed
      *                               @codeCoverageIgnore
      */
     public function deleteList($data)
@@ -313,7 +313,7 @@ class DoctrineResource extends AbstractResourceListener implements
      * If the extractCollections array contains a collection for this resource
      * expand that collection instead of returning a link to the collection
      *
-     * @param  mixed            $id
+     * @param  mixed $id
      * @return ApiProblem|mixed
      */
     public function fetch($id)
@@ -345,9 +345,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Fetch all or a subset of resources
      *
-     *
-     * @see Apigility/Doctrine/Server/Resource/AbstractResource.php
-     * @param  array            $data
+     * @see    Apigility/Doctrine/Server/Resource/AbstractResource.php
+     * @param  array $data
      * @return ApiProblem|mixed
      */
     public function fetchAll($data = array())
@@ -388,15 +387,19 @@ class DoctrineResource extends AbstractResourceListener implements
                 $collection->setItemCountPerPage($halCollection->getPageSize());
                 $collection->setCurrentPageNumber($halCollection->getPage());
 
-                $halCollection->setAttributes(array(
-                   'count' => $collection->getCurrentItemCount(),
-                   'total' => $collection->getTotalItemCount(),
-                   'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
-                ));
+                $halCollection->setAttributes(
+                    array(
+                    'count' => $collection->getCurrentItemCount(),
+                    'total' => $collection->getTotalItemCount(),
+                    'collectionTotal' => $fetchAllQuery->getCollectionTotal($entityClass),
+                    )
+                );
 
-                $halCollection->setCollectionRouteOptions(array(
+                $halCollection->setCollectionRouteOptions(
+                    array(
                     'query' => ArrayUtils::iteratorToArray($data)
-                ));
+                    )
+                );
             }
         );
 
@@ -406,8 +409,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Patch (partial in-place update) a resource
      *
-     * @param  mixed            $id
-     * @param  mixed            $data
+     * @param  mixed $id
+     * @param  mixed $data
      * @return ApiProblem|mixed
      */
     public function patch($id, $data)
@@ -432,8 +435,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Replace a collection or members of a collection
      *
-     * @param  mixed            $data
-     * @return ApiProblem|mixed
+     * @param              mixed $data
+     * @return             ApiProblem|mixed
      *                               @codeCoverageIgnore
      */
     public function replaceList($data)
@@ -444,8 +447,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Update a resource
      *
-     * @param  mixed            $id
-     * @param  mixed            $data
+     * @param  mixed $id
+     * @param  mixed $data
      * @return ApiProblem|mixed
      */
     public function update($id, $data)
@@ -471,9 +474,9 @@ class DoctrineResource extends AbstractResourceListener implements
      * The listeners are not allowed to give an early result.
      * It is possible to throw Exceptions, which will result in an ApiProblem eventually.
      *
-     * @param      $name
-     * @param      $entity
-     * @param null $collection
+     * @param $name
+     * @param $entity
+     * @param null   $collection
      *
      * @return \Zend\EventManager\ResponseCollection
      */
@@ -541,7 +544,8 @@ class DoctrineResource extends AbstractResourceListener implements
             }
 
             if (in_array($routeMatchParam, $associationMappings)
-                or in_array($routeMatchParam, $fieldNames)) {
+                or in_array($routeMatchParam, $fieldNames)
+            ) {
                 $criteria[$routeMatchParam] = $value;
             }
         }

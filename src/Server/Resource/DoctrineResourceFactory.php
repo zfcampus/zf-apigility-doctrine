@@ -29,8 +29,8 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      * Determine if we can create a service with name
      *
      * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
+     * @param $name
+     * @param $requestedName
      *
      * @return bool
      * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
@@ -65,11 +65,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $reflection = new \ReflectionClass($className);
         if (!$reflection->isSubclassOf('\ZF\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
             // @codeCoverageIgnoreStart
-            throw new ServiceNotFoundException(sprintf(
-                '%s requires that a valid DoctrineResource "class" is specified for listener %s; no service found',
-                __METHOD__,
-                $requestedName
-            ));
+            throw new ServiceNotFoundException(
+                sprintf(
+                    '%s requires that a valid DoctrineResource "class" is specified for listener %s; no service found',
+                    __METHOD__,
+                    $requestedName
+                )
+            );
         }
         // @codeCoverageIgnoreEnd
 
@@ -77,11 +79,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $config = $config['zf-apigility']['doctrine-connected'];
         if (!isset($config[$requestedName]) || !isset($config[$requestedName]['object_manager'])) {
             // @codeCoverageIgnoreStart
-            throw new ServiceNotFoundException(sprintf(
-                '%s requires that a valid "object_manager" is specified for listener %s; no service found',
-                __METHOD__,
-                $requestedName
-            ));
+            throw new ServiceNotFoundException(
+                sprintf(
+                    '%s requires that a valid "object_manager" is specified for listener %s; no service found',
+                    __METHOD__,
+                    $requestedName
+                )
+            );
         }
             // @codeCoverageIgnoreEnd
 
@@ -94,8 +98,8 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      * Create service with name
      *
      * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
+     * @param $name
+     * @param $requestedName
      *
      * @return DoctrineResource
      */
@@ -208,13 +212,17 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // Use custom query provider
         if (isset($config['query_providers']) && isset($config['query_providers']['fetch-all'])) {
             if (!$queryManager->has($config['query_providers']['fetch-all'])) {
-                throw new ServiceNotCreatedException(sprintf('Invalid query provider %s.', $config['query_providers']['fetch-all']));
+                throw new ServiceNotCreatedException(
+                    sprintf('Invalid query provider %s.', $config['query_providers']['fetch-all'])
+                );
             }
 
             $fetchAllQuery = $queryManager->get($config['query_providers']['fetch-all']);
         }
 
-        /** @var $fetchAllQuery ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface */
+        /**
+ * @var $fetchAllQuery ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
+*/
         $fetchAllQuery->setObjectManager($objectManager);
 
         return $fetchAllQuery;
@@ -246,13 +254,17 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // Use custom query provider
         if (isset($config['query_providers']) && isset($config['query_providers']['fetch'])) {
             if (!$queryManager->has($config['query_providers']['fetch'])) {
-                throw new ServiceNotCreatedException(sprintf('Invalid query provider %s.', $config['query_providers']['fetch']));
+                throw new ServiceNotCreatedException(
+                    sprintf('Invalid query provider %s.', $config['query_providers']['fetch'])
+                );
             }
 
             $fetchQuery = $queryManager->get($config['query_providers']['fetch']);
         }
 
-        /** @var $fetchQuery ZF\Apigility\Doctrine\Query\Provider\Fetch\FetchQueryProviderInterface */
+        /**
+ * @var $fetchQuery ZF\Apigility\Doctrine\Query\Provider\Fetch\FetchQueryProviderInterface
+*/
         $fetchQuery->setObjectManager($objectManager);
 
         return $fetchQuery;

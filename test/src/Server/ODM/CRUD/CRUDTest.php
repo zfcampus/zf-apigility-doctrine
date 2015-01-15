@@ -46,10 +46,12 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
     public function testCreate()
     {
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
-        ));
+            )
+        );
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
         $this->dispatch('/test/meta');
@@ -57,10 +59,12 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents(
+            array(
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
-        ));
+            )
+        );
     }
 
     public function testFetch()
@@ -75,9 +79,11 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $dm->persist($meta);
         $dm->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
-        ));
+            )
+        );
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
         $this->dispatch('/test/meta/' . $meta->getId());
@@ -103,21 +109,25 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $dm->persist($meta);
         $dm->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
-        ));
+            )
+        );
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
         $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals(2, count($body['_embedded']['meta']));
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents(
+            array(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
-        ));
+            )
+        );
     }
-/*
+    /*
     public function testPatch()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
@@ -218,5 +228,5 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
     }
 
-*/
+    */
 }

@@ -59,7 +59,7 @@ class Artist
     /**
      * Add album
      *
-     * @param \Db\Entity\Album $album
+     * @param  \Db\Entity\Album $album
      * @return Artist
      */
     public function addAlbum($album)

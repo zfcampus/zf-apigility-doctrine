@@ -44,7 +44,9 @@ class DefaultOdmQuery implements ObjectManagerAwareInterface, FetchQueryProvider
      */
     public function createQuery($entityClass)
     {
-        /** @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder */
+        /**
+ * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder
+*/
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->find($entityClass);
 

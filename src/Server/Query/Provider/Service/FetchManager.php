@@ -24,10 +24,12 @@ class FetchManager extends AbstractPluginManager
         }
 
         // @codeCoverageIgnoreStart
-        throw new Exception\RuntimeException(sprintf(
-            'Plugin of type %s is invalid; must implement FetchQueryProviderInterface',
-            (is_object($plugin) ? get_class($plugin) : gettype($plugin))
-        ));
+        throw new Exception\RuntimeException(
+            sprintf(
+                'Plugin of type %s is invalid; must implement FetchQueryProviderInterface',
+                (is_object($plugin) ? get_class($plugin) : gettype($plugin))
+            )
+        );
         // @codeCoverageIgnoreEnd
     }
 }

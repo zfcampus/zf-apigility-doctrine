@@ -38,7 +38,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
     /**
      * Fetch REST metadata
      *
-     * @param  string                       $id
+     * @param  string $id
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($entityClassName)
@@ -66,7 +66,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array               $params
+     * @param  array $params
      * @return RestServiceEntity[]
      */
     public function fetchAll($params = array())

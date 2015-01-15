@@ -44,7 +44,8 @@ abstract class RpcController extends AbstractActionController
         foreach ($sourceMetadata->associationMappings as $mapping) {
             if ($mapping['sourceEntity'] == $associationConfig['source_entity']
                 and $mapping['targetEntity'] == $associationConfig['target_entity']
-                and $mapping['fieldName'] == $associationConfig['field_name']) {
+                and $mapping['fieldName'] == $associationConfig['field_name']
+            ) {
                 $sourceField = $mapping['mappedBy'];
                 break;
             }
@@ -54,16 +55,21 @@ abstract class RpcController extends AbstractActionController
 
         if ($childId) {
             // Verify child is a child of parent
-            $child = $objectManager->getRepository($associationConfig['target_entity'])->findOneBy(array(
+            $child = $objectManager->getRepository($associationConfig['target_entity'])->findOneBy(
+                array(
                 'id' => $childId,
                 $sourceField => $parentId,
-            ));
+                )
+            );
 
             if ($child) {
                 $this->getRequest()->setMethod('GET');
-                $hal = $this->forward()->dispatch($controllerName, array(
+                $hal = $this->forward()->dispatch(
+                    $controllerName,
+                    array(
                     $targetRouteParam => $childId,
-                ));
+                    )
+                );
                 $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
                 $data = json_decode($renderer->render($hal), true);
 
