@@ -10,30 +10,58 @@ use InvalidArgumentException;
 use RuntimeException;
 use ZF\Hal\Collection as HalCollection;
 use ZF\Apigility\Admin\Model\RpcServiceEntity;
+use Zend\Stdlib\ArraySerializableInterface;
 
-class DoctrineRpcServiceEntity extends RpcServiceEntity
+class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializableInterface
 {
+    /**
+     * @var array
+     */
     protected $acceptWhitelist = array(
         'application/json',
         'application/*+json',
     );
 
+    /**
+     * @var array
+     */
     protected $contentTypeWhitelist = array(
         'application/json',
     );
 
+    /**
+     * @var string
+     */
     protected $controllerClass;
 
+    /**
+     * @var string
+     */
     protected $controllerServiceName;
 
+    /**
+     * @var array
+     */
     protected $httpMethods = array('GET');
 
+    /**
+     * @var array
+     */
     protected $inputFilters;
 
+    /**
+     * @var string
+     */
     protected $routeMatch;
 
+    /**
+     * @var string
+     */
     protected $routeName;
 
+    /**
+     * @var string
+     */
     protected $selector = 'Json';
 
     public function __get($name)

@@ -10,6 +10,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Exception;
 
 class DoctrineMetadataServiceResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
@@ -32,7 +33,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function create($data)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 
     /**
@@ -84,7 +85,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        $return = [];
+        $return = array();
         foreach ($metadataFactory->getAllMetadata() as $metadata) {
             $entityClass = $this->getEntityClass();
             $metadataEntity = new $entityClass;
@@ -101,7 +102,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function patch($id, $data)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 
     /**
@@ -109,6 +110,6 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function delete($id)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 }

@@ -25,10 +25,10 @@ abstract class RpcController extends AbstractActionController
         $zfRpcDoctrineControllerArrayKey = array_search(get_class($this), $config['controllers']['invokables']);
 
         $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
-        $metadataConfig = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
-        $hydratorConfig = $config['doctrine-hydrator'][$metadataConfig['hydrator']];
+        $metadataConfig    = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
+        $hydratorConfig    = $config['doctrine-hydrator'][$metadataConfig['hydrator']];
 
-        $objectManager = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
+        $objectManager   = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
         $metadataFactory = $objectManager->getMetadataFactory();
 
         // Find target entity controller to dispatch

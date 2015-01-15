@@ -37,6 +37,9 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         $this->restFactory = $restFactory;
     }
 
+    /**
+     * @return string
+     */
     public function setModuleName($value)
     {
         $this->moduleName = $value;

@@ -7,17 +7,33 @@
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use ZF\Apigility\Admin\Model\RestServiceEntity;
+use Zend\Stdlib\ArraySerializableInterface;
 
-class DoctrineRestServiceEntity extends RestServiceEntity
+class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerializableInterface
 {
+    /**
+     * @var string
+     */
     protected $hydratorName;
 
+    /**
+     * @var ObjectManger
+     */
     protected $objectManager;
 
+    /**
+     * @var boolean
+     */
     protected $byValue = true;
 
+    /**
+     * @var array
+     */
     protected $hydratorStrategies = array();
 
+    /**
+     * @var boolean
+     */
     protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
@@ -50,9 +66,9 @@ class DoctrineRestServiceEntity extends RestServiceEntity
     public function getArrayCopy()
     {
         $data = parent::getArrayCopy();
-        $data['hydrator_name']      = $this->hydratorName;
-        $data['object_manager']     = $this->objectManager;
-        $data['by_value']   = $this->byValue;
+        $data['hydrator_name'] = $this->hydratorName;
+        $data['object_manager'] = $this->objectManager;
+        $data['by_value'] = $this->byValue;
         $data['strategies'] = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 

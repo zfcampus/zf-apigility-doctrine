@@ -53,8 +53,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         InputFilterModel $inputFilterModel,
         ControllerManager $controllerManager
     ) {
-        $this->rpcFactory = $rpcFactory;
-        $this->inputFilterModel = $inputFilterModel;
+        $this->rpcFactory        = $rpcFactory;
+        $this->inputFilterModel  = $inputFilterModel;
         $this->controllerManager = $controllerManager;
     }
 
@@ -102,7 +102,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         if ($this->model instanceof DoctrineRpcServiceModel) {
             return $this->model;
         }
-        $moduleName = $this->getModuleName();
+        $moduleName  = $this->getModuleName();
         $this->model = $this->rpcFactory->factory($moduleName);
 
         return $this->model;
@@ -325,15 +325,15 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             $links->add(
                 Link::factory(
                     array(
-                    'rel' => 'self',
-                    'route' => array(
-                    'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
-                    'params' => array(
-                        'name' => $this->moduleName,
-                        'controller_service_name' => $service->controllerServiceName,
-                        'input_filter_name' => $inputFilter['input_filter_name'],
-                    ),
-                    ),
+                        'rel' => 'self',
+                        'route' => array(
+                            'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
+                            'params' => array(
+                                'name' => $this->moduleName,
+                                'controller_service_name' => $service->controllerServiceName,
+                                'input_filter_name' => $inputFilter['input_filter_name'],
+                            ),
+                        ),
                     )
                 )
             );

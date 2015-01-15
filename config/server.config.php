@@ -7,14 +7,17 @@
 return array(
     'service_manager' => array(
         'invokables' => array(
-            'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract' => 'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract',
+            'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract' =>
+                'ZF\\Apigility\\Doctrine\\Server\\Hydrator\\Strategy\\CollectionExtract',
         ),
         'abstract_factories' => array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
         ),
         'factories' => array(
-            'ZfApigilityDoctrineQueryProviderFetchManager'    => 'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchManagerFactory',
-            'ZfApigilityDoctrineQueryProviderFetchAllManager' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchAllManagerFactory',
+            'ZfApigilityDoctrineQueryProviderFetchManager'    =>
+                'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchManagerFactory',
+            'ZfApigilityDoctrineQueryProviderFetchAllManager' =>
+                'ZF\Apigility\Doctrine\Server\Query\Provider\Service\FetchAllManagerFactory',
         ),
     ),
 
@@ -32,24 +35,18 @@ return array(
         )
     ),
 
-    'asset_manager' => array(
-        'resolver_configs' => array(
-            'paths' => array(
-                __DIR__ . '/../asset',
-            ),
-        ),
-    ),
-
     'view_manager' => array(
         'template_path_stack' => array(
-            'zf-apigility-doctrine-server' => __DIR__ . '/../view',
+            'zf-apigility-doctrine' => __DIR__ . '/../view',
         ),
     ),
 
     'validators' => array(
         'factories' => array(
-            'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' => 'ZF\Apigility\Doctrine\Server\Validator\NoObjectExistsFactory',
-            'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' => 'ZF\Apigility\Doctrine\Server\Validator\ObjectExistsFactory',
+            'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' =>
+                'ZF\Apigility\Doctrine\Server\Validator\NoObjectExistsFactory',
+            'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' =>
+                'ZF\Apigility\Doctrine\Server\Validator\ObjectExistsFactory',
         ),
     ),
 );

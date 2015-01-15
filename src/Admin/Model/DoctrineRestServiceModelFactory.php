@@ -13,7 +13,7 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements ServiceManagerAwareInterface
 {
-    const TYPE_DEFAULT      = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
+    const TYPE_DEFAULT = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 
     /**
      * @param  string $module
