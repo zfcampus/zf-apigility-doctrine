@@ -4,18 +4,12 @@ namespace ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
-use Zend\Paginator\Adapter\AdapterInterface;
+use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\FetchAllQueryProviderInterface;
 
-/**
- * Class FetchAllOrmQuery
- *
- * @package ZF\Apigility\Doctrine\Server\Resource\Query
- */
-class DefaultOrmQuery implements ObjectManagerAwareInterface, FetchAllQueryProviderInterface
+class DefaultOdm implements FetchAllQueryProviderInterface
 {
     /**
      * @var ObjectManager
@@ -43,16 +37,15 @@ class DefaultOrmQuery implements ObjectManagerAwareInterface, FetchAllQueryProvi
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $parameters
-     *
-     * @return mixed This will return an ORM or ODM Query\Builder
+     * {@inheritDoc}
      */
     public function createQuery($entityClass, $parameters)
     {
+        /**
+ * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder
+*/
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $queryBuilder->select('row')
-            ->from($entityClass, 'row');
+        $queryBuilder->find($entityClass);
 
         return $queryBuilder;
     }
@@ -60,11 +53,11 @@ class DefaultOrmQuery implements ObjectManagerAwareInterface, FetchAllQueryProvi
     /**
      * @param   $queryBuilder
      *
-     * @return AdapterInterface
+     * @return DoctrineOdmAdapter
      */
     public function getPaginatedQuery($queryBuilder)
     {
-        $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
+        $adapter = new DoctrineOdmAdapter($queryBuilder);
 
         return $adapter;
     }
@@ -77,13 +70,9 @@ class DefaultOrmQuery implements ObjectManagerAwareInterface, FetchAllQueryProvi
     public function getCollectionTotal($entityClass)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $cmf = $this->getObjectManager()->getMetadataFactory();
-        $entityMetaData = $cmf->getMetadataFor($entityClass);
+        $queryBuilder->find($entityClass);
+        $count = $queryBuilder->getQuery()->execute()->count();
 
-        $identifier = $entityMetaData->getIdentifier();
-        $queryBuilder->select('count(row.' . $identifier[0] . ')')
-            ->from($entityClass, 'row');
-
-        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+        return $count;
     }
 }

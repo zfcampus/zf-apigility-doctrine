@@ -8,11 +8,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 use ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\FetchQueryProviderInterface;
 
 /**
- * Class DefaultOrmQuery
+ * Class DefaultOrm
  *
  * @package ZF\Apigility\Doctrine\Server\Query\Provider\Fetch
  */
-class DefaultOdmQuery implements ObjectManagerAwareInterface, FetchQueryProviderInterface
+class DefaultOdm implements ObjectManagerAwareInterface, FetchQueryProviderInterface
 {
     /**
      * @var ObjectManager

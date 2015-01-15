@@ -12,7 +12,7 @@ use ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\FetchQueryProviderInterfac
  *
  * @package ZF\Apigility\Doctrine\Server\Query\Provider\Fetch
  */
-class DefaultOrmQuery implements ObjectManagerAwareInterface, FetchQueryProviderInterface
+class DefaultOrm implements ObjectManagerAwareInterface, FetchQueryProviderInterface
 {
     /**
      * @var ObjectManager

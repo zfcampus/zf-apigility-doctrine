@@ -4,12 +4,18 @@ namespace ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
+use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
+use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\FetchAllQueryProviderInterface;
 
-class DefaultOdmQuery implements FetchAllQueryProviderInterface
+/**
+ * Class FetchAllOrm
+ *
+ * @package ZF\Apigility\Doctrine\Server\Resource\Query
+ */
+class DefaultOrm implements ObjectManagerAwareInterface, FetchAllQueryProviderInterface
 {
     /**
      * @var ObjectManager
@@ -37,15 +43,16 @@ class DefaultOdmQuery implements FetchAllQueryProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @param string $entityClass
+     * @param array  $parameters
+     *
+     * @return mixed This will return an ORM or ODM Query\Builder
      */
     public function createQuery($entityClass, $parameters)
     {
-        /**
- * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder
-*/
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $queryBuilder->find($entityClass);
+        $queryBuilder->select('row')
+            ->from($entityClass, 'row');
 
         return $queryBuilder;
     }
@@ -53,11 +60,11 @@ class DefaultOdmQuery implements FetchAllQueryProviderInterface
     /**
      * @param   $queryBuilder
      *
-     * @return DoctrineOdmAdapter
+     * @return AdapterInterface
      */
     public function getPaginatedQuery($queryBuilder)
     {
-        $adapter = new DoctrineOdmAdapter($queryBuilder);
+        $adapter = new DoctrineOrmAdapter($queryBuilder->getQuery(), false);
 
         return $adapter;
     }
@@ -70,9 +77,13 @@ class DefaultOdmQuery implements FetchAllQueryProviderInterface
     public function getCollectionTotal($entityClass)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $queryBuilder->find($entityClass);
-        $count = $queryBuilder->getQuery()->execute()->count();
+        $cmf = $this->getObjectManager()->getMetadataFactory();
+        $entityMetaData = $cmf->getMetadataFor($entityClass);
 
-        return $count;
+        $identifier = $entityMetaData->getIdentifier();
+        $queryBuilder->select('count(row.' . $identifier[0] . ')')
+            ->from($entityClass, 'row');
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }

@@ -20,15 +20,15 @@ return array(
 
     'zf-apigility-doctrine-query-provider-fetch' => array(
         'invokables' => array(
-            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOrmQuery',
-            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOdmQuery',
+            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOrm',
+            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\Fetch\DefaultOdm',
         )
     ),
 
     'zf-apigility-doctrine-query-provider-fetch-all' => array(
         'invokables' => array(
-            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOrmQuery',
-            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOdmQuery',
+            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOrm',
+            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\FetchAll\DefaultOdm',
         )
     ),
 
