@@ -133,32 +133,40 @@ $objectManager->getRepository('Album')->findOneBy(
 The album(_id) is not a field on the Album entity and will be ignored.
 
 
-Providing a base query
-----------------------
+Query Providers
+===============
 
-This module uses an empty Doctrine query-builder to create the base query for a collection.
-In some cases you want to have more control over the query-builder.
-For example: When using soft deletes, you want to make sure that the end-user can only see the active records.
-Therefore it is also possible to use your own query provider.
+Query Providers are available for find and find-all operations.  The find query provider is used to fetch an entity before it is acted upon for GET, POST, PUT, PATCH and DELETE.  The find-all query provider is used to fetch a collection on GET.  
 
-A custom plugin manager is available to register your own query providers.
-This can be done through following configuration:
+A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = 1');``` in your query provider before returning the QueryBuilder created therein.
+
+Other uses include soft deletes so the end user can only see the active records.
+
+A custom plugin manager is available to register your own query providers.  This can be done through following configurations:
 
 ```php
-'zf-collection-query' => array(
+'zf-apigility-doctrine-query-provider-fetch' => array(
     'invokables' => array(
-        'custom-query-provider' => 'Application\My\Custom\QueryProvider',
+        'custom-fetch-query-provider' => 'Application\Query\Provider\Fetch\QueryProvider',
+    )
+),
+
+'zf-apigility-doctrine-query-provider-fetch-all' => array(
+    'invokables' => array(
+        'custom-fetch-all-query-provider' => 'Application\Query\Provider\FetchAll\QueryProvider',
     )
 ),
 ```
 
-You have to make sure that this registered class implements the `ApigilityFetchAllQuery` interface.
-When the query provider is registered, you have to attach it to the doctrine-connected resource configuration:
+When the query provider is registered attach it to the doctrine-connected resource configuration:
 ```php
 'zf-apigility' => array(
     'doctrine-connected' => array(
         'Api\\V1\\Rest\\....' => array(
-            'query_provider' => 'custom-query-provider',
+            'query_providers' => array(
+                'fetch' => 'custom-fetch-query-provider',
+                'fetch-all' => 'custom-fetch-all-query-provider',
+            ),
         ),
     ),
 ),

@@ -3,7 +3,6 @@
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
-use DoctrineModule\Persistence\ProvidesObjectManager;
 use DoctrineModule\Stdlib\Hydrator;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareTrait;
@@ -16,6 +15,10 @@ use Zend\EventManager\StaticEventManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\Stdlib\ArrayUtils;
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\EventManager;
+use Doctrine\Common\Persistence\ObjectManager;
+use Traversable;
 
 /**
  * Class DoctrineResource
@@ -27,8 +30,82 @@ class DoctrineResource extends AbstractResourceListener implements
     ServiceManagerAwareInterface,
     EventManagerAwareInterface
 {
-    use ProvidesObjectManager;
-    use EventManagerAwareTrait;
+    /**
+     * @var EventManagerInterface
+     */
+    protected $events;
+
+    /**
+     * Set the event manager instance used by this context.
+     *
+     * For convenience, this method will also set the class name / LSB name as
+     * identifiers, in addition to any string or array of strings set to the
+     * $this->eventIdentifier property.
+     *
+     * @param  EventManagerInterface $events
+     * @return mixed
+     */
+    public function setEventManager(EventManagerInterface $events)
+    {
+        $identifiers = array(__CLASS__, get_class($this));
+        if (isset($this->eventIdentifier)) {
+            if ((is_string($this->eventIdentifier))
+                || (is_array($this->eventIdentifier))
+                || ($this->eventIdentifier instanceof Traversable)
+            ) {
+                $identifiers = array_unique(array_merge($identifiers, (array) $this->eventIdentifier));
+            } elseif (is_object($this->eventIdentifier)) {
+                $identifiers[] = $this->eventIdentifier;
+            }
+            // silently ignore invalid eventIdentifier types
+        }
+        $events->setIdentifiers($identifiers);
+        $this->events = $events;
+        if (method_exists($this, 'attachDefaultListeners')) {
+            $this->attachDefaultListeners();
+        }
+        return $this;
+    }
+
+    /**
+     * Retrieve the event manager
+     *
+     * Lazy-loads an EventManager instance if none registered.
+     *
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        if (!$this->events instanceof EventManagerInterface) {
+            $this->setEventManager(new EventManager());
+        }
+        return $this->events;
+    }
+
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * Set the object manager
+     *
+     * @param ObjectManager $objectManager
+     */
+    public function setObjectManager(ObjectManager $objectManager)
+    {
+        $this->objectManager = $objectManager;
+    }
+
+    /**
+     * Get the object manager
+     *
+     * @return ObjectManager
+     */
+    public function getObjectManager()
+    {
+        return $this->objectManager;
+    }
 
     /**
      * @var array
@@ -44,6 +121,11 @@ class DoctrineResource extends AbstractResourceListener implements
      * @var Query\ApigilityFetchAllQuery
      */
     protected $fetchAllQuery;
+
+    /**
+     * @var Query\ApigilityFetchQuery
+     */
+    protected $fetchQuery;
 
     /**
      * @param ServiceManager $serviceManager
@@ -63,6 +145,22 @@ class DoctrineResource extends AbstractResourceListener implements
     public function getServiceManager()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * @param \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery $fetchAllQuery
+     */
+    public function setFetchQuery($fetchQuery)
+    {
+        $this->fetchQuery = $fetchQuery;
+    }
+
+    /**
+     * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
+     */
+    public function getFetchQuery()
+    {
+        return $this->fetchQuery;
     }
 
     /**
@@ -448,9 +546,25 @@ class DoctrineResource extends AbstractResourceListener implements
             }
         }
 
-        $entity = $this->getObjectManager()->getRepository($this->getEntityClass())
-            ->findOneBy($criteria);
+        // Build query
+        $fetchQuery = $this->getFetchQuery();
+        $queryBuilder = $fetchQuery->createQuery($this->getEntityClass());
 
-        return $entity;
+        if ($queryBuilder instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $queryBuilder;
+        }
+            // @codeCoverageIgnoreEnd
+
+        // Add criteria
+        foreach ($criteria as $key => $value) {
+            if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
+                $queryBuilder->field($key)->equals($value);
+            } else {
+                $queryBuilder->andwhere($queryBuilder->expr()->eq('entity.' . $key, $value));
+            }
+        }
+
+        return $queryBuilder->getQuery()->getSingleResult();
     }
 }
