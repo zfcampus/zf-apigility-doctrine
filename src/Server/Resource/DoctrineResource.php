@@ -19,6 +19,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Traversable;
+use Doctrine\ORM\NoResultException;
 
 /**
  * Class DoctrineResource
@@ -143,7 +144,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Query\Provider\QueryProviderInterface
+     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
      */
     public function setQueryProviders(array $queryProviders)
     {
@@ -151,7 +152,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Query\Provider\QueryProviderInterface
+     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
      */
     public function getQueryProviders()
     {
@@ -159,7 +160,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return \ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery
+     * @return ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
      */
     public function getQueryProvider($method)
     {
@@ -288,12 +289,6 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        if (!$entity) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
-        }
-            // @codeCoverageIgnoreEnd
-
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
@@ -339,11 +334,6 @@ class DoctrineResource extends AbstractResourceListener implements
             return $entity;
         }
             // @codeCoverageIgnoreEnd
-
-        if (!$entity) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
-        }
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
@@ -440,12 +430,6 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        if (!$entity) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
-        }
-            // @codeCoverageIgnoreEnd
-
         // Hydrate entity with patched data
         $this->getHydrator()->hydrate((array) $data, $entity);
 
@@ -491,12 +475,6 @@ class DoctrineResource extends AbstractResourceListener implements
             return $entity;
         }
             // @codeCoverageIgnoreEnd
-
-        if (!$entity) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(404, 'Entity with id ' . $id . ' was not found');
-            // @codeCoverageIgnoreEnd
-        }
 
         $this->getHydrator()->hydrate((array) $data, $entity);
 
@@ -614,6 +592,16 @@ class DoctrineResource extends AbstractResourceListener implements
             }
         }
 
-        return $queryBuilder->getQuery()->getSingleResult();
+        try {
+            $entity = $queryBuilder->getQuery()->getSingleResult();
+        } catch (NoResultException $e) {
+            $entity = null;
+        }
+
+        if (!$entity) {
+            $entity = new ApiProblem(404, 'Entity was not found');
+        }
+
+        return $entity;
     }
 }

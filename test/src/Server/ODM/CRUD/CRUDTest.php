@@ -90,7 +90,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
 
     public function testFetch()
@@ -119,6 +118,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
 
         // Test fetch() with listener that returns ApiProblem
+        // Listener will not run because ApiProblem of 404 returns first
         $this->reset();
         $this->setUp();
 
@@ -132,11 +132,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
             }
         );
 
-        $this->dispatch('/test/meta/' . $meta->getId());
+        $this->dispatch('/test/meta/' . 111);
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
-        $this->assertEquals('ZFTestFetchFailure', $body['detail']);
-        $this->assertEquals(400, $this->getResponseStatusCode());
+        $this->assertEquals(404, $this->getResponseStatusCode());
     }
 
     public function testFetchAll()
@@ -191,7 +190,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestFetchAllFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
     /*
     public function testPatch()

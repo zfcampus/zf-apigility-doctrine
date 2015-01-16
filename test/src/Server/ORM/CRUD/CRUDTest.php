@@ -84,7 +84,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
 
     public function testFetch()
@@ -128,8 +127,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->dispatch('/test/artist/' . $artist->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
-        $this->assertEquals('ZFTestFetchFailure', $body['detail']);
-        $this->assertEquals(400, $this->getResponseStatusCode());
+        $this->assertEquals(404, $this->getResponseStatusCode());
     }
 
     public function testFetchAll()
@@ -183,7 +181,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestFetchAllFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
 
     public function testPatch()
@@ -250,7 +247,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestPatchFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
 
     public function testPut()
@@ -317,7 +313,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestPutFailure', $body['detail']);
         $this->assertEquals(400, $this->getResponseStatusCode());
->>>>>>> 140-apiproblem-from-listener
     }
 
     public function testDelete()
@@ -397,6 +392,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         );
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
         $this->dispatch('/test/artist/' . $artist->getId());
+        $body = ($this->getResponse()->getBody());
         $this->assertEquals(404, $this->getResponseStatusCode());
         $this->validateTriggeredEvents(array());
     }
