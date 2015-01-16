@@ -80,10 +80,21 @@ EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 ```
 
-The EventManager is available through the StaticEventManager:
+Attach to events through the Shared Event Manager:
 
 ```php
-StaticEventManager::getInstance()->attach('ZF\Apigility\Doctrine\DoctrineResource', 'create.post', $callable);
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+
+$sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+
+$sharedEvents->attach(
+    'ZF\Apigility\Doctrine\DoctrineResource',
+    DoctrineResourceEvent::EVENT_CREATE_PRE,
+    function(DoctrineResourceEvent $e) {
+        $e->stopPropagation();
+        return new ApiProblem(400, 'Stop API Creation');
+    }
+);
 ```
 
 It is also possible to add custom event listeners to the configuration of a single doctrine-connected resource:
@@ -151,14 +162,13 @@ A custom plugin manager is available to register your own query providers.  This
 ```
 
 When the query provider is registered attach it to the doctrine-connected resource configuration.  The default query provider is used if no specific query provider is set.  You may set query providers for these keys:
-```
-default
-fetch
-fetch-all
-update
-patch
-delete
-```
+
+* default
+* fetch
+* fetch-all
+* update
+* patch
+* delete
 
 ```php
 'zf-apigility' => array(

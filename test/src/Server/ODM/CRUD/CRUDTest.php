@@ -7,6 +7,7 @@
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use MongoClient;
+use ZF\ApiProblem\ApiProblem;
 use ZFTestApigilityGeneral\Listener\EventCatcher;
 use Zend\Http\Request;
 use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
@@ -59,12 +60,37 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
-        $this->validateTriggeredEvents(
-            array(
+        $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
-            )
+        ));
+
+        // Test create() with listener that returns ApiProblem
+        $this->reset();
+        $this->setUp();
+
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_CREATE_PRE,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestCreateFailure');
+            }
         );
+
+        $this->getRequest()->getHeaders()->addHeaders(array(
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+        ));
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistEleven","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/meta');
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+        $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+        $this->assertEquals(400, $this->getResponseStatusCode());
+>>>>>>> 140-apiproblem-from-listener
     }
 
     public function testFetch()
@@ -91,6 +117,26 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
         $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
+
+        // Test fetch() with listener that returns ApiProblem
+        $this->reset();
+        $this->setUp();
+
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_FETCH_POST,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestFetchFailure');
+            }
+        );
+
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+        $this->assertEquals('ZFTestFetchFailure', $body['detail']);
+        $this->assertEquals(400, $this->getResponseStatusCode());
     }
 
     public function testFetchAll()
@@ -120,12 +166,32 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals(2, count($body['_embedded']['meta']));
-        $this->validateTriggeredEvents(
-            array(
+        $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
-            )
+        ));
+
+        // Test fetchAll() with listener that returns ApiProblem
+        $this->reset();
+        $this->setUp();
+
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestFetchAllFailure');
+            }
         );
+
+        $this->getRequest()->setContent(null);
+        $this->dispatch('/test/meta?orderBy%5Bname%5D=ASC');
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+        $this->assertEquals('ZFTestFetchAllFailure', $body['detail']);
+        $this->assertEquals(400, $this->getResponseStatusCode());
+>>>>>>> 140-apiproblem-from-listener
     }
     /*
     public function testPatch()
