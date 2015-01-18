@@ -201,11 +201,11 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         if (class_exists('\\Doctrine\\ORM\\EntityManager')
             && $objectManager instanceof \Doctrine\ORM\EntityManager
         ) {
-            $queryProviders['default'] = $queryManager->get('default-orm');
+            $queryProviders['default'] = $queryManager->get('default_orm');
         } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager')
             && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager
         ) {
-            $queryProviders['default'] = $queryManager->get('default-odm');
+            $queryProviders['default'] = $queryManager->get('default_odm');
         } else {
             // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');

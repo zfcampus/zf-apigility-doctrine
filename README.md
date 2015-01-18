@@ -156,7 +156,7 @@ A custom plugin manager is available to register your own query providers.  This
 ```php
 'zf-apigility-doctrine-query-provider' => array(
     'invokables' => array(
-        'custom-query-provider' => 'Application\Query\Provider\CustomQueryProvider',
+        'entity_name_fetch_all' => 'Application\Query\Provider\EntityName\FetchAll',
     )
 ),
 ```
@@ -176,7 +176,7 @@ When the query provider is registered attach it to the doctrine-connected resour
         'Api\\V1\\Rest\\....' => array(
             'query_providers' => array(
                 'default' => 'default-orm',
-                'fetch_all' => 'custom-query-provider',
+                'fetch_all' => 'entity_name_fetch_all',
                 // or fetch, update, patch, delete
             ),
         ),
