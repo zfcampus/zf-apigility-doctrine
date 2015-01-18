@@ -14,15 +14,15 @@ return array(
             'ZF\Apigility\Doctrine\Server\Resource\DoctrineResourceFactory',
         ),
         'factories' => array(
-            'ZfApigilityDoctrineQueryProviderManager'    =>
+            'ZfApigilityDoctrineQueryProviderManager' =>
                 'ZF\Apigility\Doctrine\Server\Query\Provider\Service\QueryProviderManagerFactory',
         ),
     ),
 
     'zf-apigility-doctrine-query-provider' => array(
         'invokables' => array(
-            'default-orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOrm',
-            'default-odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOdm',
+            'default_orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOrm',
+            'default_odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOdm',
         )
     ),
 
