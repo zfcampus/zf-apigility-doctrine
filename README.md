@@ -165,7 +165,7 @@ When the query provider is registered attach it to the doctrine-connected resour
 
 * default
 * fetch
-* fetch-all
+* fetch_all
 * update
 * patch
 * delete
@@ -176,7 +176,7 @@ When the query provider is registered attach it to the doctrine-connected resour
         'Api\\V1\\Rest\\....' => array(
             'query_providers' => array(
                 'default' => 'default-orm',
-                'fetch-all' => 'custom-query-provider',
+                'fetch_all' => 'custom-query-provider',
                 // or fetch, update, patch, delete
             ),
         ),

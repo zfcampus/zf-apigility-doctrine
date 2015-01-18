@@ -353,7 +353,7 @@ class DoctrineResource extends AbstractResourceListener implements
     public function fetchAll($data = array())
     {
         // Build query
-        $queryProvider = $this->getQueryProvider('fetch-all');
+        $queryProvider = $this->getQueryProvider('fetch_all');
         $queryBuilder = $queryProvider->createQuery($this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
