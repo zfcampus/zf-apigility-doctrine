@@ -48,7 +48,7 @@ class DefaultOrm implements ObjectManagerAwareInterface, QueryProviderInterface
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery($entityClass, $parameters)
+    public function createQuery($event, $entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->select('row')

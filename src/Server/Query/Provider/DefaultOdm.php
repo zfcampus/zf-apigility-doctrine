@@ -39,7 +39,7 @@ class DefaultOdm implements QueryProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function createQuery($entityClass, $parameters)
+    public function createQuery($event, $entityClass, $parameters)
     {
         /**
          * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder

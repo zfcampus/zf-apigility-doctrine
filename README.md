@@ -76,6 +76,8 @@ EVENT_UPDATE_PRE = 'update.pre';
 EVENT_UPDATE_POST = 'update.post';
 EVENT_PATCH_PRE = 'patch.pre';
 EVENT_PATCH_POST = 'patch.post';
+EVENT_PATCH_PRE = 'patch.pre';
+EVENT_PATCH_POST = 'patch.post';
 EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 ```
@@ -149,7 +151,7 @@ Query Providers
 
 Query Providers are available for all find operations.  The find query provider is used to fetch an entity before it is acted upon for all DoctrineResource methods except create.
 
-A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = 1');``` in your query provider before returning the QueryBuilder created therein.  Other uses include soft deletes so the end user can only see the active records.
+A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = ' . $event->getIdentity());``` in your query provider before returning the QueryBuilder created therein.  Other uses include soft deletes so the end user can only see the active records.
 
 A custom plugin manager is available to register your own query providers.  This can be done through following configuration:
 
@@ -169,6 +171,8 @@ When the query provider is registered attach it to the doctrine-connected resour
 * update
 * patch
 * delete
+
+* patch_all delegates to patch
 
 ```php
 'zf-apigility' => array(
