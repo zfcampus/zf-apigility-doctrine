@@ -7,6 +7,7 @@ use DoctrineModule\Stdlib\Hydrator\Strategy\AbstractCollectionStrategy;
 use ZF\Hal\Collection;
 
 /**
+ * Class CollectionExtract
  * A field-specific hydrator for collections.
  *
  * @returns HalCollection
@@ -16,7 +17,7 @@ class CollectionExtract extends AbstractCollectionStrategy implements StrategyIn
     public function extract($value)
     {
         $value = ($value)?: array();
-        
+
         $halCollection = new Collection($value);
 
         return $halCollection;

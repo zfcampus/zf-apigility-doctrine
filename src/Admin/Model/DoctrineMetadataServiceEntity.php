@@ -6,7 +6,9 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-class DoctrineMetadataServiceEntity
+use Zend\Stdlib\ArraySerializableInterface;
+
+class DoctrineMetadataServiceEntity implements ArraySerializableInterface
 {
     protected $name;
     protected $namespace;
@@ -175,7 +177,7 @@ class DoctrineMetadataServiceEntity
 
     public function getArrayCopy()
     {
-        return [
+        return array(
             'name' => $this->name,
             'namespace' => $this->namespace,
             'rootEntityName' => $this->rootEntityName,
@@ -213,6 +215,6 @@ class DoctrineMetadataServiceEntity
             '*namingStrategy' => $this->namingStrategy,
             'reflFields' => $this->reflFields,
             'Doctrine\ORM\Mapping\ClassMetadataInfo_prototype' => $this->ClassMetadataInfo_prototype,
-        ];
+        );
     }
 }

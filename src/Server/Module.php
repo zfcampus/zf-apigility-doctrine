@@ -33,10 +33,10 @@ class Module implements DependencyIndicatorInterface
         $serviceListener = $sm->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            'ZfCollectionQueryManager',
-            'zf-collection-query',
-            'ZF\Apigility\Doctrine\Server\Collection\Query\ApigilityFetchAllQuery',
-            'getZfCollectionQueryConfig'
+            'ZfApigilityDoctrineQueryProviderManager',
+            'zf-apigility-doctrine-query-provider',
+            'ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface',
+            'getZfApigilityDoctrineQueryProviderConfig'
         );
     }
 

@@ -37,9 +37,11 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
-        ));
+            )
+        );
 
         $this->dispatch(
             '/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist',
@@ -84,7 +86,7 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
 
         $filter = new FilterChain();
         $filter->attachByName('WordCamelCaseToUnderscore')
-               ->attachByName('StringToLower');
+            ->attachByName('StringToLower');
 
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
         $metadataFactory = $em->getMetadataFactory();
@@ -97,19 +99,21 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
                         'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource'
                     );
                     $rpcServiceResource->setModuleName('DbApi');
-                    $rpcServiceResource->create(array(
+                    $rpcServiceResource->create(
+                        array(
                         'service_name' => 'Artist' . $mapping['fieldName'],
                         'route' => '/db-test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
                         'http_methods' => array(
-                            'GET', 'PUT', 'POST'
+                        'GET', 'PUT', 'POST'
                         ),
                         'options' => array(
-                            'target_entity' => $mapping['targetEntity'],
-                            'source_entity' => $mapping['sourceEntity'],
-                            'field_name' => $mapping['fieldName'],
+                        'target_entity' => $mapping['targetEntity'],
+                        'source_entity' => $mapping['sourceEntity'],
+                        'field_name' => $mapping['fieldName'],
                         ),
                         'selector' => 'custom selector',
-                    ));
+                        )
+                    );
                     break;
                 default:
                     break;

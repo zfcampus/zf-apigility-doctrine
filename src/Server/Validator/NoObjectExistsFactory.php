@@ -18,21 +18,23 @@ class NoObjectExistsFactory implements FactoryInterface, MutableCreationOptionsI
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $validators
+     * @param  ServiceLocatorInterface $validators
      * @return mixed
      */
     public function createService(ServiceLocatorInterface $validators)
     {
         if (isset($this->options['entity_class'])) {
-            return new NoObjectExists(ArrayUtils::merge(
-                $this->options,
-                array(
+            return new NoObjectExists(
+                ArrayUtils::merge(
+                    $this->options,
+                    array(
                     'object_repository' => $validators
                         ->getServiceLocator()
                         ->get('Doctrine\ORM\EntityManager')
                         ->getRepository($this->options['entity_class'])
+                    )
                 )
-            ));
+            );
         }
         return new NoObjectExists($this->options);
     }

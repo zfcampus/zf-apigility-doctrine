@@ -10,6 +10,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Exception;
 
 class DoctrineMetadataServiceResource extends AbstractResourceListener implements ServiceManagerAwareInterface
 {
@@ -32,13 +33,13 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function create($data)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 
     /**
      * Fetch REST metadata
      *
-     * @param  string                       $id
+     * @param  string $id
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($entityClassName)
@@ -66,7 +67,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array               $params
+     * @param  array $params
      * @return RestServiceEntity[]
      */
     public function fetchAll($params = array())
@@ -84,7 +85,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        $return = [];
+        $return = array();
         foreach ($metadataFactory->getAllMetadata() as $metadata) {
             $entityClass = $this->getEntityClass();
             $metadataEntity = new $entityClass;
@@ -101,7 +102,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function patch($id, $data)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 
     /**
@@ -109,6 +110,6 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener implement
      */
     public function delete($id)
     {
-        throw new \Exception('Not Implemented');
+        throw new Exception('Not Implemented');
     }
 }

@@ -12,17 +12,17 @@ use ZF\Rest\ResourceEvent;
  */
 class DoctrineResourceEvent extends Event
 {
-    const EVENT_FETCH_POST = 'fetch.post';
-    const EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
+    const EVENT_FETCH_POST     = 'fetch.post';
+    const EVENT_FETCH_ALL_PRE  = 'fetch-all.pre';
     const EVENT_FETCH_ALL_POST = 'fetch-all.post';
-    const EVENT_CREATE_PRE = 'create.pre';
-    const EVENT_CREATE_POST = 'create.post';
-    const EVENT_UPDATE_PRE = 'update.pre';
-    const EVENT_UPDATE_POST = 'update.post';
-    const EVENT_PATCH_PRE = 'patch.pre';
-    const EVENT_PATCH_POST = 'patch.post';
-    const EVENT_DELETE_PRE = 'delete.pre';
-    const EVENT_DELETE_POST = 'delete.post';
+    const EVENT_CREATE_PRE     = 'create.pre';
+    const EVENT_CREATE_POST    = 'create.post';
+    const EVENT_UPDATE_PRE     = 'update.pre';
+    const EVENT_UPDATE_POST    = 'update.post';
+    const EVENT_PATCH_PRE      = 'patch.pre';
+    const EVENT_PATCH_POST     = 'patch.post';
+    const EVENT_DELETE_PRE     = 'delete.pre';
+    const EVENT_DELETE_POST    = 'delete.post';
 
     /**
      * @var ResourceEvent

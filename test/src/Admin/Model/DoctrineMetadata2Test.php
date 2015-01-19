@@ -35,9 +35,11 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
-        ));
+            )
+        );
 
         $this->dispatch(
             '/apigility/api/module/DbApi/doctrine/DbApi%5CV1%5CRest%5CArtist%5CController',
@@ -65,23 +67,30 @@ class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $this->resource->setModuleName('DbApi');
         $this->assertEquals($this->resource->getModuleName(), 'DbApi');
 
-        $entity = $this->resource->patch('DbApi\\V1\\Rest\\Artist\\Controller', array(
-            'routematch' => '/doctrine-changed/test',
-            'httpmethods' => array('GET', 'POST', 'PUT'),
-            'selector' => 'new doctrine selector',
-            'accept_whitelist' => array('new whitelist accept'),
-            'content_type_whitelist' => array('new content whitelist'),
-        ));
+        $entity = $this->resource->patch(
+            'DbApi\\V1\\Rest\\Artist\\Controller',
+            array(
+                'routematch' => '/doctrine-changed/test',
+                'httpmethods' => array('GET', 'POST', 'PUT'),
+                'selector' => 'new doctrine selector',
+                'accept_whitelist' => array('new whitelist accept'),
+                'content_type_whitelist' => array('new content whitelist'),
+            )
+        );
 
         $this->rpcResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
         $this->rpcResource->setModuleName('DbApi');
-        $this->rpcResource->patch('DbApi\\V1\\Rpc\\Artistalbum\\Controller', array(
-            'routematch' => '/doctrine-rpc-changed/test',
-            'httpmethods' => array('GET', 'POST', 'PUT'),
-            'selector' => 'new selector',
-            'accept_whitelist' => array('new whitelist'),
-            'content_type_whitelist' => array('new content whitelist'),
-        ));
+        $this->rpcResource->
+            patch(
+                'DbApi\\V1\\Rpc\\Artistalbum\\Controller',
+                array(
+                'routematch' => '/doctrine-rpc-changed/test',
+                'httpmethods' => array('GET', 'POST', 'PUT'),
+                'selector' => 'new selector',
+                'accept_whitelist' => array('new whitelist'),
+                'content_type_whitelist' => array('new content whitelist'),
+                )
+            );
 
         // Test get model returns cached model
         $this->assertEquals($this->rpcResource->getModel(), $this->rpcResource->getModel());
