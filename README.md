@@ -12,7 +12,7 @@ Installation of this module uses composer. For composer documentation, please re
 [getcomposer.org](http://getcomposer.org/).
 
 ```sh
-$ php composer.phar require zfcampus/zf-apigility-doctrine:dev-master
+$ php composer.phar require zfcampus/zf-apigility-doctrine "~0.2"
 ```
 
 This library provides two modules.  The first, ZF\Apigility\Doctrine\Server provides
