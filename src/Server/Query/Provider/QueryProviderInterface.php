@@ -5,6 +5,7 @@ namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
+use ZF\Rest\ResourceEvent;
 
 interface QueryProviderInterface extends ObjectManagerAwareInterface
 {
@@ -14,7 +15,7 @@ interface QueryProviderInterface extends ObjectManagerAwareInterface
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery($event, $entityClass, $parameters);
+    public function createQuery(ResourceEvent $event, $entityClass, $parameters);
 
     /**
      * This function is not necessary for any but fetch-all queries

@@ -9,6 +9,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Rest\ResourceEvent;
 
 /**
  * Class FetchAllOrm
@@ -48,7 +49,7 @@ class DefaultOrm implements ObjectManagerAwareInterface, QueryProviderInterface
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery($event, $entityClass, $parameters)
+    public function createQuery(ResourceEvent $event, $entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->select('row')

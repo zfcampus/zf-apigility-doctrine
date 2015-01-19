@@ -8,6 +8,7 @@ use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Rest\ResourceEvent;
 
 class DefaultOdm implements QueryProviderInterface
 {
@@ -39,7 +40,7 @@ class DefaultOdm implements QueryProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function createQuery($event, $entityClass, $parameters)
+    public function createQuery(ResourceEvent $event, $entityClass, $parameters)
     {
         /**
          * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder

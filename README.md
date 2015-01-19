@@ -179,7 +179,7 @@ When the query provider is registered attach it to the doctrine-connected resour
     'doctrine-connected' => array(
         'Api\\V1\\Rest\\....' => array(
             'query_providers' => array(
-                'default' => 'default-orm',
+                'default' => 'default_orm',
                 'fetch_all' => 'entity_name_fetch_all',
                 // or fetch, update, patch, delete
             ),
