@@ -72,24 +72,26 @@ class DoctrineRestServiceResourceTest extends AbstractHttpControllerTestCase //T
         $this->assertNotEmpty($controllerServiceName);
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
 
-//        $serviceManager = ServiceManagerFactory::getServiceManager();
-//        $config = $serviceManager->get('Config');
+        //        $serviceManager = ServiceManagerFactory::getServiceManager();
+        //        $config = $serviceManager->get('Config');
 
-//        $routerConfig = isset($config['router']) ? $config['router'] : array();
-//        $router = HttpRouter::factory($routerConfig);
+        //        $routerConfig = isset($config['router']) ? $config['router'] : array();
+        //        $router = HttpRouter::factory($routerConfig);
 
-//        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
-//        $event = new MvcEvent();
-//        $event->setRouter($router);
-//        $event->setRouteMatch($routeMatch);
+        //        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
+        //        $event = new MvcEvent();
+        //        $event->setRouter($router);
+        //        $event->setRouteMatch($routeMatch);
 
-//        $this->getRequest()->setMethod('GET');
+        //        $this->getRequest()->setMethod('GET');
 
         $request = $this->getRequest();
         $request->setMethod('GET');
-        $request->getHeaders()->addHeaders(array(
+        $request->getHeaders()->addHeaders(
+            array(
             'Accept' => 'application/json',
-        ));
+            )
+        );
 
         $x = $this->dispatch('/db-api/artist');
 
@@ -99,20 +101,20 @@ class DoctrineRestServiceResourceTest extends AbstractHttpControllerTestCase //T
 
         return;
 
-//        $controller->setEvent($event);
-//        $controller->setServiceLocator($serviceManager);
+        //        $controller->setEvent($event);
+        //        $controller->setServiceLocator($serviceManager);
 
-//        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
+        //        $routeMatch = new RouteMatch(array('controller' => $controllerServiceName));
 
-//        print_r($config);
-//        print_r(get_class_methods($router));
+        //        print_r($config);
+        //        print_r(get_class_methods($router));
 
         $this->resource->delete('DbApi\\V1\\Rest\\Artist\\Controller');
 
         return;
 
-//        $controller = new $controllerServiceName;
-//        $request    = new Request();
+        //        $controller = new $controllerServiceName;
+        //        $request    = new Request();
 
         $query = [];
         $query[] = array('type' => 'eq', 'field' => 'id', 'value' => $found->getId());
@@ -123,7 +125,7 @@ class DoctrineRestServiceResourceTest extends AbstractHttpControllerTestCase //T
         $result   = $controller->dispatch($this->request);
         $response = $controller->getResponse();
 
-//        $this->assertEquals(200, $response->getStatusCode());
+        //        $this->assertEquals(200, $response->getStatusCode());
 
         $hal = $response->getBody();
 

@@ -37,6 +37,9 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         $this->restFactory = $restFactory;
     }
 
+    /**
+     * @return string
+     */
     public function setModuleName($value)
     {
         $this->moduleName = $value;
@@ -57,10 +60,12 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         $moduleName = $this->getEvent()->getRouteParam('name', false);
         if (!$moduleName) {
             // @codeCoverageIgnoreStart
-            throw new RuntimeException(sprintf(
-                '%s cannot operate correctly without a "name" segment in the route matches',
-                __CLASS__
-            ));
+            throw new RuntimeException(
+                sprintf(
+                    '%s cannot operate correctly without a "name" segment in the route matches',
+                    __CLASS__
+                )
+            );
             // @codeCoverageIgnoreEnd
         }
         $this->moduleName = $moduleName;
@@ -85,7 +90,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Create a new REST service
      *
-     * @param  array|object      $data
+     * @param  array|object $data
      * @return RestServiceEntity
      * @throws CreationException
      */
@@ -118,7 +123,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Fetch REST metadata
      *
-     * @param  string                       $id
+     * @param  string $id
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($id)
@@ -135,7 +140,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array               $params
+     * @param  array $params
      * @return RestServiceEntity[]
      */
     public function fetchAll($params = array())
@@ -148,8 +153,8 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Update an existing REST service
      *
-     * @param  string                       $id
-     * @param  object|array                 $data
+     * @param  string       $id
+     * @param  object|array $data
      * @return ApiProblem|RestServiceEntity
      * @throws PatchException               if unable to update configuration
      */

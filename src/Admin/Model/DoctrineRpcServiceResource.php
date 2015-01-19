@@ -53,8 +53,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         InputFilterModel $inputFilterModel,
         ControllerManager $controllerManager
     ) {
-        $this->rpcFactory = $rpcFactory;
-        $this->inputFilterModel = $inputFilterModel;
+        $this->rpcFactory        = $rpcFactory;
+        $this->inputFilterModel  = $inputFilterModel;
         $this->controllerManager = $controllerManager;
     }
 
@@ -81,10 +81,12 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         // @codeCoverageIgnoreStart
         $moduleName = $this->getEvent()->getRouteParam('name', false);
         if (!$moduleName) {
-            throw new RuntimeException(sprintf(
-                '%s cannot operate correctly without a "name" segment in the route matches',
-                __CLASS__
-            ));
+            throw new RuntimeException(
+                sprintf(
+                    '%s cannot operate correctly without a "name" segment in the route matches',
+                    __CLASS__
+                )
+            );
         }
         $this->moduleName = $moduleName;
 
@@ -100,7 +102,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         if ($this->model instanceof DoctrineRpcServiceModel) {
             return $this->model;
         }
-        $moduleName = $this->getModuleName();
+        $moduleName  = $this->getModuleName();
         $this->model = $this->rpcFactory->factory($moduleName);
 
         return $this->model;
@@ -109,85 +111,85 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     /**
      * Create a new RPC service
      *
-     * @param  array|object             $data
+     * @param  array|object $data
      * @return DoctrineRpcServiceEntity
      * @throws CreationException
      */
     public function create($data)
     {
-// @codeCoverageIgnoreStart
+        // @codeCoverageIgnoreStart
         if (is_object($data)) {
             $data = (array) $data;
         }
-// @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
         $creationData = array(
             'http_methods' => array('GET'),
             'selector'     => null,
         );
 
-if (!isset($data['service_name'])
+        if (!isset($data['service_name'])
             || !is_string($data['service_name'])
             || empty($data['service_name'])
         ) {
-// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
             throw new CreationException('Unable to create RPC service; missing service_name');
-}
-// @codeCoverageIgnoreEnd
+        }
+        // @codeCoverageIgnoreEnd
         $creationData['service_name'] = $data['service_name'];
 
         $model = $this->getModel();
-if ($model->fetch($creationData['service_name'])) {
-// @codeCoverageIgnoreStart
-    throw new CreationException('Service by that name already exists', 409);
-}
-// @codeCoverageIgnoreEnd
+        if ($model->fetch($creationData['service_name'])) {
+            // @codeCoverageIgnoreStart
+            throw new CreationException('Service by that name already exists', 409);
+        }
+        // @codeCoverageIgnoreEnd
 
-if (!isset($data['route'])
+        if (!isset($data['route'])
             || !is_string($data['route'])
             || empty($data['route'])
         ) {
-// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
             throw new CreationException('Unable to create RPC service; missing route');
-}
-// @codeCoverageIgnoreEnd
+        }
+        // @codeCoverageIgnoreEnd
         $creationData['route'] = $data['route'];
 
-if (isset($data['http_methods'])
+        if (isset($data['http_methods'])
             && (is_string($data['http_methods']) || is_array($data['http_methods']))
             && !empty($data['http_methods'])
         ) {
             $creationData['http_methods'] = $data['http_methods'];
-}
+        }
 
-if (isset($data['selector'])
+        if (isset($data['selector'])
             && is_string($data['selector'])
             && !empty($data['selector'])
         ) {
             $creationData['selector'] = $data['selector'];
-}
+        }
 
         $creationData['options'] = (array) $data['options'];
 
-try {
-    $service = $model->createService(
-        $creationData['service_name'],
-        $creationData['route'],
-        $creationData['http_methods'],
-        $creationData['selector'],
-        $creationData['options']
-    );
-} catch (\Exception $e) {
-// @codeCoverageIgnoreStart
-    throw new CreationException('Unable to create RPC service', $e->getCode(), $e);
-}
-// @codeCoverageIgnoreEnd
+        try {
+            $service = $model->createService(
+                $creationData['service_name'],
+                $creationData['route'],
+                $creationData['http_methods'],
+                $creationData['selector'],
+                $creationData['options']
+            );
+        } catch (\Exception $e) {
+            // @codeCoverageIgnoreStart
+            throw new CreationException('Unable to create RPC service', $e->getCode(), $e);
+        }
+        // @codeCoverageIgnoreEnd
         return $service;
     }
 
     /**
      * Fetch RPC metadata
      *
-     * @param  string                              $id
+     * @param  string $id
      * @return DoctrineRpcServiceEntity|ApiProblem
      */
     public function fetch($id)
@@ -209,7 +211,7 @@ try {
     /**
      * Fetch metadata for all RPC services
      *
-     * @param  array                      $params
+     * @param  array $params
      * @return DoctrineRpcServiceEntity[]
      */
     public function fetchAll($params = array())
@@ -228,8 +230,8 @@ try {
     /**
      * Update an existing RPC service
      *
-     * @param  string                              $id
-     * @param  object|array                        $data
+     * @param  string       $id
+     * @param  object|array $data
      * @return ApiProblem|DoctrineRpcServiceEntity
      * @throws PatchException                      if unable to update configuration
      */
@@ -270,7 +272,7 @@ try {
                     case 'content_type_whitelist':
                         $model->updateContentNegotiationWhitelist($id, 'content_type', $value);
                         break;
-// @codeCoverageIgnoreStart
+                // @codeCoverageIgnoreStart
                     default:
                         break;
                 }
@@ -278,7 +280,7 @@ try {
                 throw new PatchException('Error updating RPC service', 500, $e);
             }
         }
-// @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
         return $model->fetch($id);
     }
 
@@ -292,9 +294,9 @@ try {
     {
         $entity = $this->fetch($id);
         if ($entity instanceof ApiProblem) {
-// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
             return $entity;
-// @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
         }
 
         return $this->getModel()->deleteService($entity);
@@ -320,31 +322,39 @@ try {
         foreach ($inputFilters as $inputFilter) {
             $resource = new HalResource($inputFilter, $inputFilter['input_filter_name']);
             $links    = $resource->getLinks();
-            $links->add(Link::factory(array(
-                'rel' => 'self',
-                'route' => array(
-                    'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
-                    'params' => array(
-                        'name' => $this->moduleName,
-                        'controller_service_name' => $service->controllerServiceName,
-                        'input_filter_name' => $inputFilter['input_filter_name'],
-                    ),
-                ),
-            )));
+            $links->add(
+                Link::factory(
+                    array(
+                        'rel' => 'self',
+                        'route' => array(
+                            'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
+                            'params' => array(
+                                'name' => $this->moduleName,
+                                'controller_service_name' => $service->controllerServiceName,
+                                'input_filter_name' => $inputFilter['input_filter_name'],
+                            ),
+                        ),
+                    )
+                )
+            );
             $collection[] = $resource;
         }
 
         $collection = new HalCollection($collection);
         $collection->setCollectionName('input_filter');
         $collection->setCollectionRoute('zf-apigility-admin/module/rpc-service/inputfilter');
-        $collection->setCollectionRouteParams(array(
+        $collection->setCollectionRouteParams(
+            array(
             'name' => $this->moduleName,
             'controller_service_name' => $service->controllerServiceName,
-        ));
+            )
+        );
 
-        $service->exchangeArray(array(
+        $service->exchangeArray(
+            array(
             'input_filters' => $collection,
-        ));
+            )
+        );
     }
         // @codeCoverageIgnoreEnd
 
@@ -363,8 +373,10 @@ try {
         }
 
         $controller = $this->controllerManager->get($controllerServiceName);
-        $service->exchangeArray(array(
+        $service->exchangeArray(
+            array(
             'controller_class' => get_class($controller),
-        ));
+            )
+        );
     }
 }

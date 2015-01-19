@@ -13,10 +13,10 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements ServiceManagerAwareInterface
 {
-    const TYPE_DEFAULT      = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
+    const TYPE_DEFAULT = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 
     /**
-     * @param  string           $module
+     * @param  string $module
      * @return RestServiceModel
      */
     public function factory($module, $type = self::TYPE_DEFAULT)
@@ -44,10 +44,12 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
                 return $restModel;
             // @codeCoverageIgnoreStart
             default:
-                throw new Exception\InvalidArgumentException(sprintf(
-                    'Model of type "%s" does not exist or cannot be handled by this factory',
-                    $type
-                ));
+                throw new Exception\InvalidArgumentException(
+                    sprintf(
+                        'Model of type "%s" does not exist or cannot be handled by this factory',
+                        $type
+                    )
+                );
         }
             // @codeCoverageIgnoreEnd
     }

@@ -10,40 +10,70 @@ use InvalidArgumentException;
 use RuntimeException;
 use ZF\Hal\Collection as HalCollection;
 use ZF\Apigility\Admin\Model\RpcServiceEntity;
+use Zend\Stdlib\ArraySerializableInterface;
 
-class DoctrineRpcServiceEntity extends RpcServiceEntity
+class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializableInterface
 {
+    /**
+     * @var array
+     */
     protected $acceptWhitelist = array(
         'application/json',
         'application/*+json',
     );
 
+    /**
+     * @var array
+     */
     protected $contentTypeWhitelist = array(
         'application/json',
     );
 
+    /**
+     * @var string
+     */
     protected $controllerClass;
 
+    /**
+     * @var string
+     */
     protected $controllerServiceName;
 
+    /**
+     * @var array
+     */
     protected $httpMethods = array('GET');
 
+    /**
+     * @var array
+     */
     protected $inputFilters;
 
+    /**
+     * @var string
+     */
     protected $routeMatch;
 
+    /**
+     * @var string
+     */
     protected $routeName;
 
+    /**
+     * @var string
+     */
     protected $selector = 'Json';
 
     public function __get($name)
     {
         if (!isset($this->{$name})) {
-            throw new \OutOfRangeException(sprintf(
-                '%s does not contain a property by the name of "%s"',
-                __CLASS__,
-                $name
-            ));
+            throw new \OutOfRangeException(
+                sprintf(
+                    '%s does not contain a property by the name of "%s"',
+                    __CLASS__,
+                    $name
+                )
+            );
         }
 
         return $this->{$name};
@@ -51,7 +81,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
 
     /**
      * @todo   validation
-     * @param  array                    $data
+     * @param  array $data
      * @throws InvalidArgumentException if a particular value does not validate
      * @throws RuntimeException         if the object does not have a controller service name following population
      */
@@ -64,21 +94,25 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
             switch ($key) {
                 case 'acceptwhitelist':
                     if (!is_array($value)) {
-                        throw new InvalidArgumentException(sprintf(
-                            '%s expects an array value for "%s"; received "%s"',
-                            __CLASS__,
-                            (is_object($value) ? get_class($value) : gettype($value))
-                        ));
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                '%s expects an array value for "%s"; received "%s"',
+                                __CLASS__,
+                                (is_object($value) ? get_class($value) : gettype($value))
+                            )
+                        );
                     }
                     $this->acceptWhitelist = $value;
                     break;
                 case 'contenttypewhitelist':
                     if (!is_array($value)) {
-                        throw new InvalidArgumentException(sprintf(
-                            '%s expects an array value for "%s"; received "%s"',
-                            __CLASS__,
-                            (is_object($value) ? get_class($value) : gettype($value))
-                        ));
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                '%s expects an array value for "%s"; received "%s"',
+                                __CLASS__,
+                                (is_object($value) ? get_class($value) : gettype($value))
+                            )
+                        );
                     }
                     $this->contentTypeWhitelist = $value;
                     break;
@@ -90,17 +124,19 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
                     break;
                 case 'httpmethods':
                     if (!is_array($value)) {
-                        throw new InvalidArgumentException(sprintf(
-                            '%s expects an array value for "%s"; received "%s"',
-                            __CLASS__,
-                            (is_object($value) ? get_class($value) : gettype($value))
-                        ));
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                '%s expects an array value for "%s"; received "%s"',
+                                __CLASS__,
+                                (is_object($value) ? get_class($value) : gettype($value))
+                            )
+                        );
                     }
                     $this->httpMethods = $value;
                     break;
                 case 'inputfilters':
                     if ($value instanceof InputFilterCollection
-                        || $value instanceof HalCollection
+                    || $value instanceof HalCollection
                     ) {
                         $this->inputFilters = $value;
                     }
@@ -123,10 +159,12 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity
             || !is_string($this->controllerServiceName)
             || empty($this->controllerServiceName)
         ) {
-            throw new RuntimeException(sprintf(
-                '%s requires a controller service name; none present following population',
-                __CLASS__
-            ));
+            throw new RuntimeException(
+                sprintf(
+                    '%s requires a controller service name; none present following population',
+                    __CLASS__
+                )
+            );
         }
     }
 

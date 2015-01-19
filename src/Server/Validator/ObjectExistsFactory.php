@@ -18,21 +18,23 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $validators
+     * @param  ServiceLocatorInterface $validators
      * @return mixed
      */
     public function createService(ServiceLocatorInterface $validators)
     {
         if (isset($this->options['entity_class'])) {
-            return new ObjectExists(ArrayUtils::merge(
-                $this->options,
-                array(
+            return new ObjectExists(
+                ArrayUtils::merge(
+                    $this->options,
+                    array(
                     'object_repository' => $validators
                         ->getServiceLocator()
                         ->get('Doctrine\ORM\EntityManager')
                         ->getRepository($this->options['entity_class'])
+                    )
                 )
-            ));
+            );
         }
         return new ObjectExists($this->options);
     }

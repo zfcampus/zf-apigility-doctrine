@@ -1,23 +1,46 @@
 <?php
 
-namespace ZF\Apigility\Doctrine\Server\Collection\Query;
+namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
-use DoctrineModule\Persistence\ProvidesObjectManager;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 use Zend\Paginator\Adapter\AdapterInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
 
 /**
- * Class FetchAllOrmQuery
+ * Class FetchAllOrm
  *
- * @package ZF\Apigility\Doctrine\Server\Resource\Query
+ * @package ZF\Apigility\Doctrine\Server\Query\Provider
  */
-class FetchAllOrmQuery implements ObjectManagerAwareInterface, ApigilityFetchAllQuery
+class DefaultOrm implements ObjectManagerAwareInterface, QueryProviderInterface
 {
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
 
-    use ProvidesObjectManager;
+    /**
+     * Set the object manager
+     *
+     * @param ObjectManager $objectManager
+     */
+    public function setObjectManager(ObjectManager $objectManager)
+    {
+        $this->objectManager = $objectManager;
+    }
+
+    /**
+     * Get the object manager
+     *
+     * @return ObjectManager
+     */
+    public function getObjectManager()
+    {
+        return $this->objectManager;
+    }
 
     /**
      * @param string $entityClass
@@ -25,24 +48,11 @@ class FetchAllOrmQuery implements ObjectManagerAwareInterface, ApigilityFetchAll
      *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery($entityClass, $parameters)
+    public function createQuery($event, $entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-
         $queryBuilder->select('row')
             ->from($entityClass, 'row');
-
-        // Get metadata for type casting
-        $cmf = $this->getObjectManager()->getMetadataFactory();
-        $entityMetaData = $cmf->getMetadataFor($entityClass);
-        $metadata = (array) $entityMetaData;
-        // Orderby
-        if (!isset($parameters['orderBy'])) {
-            $parameters['orderBy'] = array($entityMetaData->getIdentifier()[0] => 'asc');
-        }
-        foreach ($parameters['orderBy'] as $fieldName => $sort) {
-            $queryBuilder->addOrderBy("row.$fieldName", $sort);
-        }
 
         return $queryBuilder;
     }
@@ -70,7 +80,8 @@ class FetchAllOrmQuery implements ObjectManagerAwareInterface, ApigilityFetchAll
         $cmf = $this->getObjectManager()->getMetadataFactory();
         $entityMetaData = $cmf->getMetadataFor($entityClass);
 
-        $queryBuilder->select('count(row.' . $entityMetaData->getIdentifier()[0] . ')')
+        $identifier = $entityMetaData->getIdentifier();
+        $queryBuilder->select('count(row.' . $identifier[0] . ')')
             ->from($entityClass, 'row');
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();

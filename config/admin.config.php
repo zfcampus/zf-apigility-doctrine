@@ -42,8 +42,8 @@ return array(
 
     'zf-content-negotiation' => array(
         'controllers' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => 'HalJson',
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => 'HalJson',
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService'     => 'HalJson',
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService'      => 'HalJson',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
         ),
         'accept-whitelist' => array(
@@ -79,22 +79,22 @@ return array(
     'zf-hal' => array(
         'metadata_map' => array(
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity' => array(
-                'hydrator'        => 'ArraySerializable',
-                'route_identifier_name' => 'controller_service_name',
+                'hydrator'               => 'ArraySerializable',
+                'route_identifier_name'  => 'controller_service_name',
                 'entity_identifier_name' => 'controller_service_name',
-                'route_name'      => 'zf-apigility-doctrine-rpc-service',
+                'route_name'             => 'zf-apigility-doctrine-rpc-service',
             ),
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity' => array(
-                'hydrator'        => 'ArraySerializable',
-                'route_identifier_name' => 'controller_service_name',
+                'hydrator'               => 'ArraySerializable',
+                'route_identifier_name'  => 'controller_service_name',
                 'entity_identifier_name' => 'controller_service_name',
-                'route_name'      => 'zf-apigility-doctrine-service',
+                'route_name'             => 'zf-apigility-doctrine-service',
             ),
             'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity' => array(
-                'hydrator'        => 'ArraySerializable',
+                'hydrator'               => 'ArraySerializable',
                 'entity_identifier_name' => 'name',
-                'route_identifier_name'      => 'name',
-                'route_name'      => 'zf-apigility-doctrine-metadata-service',
+                'route_identifier_name'  => 'name',
+                'route_name'             => 'zf-apigility-doctrine-metadata-service',
             ),
         ),
     ),
@@ -105,7 +105,7 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-rpc-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity',
             'route_identifier_name'      => 'controller_service_name',
-            'entity_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
+            'entity_http_methods'        => array('GET', 'POST', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
             'collection_name'            => 'doctrine-rpc',
             'collection_query_whitelist' => array('version'),
@@ -115,7 +115,7 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
             'route_identifier_name'      => 'controller_service_name',
-            'entity_http_methods'      => array('GET', 'POST', 'PATCH', 'DELETE'),
+            'entity_http_methods'        => array('GET', 'POST', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
             'collection_name'            => 'doctrine',
             'collection_query_whitelist' => array('version'),
@@ -125,7 +125,7 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-metadata-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity',
             'route_identifier_name'      => 'name',
-            'entity_http_methods'      => array('GET'),
+            'entity_http_methods'        => array('GET'),
             'collection_http_methods'    => array('GET'),
             'collection_name'            => 'doctrine-metadata',
             'collection_query_whitelist' => array('version'),
@@ -134,11 +134,11 @@ return array(
     'validator_metadata' => array(
         'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' => array(
             'entity_class' => 'string',
-            'fields' => 'string',
+            'fields'       => 'string',
         ),
         'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' => array(
             'entity_class' => 'string',
-            'fields' => 'string',
+            'fields'       => 'string',
         ),
     ),
 );

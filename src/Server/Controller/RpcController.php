@@ -25,10 +25,10 @@ abstract class RpcController extends AbstractActionController
         $zfRpcDoctrineControllerArrayKey = array_search(get_class($this), $config['controllers']['invokables']);
 
         $associationConfig = $config['zf-rpc-doctrine-controller'][$zfRpcDoctrineControllerArrayKey];
-        $metadataConfig = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
-        $hydratorConfig = $config['doctrine-hydrator'][$metadataConfig['hydrator']];
+        $metadataConfig    = $config['zf-hal']['metadata_map'][$associationConfig['source_entity']];
+        $hydratorConfig    = $config['doctrine-hydrator'][$metadataConfig['hydrator']];
 
-        $objectManager = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
+        $objectManager   = $this->getServiceLocator()->get($hydratorConfig['object_manager']);
         $metadataFactory = $objectManager->getMetadataFactory();
 
         // Find target entity controller to dispatch
@@ -44,27 +44,32 @@ abstract class RpcController extends AbstractActionController
         foreach ($sourceMetadata->associationMappings as $mapping) {
             if ($mapping['sourceEntity'] == $associationConfig['source_entity']
                 and $mapping['targetEntity'] == $associationConfig['target_entity']
-                and $mapping['fieldName'] == $associationConfig['field_name']) {
+                and $mapping['fieldName'] == $associationConfig['field_name']
+            ) {
                 $sourceField = $mapping['mappedBy'];
                 break;
             }
         }
 
-        $query = (array) $this->getRequest()->getQuery()->get('query');
-        $orderBy = $this->getRequest()->getQuery()->get('orderBy');
+        $query = array();
 
         if ($childId) {
             // Verify child is a child of parent
-            $child = $objectManager->getRepository($associationConfig['target_entity'])->findOneBy(array(
+            $child = $objectManager->getRepository($associationConfig['target_entity'])->findOneBy(
+                array(
                 'id' => $childId,
                 $sourceField => $parentId,
-            ));
+                )
+            );
 
             if ($child) {
                 $this->getRequest()->setMethod('GET');
-                $hal = $this->forward()->dispatch($controllerName, array(
+                $hal = $this->forward()->dispatch(
+                    $controllerName,
+                    array(
                     $targetRouteParam => $childId,
-                ));
+                    )
+                );
                 $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
                 $data = json_decode($renderer->render($hal), true);
 
@@ -81,10 +86,7 @@ abstract class RpcController extends AbstractActionController
             $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
 
             $this->getRequest()->setMethod('GET');
-            $hal = $this->forward()->dispatch($controllerName, array(
-                'query' => $query,
-                'orderBy' => $orderBy,
-            ));
+            $hal = $this->forward()->dispatch($controllerName, array());
             $renderer = $this->getServiceLocator()->get('ZF\Hal\JsonRenderer');
             $data = json_decode($renderer->render($hal), true);
 
