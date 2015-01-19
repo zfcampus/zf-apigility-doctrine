@@ -105,22 +105,30 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $config   = $serviceLocator->get('Config');
-        $config   = $config['zf-apigility']['doctrine-connected'][$requestedName];
+        $config = $serviceLocator->get('Config');
+        $doctrineConnectedConfig = $config['zf-apigility']['doctrine-connected'][$requestedName];
 
-        $className = isset($config['class']) ? $config['class'] : $requestedName;
+        foreach ($config['zf-rest'] as $restControllerConfig) {
+            if ($restControllerConfig['listener'] == $requestedName) {
+                $restConfig = $restControllerConfig;
+                break;
+            }
+        }
+
+        $className = isset($doctrineConnectedConfig['class']) ? $doctrineConnectedConfig['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
 
-        $objectManager = $this->loadObjectManager($serviceLocator, $config);
-        $hydrator = $this->loadHydrator($serviceLocator, $config, $objectManager);
-        $queryProviders = $this->loadQueryProviders($serviceLocator, $config, $objectManager);
-        $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $config);
+        $objectManager = $this->loadObjectManager($serviceLocator, $doctrineConnectedConfig);
+        $hydrator = $this->loadHydrator($serviceLocator, $doctrineConnectedConfig, $objectManager);
+        $queryProviders = $this->loadQueryProviders($serviceLocator, $doctrineConnectedConfig, $objectManager);
+        $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
 
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
         $listener->setServiceManager($serviceLocator);
+        $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
                 $listener->getEventManager()->attach($configuredListener);

@@ -37,6 +37,11 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/artist",
+            "collectionHttpMethods" => array(
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+            ),
         );
 
         $albumResourceDefinition = array(
@@ -46,6 +51,11 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
             "routeIdentifierName" => "album_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/album",
+            "collectionHttpMethods" => array(
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+            ),
         );
 
         $resource->setModuleName('ZFTestApigilityDbApi');
