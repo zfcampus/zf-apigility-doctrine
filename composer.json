@@ -28,7 +28,7 @@
         "squizlabs/php_codesniffer": "~2.0"
     },
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.3",
         "phpro/zf-doctrine-hydration-module": ">=0.1.5",
         "zfcampus/zf-apigility": "~1.0"
     },
