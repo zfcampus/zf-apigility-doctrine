@@ -40,6 +40,19 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
     }
 
+    /**
+     * @param $expectedEvents
+     */
+    protected function validateTriggeredEventsContains($expectedEvents)
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
+
+        foreach ($expectedEvents as $event) {
+            $this->assertTrue(in_array($event, $eventCatcher->getCaughtEvents()));
+        }
+    }
+
     public function testCreate()
     {
         $this->getRequest()->getHeaders()->addHeaders(
@@ -243,6 +256,107 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->getRequest()->setMethod(Request::METHOD_PATCH);
         $this->getRequest()->setContent('{"name":"ArtistTenPatchEdit"}');
         $this->dispatch('/test/artist/' . $artist->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+        $this->assertEquals('ZFTestPatchFailure', $body['detail']);
+        $this->assertEquals(400, $this->getResponseStatusCode());
+    }
+
+    public function testPatchList()
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $patchList = array();
+
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $patchList[] = array(
+            'id' => $body['id'],
+            'name' => 'oneNewName',
+        );
+
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistTwo","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $patchList[] = array(
+            'id' => $body['id'],
+            'name' => 'twoNewName',
+        );
+
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistThree","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $patchList[] = array(
+            'id' => $body['id'],
+            'name' => 'threeNewName',
+        );
+
+        $em->clear();
+
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_PATCH);
+        $this->getRequest()->setContent(json_encode($patchList));
+        $this->dispatch('/test/artist');
+
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals('oneNewName', $body['_embedded']['artist'][0]['name']);
+        $this->assertEquals('twoNewName', $body['_embedded']['artist'][1]['name']);
+        $this->assertEquals('threeNewName', $body['_embedded']['artist'][2]['name']);
+
+        $this->validateTriggeredEventsContains(array(
+            DoctrineResourceEvent::EVENT_PATCH_LIST_PRE,
+            DoctrineResourceEvent::EVENT_PATCH_LIST_POST,
+        ));
+
+        // Test patch() with listener that returns ApiProblem
+        $this->reset();
+        $this->setUp();
+
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+
+        $artist = new ArtistEntity();
+        $artist->setName('ArtistTen');
+        $artist->setCreatedAt(new \Datetime());
+        $em->persist($artist);
+        $em->flush();
+
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResourceEvent::EVENT_PATCH_LIST_POST,
+            function(DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestPatchFailure');
+            }
+        );
+
+        $this->getRequest()->getHeaders()->addHeaders(array(
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+        ));
+        $this->getRequest()->setMethod(Request::METHOD_PATCH);
+        $this->getRequest()->setContent('[{"id": "' . $artist->getId() . '", "name":"ArtistTenPatchEdit"}]');
+        $this->dispatch('/test/artist');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
         $this->assertEquals('ZFTestPatchFailure', $body['detail']);

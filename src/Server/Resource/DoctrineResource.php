@@ -20,6 +20,7 @@ use Zend\EventManager\EventManager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Traversable;
 use Doctrine\ORM\NoResultException;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class DoctrineResource
@@ -174,6 +175,29 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
+     * @var entityIdentifierName string
+     */
+    protected $entityIdentifierName;
+
+    /**
+     * @return string
+     */
+    public function getEntityIdentifierName()
+    {
+        return $this->entityIdentifierName;
+    }
+
+    /**
+     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     */
+    public function setEntityIdentifierName($value)
+    {
+        $this->entityIdentifierName = $value;
+
+        return $this;
+    }
+
+    /**
      * @var string
      */
     protected $multiKeyDelimiter = '.';
@@ -302,6 +326,43 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         return true;
+    }
+
+    /**
+     * Respond to the PATCH method (partial update of existing entity) on
+     * a collection, i.e. update multiple entities in a collection.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function patchList($data)
+    {
+        $return = new ArrayCollection();
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
+        $this->getObjectManager()->getConnection()->beginTransaction();
+        foreach ($data as $row) {
+            $result = $this->patch($row[$this->getEntityIdentifierName()], $row);
+            if ($result instanceof ApiProblem) {
+                $this->getObjectManager()->getConnection()->rollback();
+
+                return $result;
+            }
+
+            $return->add($result);
+        }
+        $this->getObjectManager()->getConnection()->commit();
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_POST, $return);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
+        return $return;
     }
 
     /**
