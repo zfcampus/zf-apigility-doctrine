@@ -63,9 +63,8 @@ Custom Events
 
 It is possible to hook in on specific doctrine events of the type `DoctrineResourceEvent`.
 This way, it is possible to alter the doctrine entities or collections before or after a specific action is performed.
-The EVENT_FETCH_ALL_PRE works on the Query Builder from the fetch all query.  This allows you to modify the Query Builder before a fetch is performed.
 
-A list of all supported events:
+Supported events:
 ```
 EVENT_FETCH_POST = 'fetch.post';
 EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
@@ -78,6 +77,8 @@ EVENT_PATCH_PRE = 'patch.pre';
 EVENT_PATCH_POST = 'patch.post';
 EVENT_PATCH_PRE = 'patch.pre';
 EVENT_PATCH_POST = 'patch.post';
+EVENT_PATCH_LIST_PRE = 'patch-all.pre';
+EVENT_PATCH_LIST_POST = 'patch-all.post';
 EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 ```
