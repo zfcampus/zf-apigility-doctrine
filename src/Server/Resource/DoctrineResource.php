@@ -344,6 +344,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getObjectManager()->remove($entity);
         $this->getObjectManager()->flush();
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
@@ -390,15 +391,36 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * Delete a collection, or members of a collection
+     * Delete a list of entities
      *
-     * @param              mixed $data
-     * @return             ApiProblem|mixed
-     *                               @codeCoverageIgnore
+     * @param mixed $data
+     * @return ApiProblem|mixed
      */
     public function deleteList($data)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
+        $this->getObjectManager()->getConnection()->beginTransaction();
+        foreach ($data as $row) {
+            $result = $this->delete($row[$this->getEntityIdentifierName()]);
+
+            if ($result instanceof ApiProblem) {
+                $this->getObjectManager()->getConnection()->rollback();
+
+                return $result;
+            }
+        }
+        $this->getObjectManager()->getConnection()->commit();
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
+        return true;
     }
 
     /**
