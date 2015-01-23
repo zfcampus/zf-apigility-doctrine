@@ -16,6 +16,8 @@ return array(
         'factories' => array(
             'ZfApigilityDoctrineQueryProviderManager' =>
                 'ZF\Apigility\Doctrine\Server\Query\Provider\Service\QueryProviderManagerFactory',
+            'ZfApigilityDoctrineQueryCreateFilterManager' =>
+                'ZF\Apigility\Doctrine\Server\Query\CreateFilter\Service\QueryCreateFilterManagerFactory',
         ),
     ),
 
@@ -23,6 +25,12 @@ return array(
         'invokables' => array(
             'default_orm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOrm',
             'default_odm' => 'ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOdm',
+        )
+    ),
+
+    'zf-apigility-doctrine-query-create-filter' => array(
+        'invokables' => array(
+            'default' => 'ZF\Apigility\Doctrine\Server\Query\CreateFilter\DefaultCreateFilter',
         )
     ),
 

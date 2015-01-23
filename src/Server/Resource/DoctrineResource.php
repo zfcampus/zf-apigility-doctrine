@@ -21,6 +21,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Traversable;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Common\Collections\ArrayCollection;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
 
 /**
  * Class DoctrineResource
@@ -198,6 +199,24 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
+     * @var QueryCreateFilterInterface
+     */
+    protected $queryCreateFilter;
+
+    public function setQueryCreateFilter(QueryCreateFilterInterface $value)
+    {
+        $this->queryCreateFilter = $value;
+
+        return $this;
+    }
+
+    public function getQueryCreateFilter()
+    {
+        return $this->queryCreateFilter;
+    }
+
+
+    /**
      * @var string
      */
     protected $multiKeyDelimiter = '.';
@@ -278,6 +297,12 @@ class DoctrineResource extends AbstractResourceListener implements
     public function create($data)
     {
         $entityClass = $this->getEntityClass();
+
+        $data = $this->getQueryCreateFilter()->filter($this->getEvent(), $entityClass, $data);
+        if ($data instanceof ApiProblem) {
+            return $results->last();
+        }
+
         $entity = new $entityClass;
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $data, $entity);

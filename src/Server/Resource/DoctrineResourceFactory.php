@@ -121,12 +121,14 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $objectManager = $this->loadObjectManager($serviceLocator, $doctrineConnectedConfig);
         $hydrator = $this->loadHydrator($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $queryProviders = $this->loadQueryProviders($serviceLocator, $doctrineConnectedConfig, $objectManager);
+        $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
 
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
+        $listener->setQueryCreateFilter($queryCreateFilter);
         $listener->setServiceManager($serviceLocator);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         if (count($configuredListeners)) {
@@ -191,6 +193,23 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // @codeCoverageIgnoreEnd
         return $hydratorManager->get($config['hydrator']);
     }
+
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param                         $config
+     * @param                         $objectManager
+     *
+     * @return ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
+     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
+     */
+    protected function loadQueryCreateFilter(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    {
+        $createFilterManager = $serviceLocator->get('ZfApigilityDoctrineQueryCreateFilterManager');
+        $filterManagerAlias = (isset($config['query_create_filter'])) ? $config['query_create_filter']: 'default';
+
+        return $createFilterManager->get($filterManagerAlias);
+    }
+
 
     /**
      * @param ServiceLocatorInterface $serviceLocator

@@ -38,6 +38,13 @@ class Module implements DependencyIndicatorInterface
             'ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface',
             'getZfApigilityDoctrineQueryProviderConfig'
         );
+
+        $serviceListener->addServiceManager(
+            'ZfApigilityDoctrineQueryCreateFilterManager',
+            'zf-apigility-doctrine-query-create-filter',
+            'ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface',
+            'getZfApigilityDoctrineQueryCreateFilterConfig'
+        );
     }
 
     /**
