@@ -188,3 +188,32 @@ When the query provider is registered attach it to the doctrine-connected resour
     ),
 ),
 ```
+
+Query Create Filters
+==============
+
+In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to Query Providers in their implementation.  
+
+Create filters take the data as a paramter and return the data, modified or filtered.
+
+A custom plugin manager is available to register your own create filters.  This can be done through following configuration:
+
+```php
+'zf-apigility-doctrine-query-create-filter' => array(
+    'invokables' => array(
+        'entity_name' => 'Application\Query\CreateFilter\EntityName',
+    )
+),
+```
+
+Register your Query Create Filter as:
+```php
+'zf-apigility' => array(
+    'doctrine-connected' => array(
+        'Api\\V1\\Rest\\....' => array(
+            'query_create_filter' => 'entity_name',
+            ...
+        ),
+    ),
+),
+```
