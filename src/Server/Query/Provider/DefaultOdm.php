@@ -2,41 +2,14 @@
 
 namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
-use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
-use Doctrine\Common\Persistence\ObjectManager;
-use Zend\ServiceManager\AbstractPluginManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\ResourceEvent;
+use OAuth2\Request as OAuth2Request;
+use OAuth2\Server as OAuth2Server;
 
-class DefaultOdm implements QueryProviderInterface
+class DefaultOdm extends AbstractQueryProvider
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * Set the object manager
-     *
-     * @param ObjectManager $objectManager
-     */
-    public function setObjectManager(ObjectManager $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
-
-    /**
-     * Get the object manager
-     *
-     * @return ObjectManager
-     */
-    public function getObjectManager()
-    {
-        return $this->objectManager;
-    }
-
     /**
      * {@inheritDoc}
      */
