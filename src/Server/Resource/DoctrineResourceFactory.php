@@ -10,6 +10,7 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
+use Exception;
 
 /**
  * Class AbstractDoctrineResourceFactory
@@ -207,7 +208,21 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $createFilterManager = $serviceLocator->get('ZfApigilityDoctrineQueryCreateFilterManager');
         $filterManagerAlias = (isset($config['query_create_filter'])) ? $config['query_create_filter']: 'default';
 
-        return $createFilterManager->get($filterManagerAlias);
+        $queryCreateFilter = $createFilterManager->get($filterManagerAlias);
+
+        // Load the oAuth2 server
+        $oAuth2Server = false;
+        try {
+            $oAuth2Server = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
+            $queryCreateFilter->setOAuth2Server($oAuth2Server);
+        } catch (Exception $e) {
+            // If no oAuth2 server that's just fine.
+        }
+
+        // Set object manager for all query providers
+        $queryCreateFilter ->setObjectManager($objectManager);
+
+        return $queryCreateFilter;
     }
 
 
@@ -246,9 +261,20 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             }
         }
 
+        // Load the oAuth2 server
+        $oAuth2Server = false;
+        try {
+            $oAuth2Server = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
+        } catch (Exception $e) {
+            // If no oAuth2 server that's just fine.
+        }
+
         // Set object manager for all query providers
         foreach ($queryProviders as $provider) {
             $provider->setObjectManager($objectManager);
+            if ($oAuth2Server) {
+                $provider->setOAuth2Server($oAuth2Server);
+            }
         }
 
         return $queryProviders;

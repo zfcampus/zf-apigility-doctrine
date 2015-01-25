@@ -300,7 +300,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $data = $this->getQueryCreateFilter()->filter($this->getEvent(), $entityClass, $data);
         if ($data instanceof ApiProblem) {
-            return $results->last();
+            return $data;
         }
 
         $entity = new $entityClass;
@@ -674,7 +674,9 @@ class DoctrineResource extends AbstractResourceListener implements
             if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
                 $queryBuilder->field($key)->equals($value);
             } else {
-                $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key, $value));
+                $parameterName = 'a' . md5(rand());
+                $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key, ":$parameterName"));
+                $queryBuilder->setParameter($parameterName, $value);
             }
         }
 

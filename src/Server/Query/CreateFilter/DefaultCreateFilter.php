@@ -2,9 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Query\CreateFilter;
 
-use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\ResourceEvent;
 
@@ -13,33 +10,8 @@ use ZF\Rest\ResourceEvent;
  *
  * @package ZF\Apigility\Doctrine\Server\Query\CreateFilter
  */
-class DefaultCreateFilter implements ObjectManagerAwareInterface, QueryCreateFilterInterface
+class DefaultCreateFilter extends AbstractCreateFilter
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * Set the object manager
-     *
-     * @param ObjectManager $objectManager
-     */
-    public function setObjectManager(ObjectManager $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
-
-    /**
-     * Get the object manager
-     *
-     * @return ObjectManager
-     */
-    public function getObjectManager()
-    {
-        return $this->objectManager;
-    }
-
     /**
      * @param string $entityClass
      * @param array  $data
