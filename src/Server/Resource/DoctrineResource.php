@@ -674,7 +674,7 @@ class DoctrineResource extends AbstractResourceListener implements
             if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
                 $queryBuilder->field($key)->equals($value);
             } else {
-                $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key, $value));
+                $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key,  ':' . $key))->setParameter($key, $value);
             }
         }
 
