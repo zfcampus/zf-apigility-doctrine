@@ -121,7 +121,7 @@ Multi-keyed entities
 --------------------
 
 You may delimit multi keys through the route parameter.  The default
-delimter is a period . (e.g. 1.2.3).  You may change the delimiter by
+delimiter is a period . (e.g. 1.2.3).  You may change the delimiter by
 setting the DoctrineResource::setMultiKeyDelimiter($value)
 
 
@@ -154,7 +154,7 @@ Query Providers are available for all find operations.  The find query provider 
 
 A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = ' . $event->getIdentity());``` in your query provider before returning the QueryBuilder created therein.  Other uses include soft deletes so the end user can only see the active records.
 
-A custom plugin manager is available to register your own query providers.  This can be done through following configuration:
+A custom plugin manager is available to register your own query providers.  This can be done through this configuration:
 
 ```php
 'zf-apigility-doctrine-query-provider' => array(
@@ -194,7 +194,7 @@ Query Create Filters
 
 In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to Query Providers in their implementation.  
 
-Create filters take the data as a paramter and return the data, modified or filtered.
+Create filters take the data as a parameter and return the data, modified or filtered.
 
 A custom plugin manager is available to register your own create filters.  This can be done through following configuration:
 
