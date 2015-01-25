@@ -21,7 +21,8 @@ class UserAlbumCreateFilter extends DefaultCreateFilter
             return $validate;
         }
 
-        $request = $this->getServiceLocator()->getServiceLocator()->get('Request')->getQuery()->toArray();
+        $request = $event->getRequest()->getQuery()->toArray();
+
         $identity = $event->getIdentity()->getAuthenticationIdentity();
         $data->user = $identity['user_id'];
 
