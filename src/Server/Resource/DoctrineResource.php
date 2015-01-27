@@ -613,27 +613,22 @@ class DoctrineResource extends AbstractResourceListener implements
         $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
         $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
 
-        $criteria = array();
+        // Match identiy identifier name(s) with id(s)
+        $ids = explode($this->getMultiKeyDelimiter(), $id);
+        $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
 
-        // Check if ID is a composite ID
-        if (strpos($id, $this->getMultiKeyDelimiter()) !== false) {
-            $compositeIdParts = explode($this->getMultiKeyDelimiter(), $id);
+        if (sizeof($ids) != sizeof($keys)) {
+            return new ApiProblem(
+                500,
+                'Invalid multi identifier count.  '
+                . sizeof($ids)
+                . ' must equal '
+                . sizeof($keys)
+            );
+        }
 
-            if (sizeof($compositeIdParts) != sizeof($identifierFieldNames)) {
-                return new ApiProblem(
-                    500,
-                    'Invalid multi identifier count.  '
-                    . sizeof($compositeIdParts)
-                    . ' must equal '
-                    . sizeof($identifierFieldNames)
-                );
-            }
-
-            foreach ($compositeIdParts as $index => $compositeIdPart) {
-                $criteria[$identifierFieldNames[$index]] = $compositeIdPart;
-            }
-        } else {
-            $criteria[$identifierFieldNames[0]] = $id;
+        foreach ($keys as $index => $identifier) {
+            $criteria[$identifier] = $ids[$index];
         }
 
         $routeMatch = $this->getEvent()->getRouteMatch();

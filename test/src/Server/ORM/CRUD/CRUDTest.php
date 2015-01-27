@@ -123,6 +123,20 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals('ArtistTwo', $body['name']);
         $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
 
+        // Test fetch() of resource with non-primary key identifier
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+            'Accept' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+        $this->getRequest()->setContent(null);
+        $this->dispatch('/test/artist-by-name/' . $artist->getName());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(200, $this->getResponseStatusCode());
+        $this->assertEquals('ArtistTwo', $body['name']);
+
         // Test fetch() with listener that returns ApiProblem
         $this->reset();
         $this->setUp();
