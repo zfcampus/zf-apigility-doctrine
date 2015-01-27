@@ -610,12 +610,10 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected function findEntity($id, $method)
     {
-        $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
-        $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
-
         // Match identiy identifier name(s) with id(s)
         $ids = explode($this->getMultiKeyDelimiter(), $id);
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
+        $criteria = array();
 
         if (sizeof($ids) != sizeof($keys)) {
             return new ApiProblem(
@@ -631,6 +629,7 @@ class DoctrineResource extends AbstractResourceListener implements
             $criteria[$identifier] = $ids[$index];
         }
 
+        $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
         $routeMatch = $this->getEvent()->getRouteMatch();
         $associationMappings = $classMetaData->getAssociationNames();
         $fieldNames = $classMetaData->getFieldNames();
