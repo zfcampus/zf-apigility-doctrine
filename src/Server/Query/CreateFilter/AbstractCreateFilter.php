@@ -87,7 +87,7 @@ abstract class AbstractCreateFilter implements ObjectManagerAwareInterface, Quer
         if (! $this->getOAuth2Server()->verifyResourceRequest(
             OAuth2Request::createFromGlobals(),
             $response = null,
-            $scope = null
+            $scope
         )) {
             $error = $this->getOAuth2Server()->getResponse();
             $parameters = $error->getParameters();
