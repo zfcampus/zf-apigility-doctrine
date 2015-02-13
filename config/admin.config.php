@@ -37,16 +37,37 @@ return array(
                 ),
                 'may_terminate' => true,
             ),
+            'zf-apigility-doctrine-autodiscovery' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/apigility/api/module/:name/:version/doctrine/autodiscovery/:object_manager_alias',
+                    'defaults' => array(
+                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery',
+                        'action' => 'discover',
+                    ),
+                ),
+            ),
+        ),
+    ),
+
+    'controllers' => array(
+        'factories' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscoveryControllerFactory'
         ),
     ),
 
     'zf-content-negotiation' => array(
         'controllers' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery'   => 'Json',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService'     => 'HalJson',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService'      => 'HalJson',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
         ),
         'accept-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
+                'application/json',
+                'application/*+json',
+            ),
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
                 'application/json',
                 'application/*+json',
@@ -61,6 +82,10 @@ return array(
             ),
         ),
         'content-type-whitelist' => array(
+            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
+                'application/json',
+                'application/*+json',
+            ),
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
                 'application/json',
                 'application/*+json',
@@ -129,6 +154,12 @@ return array(
             'collection_http_methods'    => array('GET'),
             'collection_name'            => 'doctrine-metadata',
             'collection_query_whitelist' => array('version'),
+        ),
+    ),
+    'zf-rpc' => array(
+        'ZF\Apigility\Doctrine\Admin\Controller\DbAutodiscovery' => array(
+            'http_methods' => array('GET'),
+            'route_name'   => 'zf-apigility-doctrine-autodiscovery',
         ),
     ),
     'validator_metadata' => array(

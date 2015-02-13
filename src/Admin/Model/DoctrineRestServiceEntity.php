@@ -6,6 +6,7 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use ZF\Apigility\Admin\Model\RestServiceEntity;
 use Zend\Stdlib\ArraySerializableInterface;
 
@@ -17,7 +18,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     protected $hydratorName;
 
     /**
-     * @var ObjectManger
+     * @var ObjectManager
      */
     protected $objectManager;
 
