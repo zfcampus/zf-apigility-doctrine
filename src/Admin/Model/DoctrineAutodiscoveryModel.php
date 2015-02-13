@@ -61,7 +61,6 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                         break;
                     case 'integer':
                         $field['filters'] = $this->filters['integer'];
-                        $field['validators'][] = $this->validators['integer'];
                         break;
                     default:
                         continue;

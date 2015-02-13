@@ -40,7 +40,7 @@ return array(
             'zf-apigility-doctrine-autodiscovery' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/apigility/api/module/:name/:version/doctrine/autodiscovery/:object_manager_alias',
+                    'route' => '/apigility/api/module/:name/:version/autodiscovery/doctrine/:object_manager_alias',
                     'defaults' => array(
                         'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery',
                         'action' => 'discover',
