@@ -188,19 +188,24 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Delete a service
      *
-     * @param  string $id
-     * @return true
+     * @param mixed $id
+     * @return bool
+     * @throws \Exception
      */
     public function delete($id)
     {
         // Make sure we have an entity first
         $model  = $this->getModel();
         $entity = $model->fetch($id);
+
+        $request   = $this->getEvent()->getRequest();
+        $recursive = $request->getQuery('recursive', false);
+
         try {
             switch (true) {
                 case ($entity instanceof DoctrineRestServiceEntity):
                 default:
-                    $model->deleteService($entity->controllerServiceName);
+                    $model->deleteService($entity->controllerServiceName, $recursive);
             }
         } catch (\Exception $e) {
             // @codeCoverageIgnoreStart

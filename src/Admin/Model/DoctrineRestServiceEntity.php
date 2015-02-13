@@ -53,7 +53,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
                 case 'byvalue':
                     $this->byValue = $value;
                     break;
-                case 'hydratorstrategies':
+                case 'strategies':
                     $this->hydratorStrategies = $value;
                     break;
                 case 'usegeneratedhydrator':
