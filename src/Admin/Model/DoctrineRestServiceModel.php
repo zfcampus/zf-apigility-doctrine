@@ -70,7 +70,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         'pageSize'                 => 'page_size',
         'pageSizeParam'            => 'page_size_param',
         'entityClass'              => 'entity_class',
+        'entityIdentifierName'     => 'entity_identifier_name',
         'collectionClass'          => 'collection_class',
+        'collectionName'           => 'collection_name',
     );
 
     /**
@@ -306,7 +308,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Fetch all services
      *
-     * @return RestServiceEntity[]
+     * @return DoctrineRestServiceEntity[]
      */
     public function fetchAll($version = null)
     {
@@ -381,8 +383,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create a new service using the details provided
      *
-     * @param  NewDoctrineServiceEntity $details
-     * @return RestServiceEntity
+     * @param NewDoctrineServiceEntity $details
+     * @return DoctrineRestServiceEntity
+     * @throws \Exception
      */
     public function createService(NewDoctrineServiceEntity $details)
     {

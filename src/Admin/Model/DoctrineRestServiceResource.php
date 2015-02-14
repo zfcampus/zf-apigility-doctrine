@@ -15,7 +15,7 @@ use ZF\Rest\Exception\PatchException;
 class DoctrineRestServiceResource extends AbstractResourceListener
 {
     /**
-     * @var RestServiceModel
+     * @var DoctrineRestServiceModel
      */
     protected $model;
 
@@ -25,12 +25,12 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     protected $moduleName;
 
     /**
-     * @var RestServiceModelFactory
+     * @var DoctrineRestServiceModelFactory
      */
     protected $restFactory;
 
     /**
-     * @param RestServiceModelFactory $restFactory
+     * @param DoctrineRestServiceModelFactory $restFactory
      */
     public function __construct(DoctrineRestServiceModelFactory $restFactory)
     {
@@ -74,7 +74,8 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     }
 
     /**
-     * @return RestServiceModel
+     * @param string $type
+     * @return DoctrineRestServiceModel
      */
     public function getModel($type = DoctrineRestServiceModelFactory::TYPE_DEFAULT)
     {
