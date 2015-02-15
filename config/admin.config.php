@@ -140,7 +140,7 @@ return array(
             'route_name'                 => 'zf-apigility-doctrine-service',
             'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
             'route_identifier_name'      => 'controller_service_name',
-            'entity_http_methods'        => array('GET', 'PATCH', 'DELETE'),
+            'entity_http_methods'        => array('GET', 'POST', 'PATCH', 'DELETE'),
             'collection_http_methods'    => array('GET', 'POST'),
             'collection_name'            => 'doctrine',
             'collection_query_whitelist' => array('version'),
@@ -157,7 +157,7 @@ return array(
         ),
     ),
     'zf-rpc' => array(
-        'ZF\Apigility\Doctrine\Admin\Controller\DbAutodiscovery' => array(
+        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
             'http_methods' => array('GET'),
             'route_name'   => 'zf-apigility-doctrine-autodiscovery',
         ),
