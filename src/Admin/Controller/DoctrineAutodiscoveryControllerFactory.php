@@ -15,7 +15,7 @@ class DoctrineAutodiscoveryControllerFactory implements FactoryInterface
      * Create service
      *
      * @param ServiceLocatorInterface $controllers
-     * @return AutodiscoveryController
+     * @return DoctrineAutodiscoveryController
      */
     public function createService(ServiceLocatorInterface $controllers)
     {
@@ -24,5 +24,4 @@ class DoctrineAutodiscoveryControllerFactory implements FactoryInterface
         $model = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel');
         return new DoctrineAutodiscoveryController($model);
     }
-
 }
