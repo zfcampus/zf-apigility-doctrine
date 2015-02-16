@@ -43,14 +43,16 @@ class Module
     {
         return array(
             'invokables' => array(
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' =>
+                    'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
             ),
             'factories' => array(
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel' => function ($services) {
                     if (!$services->has('Config')) {
                         // @codeCoverageIgnoreStart
                         throw new ServiceNotCreatedException(
-                            'Cannot create ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel service because Config service is not present'
+                            'Cannot create ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel
+                            service because Config service is not present'
                         );
                         // @codeCoverageIgnoreEnd
                     }
