@@ -15,7 +15,7 @@ use ZF\Rest\Exception\PatchException;
 class DoctrineRestServiceResource extends AbstractResourceListener
 {
     /**
-     * @var RestServiceModel
+     * @var DoctrineRestServiceModel
      */
     protected $model;
 
@@ -25,12 +25,12 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     protected $moduleName;
 
     /**
-     * @var RestServiceModelFactory
+     * @var DoctrineRestServiceModelFactory
      */
     protected $restFactory;
 
     /**
-     * @param RestServiceModelFactory $restFactory
+     * @param DoctrineRestServiceModelFactory $restFactory
      */
     public function __construct(DoctrineRestServiceModelFactory $restFactory)
     {
@@ -74,7 +74,8 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     }
 
     /**
-     * @return RestServiceModel
+     * @param string $type
+     * @return DoctrineRestServiceModel
      */
     public function getModel($type = DoctrineRestServiceModelFactory::TYPE_DEFAULT)
     {
@@ -188,19 +189,24 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     /**
      * Delete a service
      *
-     * @param  string $id
-     * @return true
+     * @param mixed $id
+     * @return bool
+     * @throws \Exception
      */
     public function delete($id)
     {
         // Make sure we have an entity first
         $model  = $this->getModel();
         $entity = $model->fetch($id);
+
+        $request   = $this->getEvent()->getRequest();
+        $recursive = $request->getQuery('recursive', false);
+
         try {
             switch (true) {
                 case ($entity instanceof DoctrineRestServiceEntity):
                 default:
-                    $model->deleteService($entity->controllerServiceName);
+                    $model->deleteService($entity->controllerServiceName, $recursive);
             }
         } catch (\Exception $e) {
             // @codeCoverageIgnoreStart

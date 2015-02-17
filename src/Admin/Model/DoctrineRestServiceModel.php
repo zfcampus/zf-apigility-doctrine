@@ -14,6 +14,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
+use ZF\Apigility\Admin\Utility;
 use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
@@ -21,6 +22,7 @@ use Zf\Apigility\Admin\Model\ModuleEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use ZF\ApiProblem\ApiProblem;
+use ReflectionClass;
 
 class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceManagerAwareInterface
 {
@@ -68,7 +70,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         'pageSize'                 => 'page_size',
         'pageSizeParam'            => 'page_size_param',
         'entityClass'              => 'entity_class',
+        'entityIdentifierName'     => 'entity_identifier_name',
         'collectionClass'          => 'collection_class',
+        'collectionName'           => 'collection_name',
     );
 
     /**
@@ -304,7 +308,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Fetch all services
      *
-     * @return RestServiceEntity[]
+     * @return DoctrineRestServiceEntity[]
      */
     public function fetchAll($version = null)
     {
@@ -379,8 +383,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create a new service using the details provided
      *
-     * @param  NewDoctrineServiceEntity $details
-     * @return RestServiceEntity
+     * @param NewDoctrineServiceEntity $details
+     * @return DoctrineRestServiceEntity
+     * @throws \Exception
      */
     public function createService(NewDoctrineServiceEntity $details)
     {
@@ -512,9 +517,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      *
      * @todo   Remove content-negotiation and/or HAL configuration?
      * @param  string $controllerService
+     * @param  bool $recursive
      * @return true
      */
-    public function deleteService($controllerService, $deleteFiles = true)
+    public function deleteService($controllerService, $recursive = false)
     {
         try {
             $service = $this->fetch($controllerService);
@@ -530,8 +536,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             // @codeCoverageIgnoreEnd
         }
 
-        if ($deleteFiles) {
+        /*if ($deleteFiles) {
             $this->deleteFiles($service);
+        }*/
+        if ($recursive) {
+            $reflection = new ReflectionClass($service->resourceClass);
+            Utility::recursiveDelete(dirname($reflection->getFileName()));
         }
         $this->deleteRoute($service);
         $response = $this->deleteDoctrineRestConfig($service);
@@ -1100,6 +1110,14 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->configResource->deleteKey($key);
 
         $key = array('zf-hal', 'metadata_map', $entity->entityClass);
+        $this->configResource->deleteKey($key);
+
+        $validator = $config['zf-content-validation'][$entity->controllerServiceName]['input_filter'];
+
+        $key = array('zf-content-validation', $entity->controllerServiceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('input_filter_specs', $validator);
         $this->configResource->deleteKey($key);
     }
 

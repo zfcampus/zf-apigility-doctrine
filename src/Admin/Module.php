@@ -41,120 +41,132 @@ class Module
 
     public function getServiceConfig()
     {
-        return array('factories' => array(
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' => function ($services) {
+        return array(
+            'invokables' => array(
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' =>
+                    'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
+            ),
+            'factories' => array(
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel' => function ($services) {
+                    if (!$services->has('Config')) {
+                        // @codeCoverageIgnoreStart
+                        throw new ServiceNotCreatedException(
+                            'Cannot create ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel
+                            service because Config service is not present'
+                        );
+                        // @codeCoverageIgnoreEnd
+                    }
+                    $config = $services->get('Config');
 
-                $resource = new Model\DoctrineMetadataServiceResource();
+                    return new Model\DoctrineAutodiscoveryModel($config);
+                },
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
+                    if (!$services->has('ZF\Configuration\ModuleUtils')
+                        || !$services->has('ZF\Configuration\ConfigResourceFactory')
+                        || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
+                        || !$services->has('SharedEventManager')
+                    ) {
+                        // @codeCoverageIgnoreStart
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory is missing one'
+                            . ' or more dependencies from ZF\Configuration'
+                        );
+                        // @codeCoverageIgnoreEnd
+                    }
+                    $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
+                    $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
+                    $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
+                    $sharedEvents  = $services->get('SharedEventManager');
 
-                return $resource;
-            },
+                    // Wire Doctrine-Connected fetch listener
+                    $sharedEvents->attach(
+                        __NAMESPACE__ . '\Admin\Model\DoctrineRestServiceModel',
+                        'fetch',
+                        'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel::onFetch'
+                    );
 
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
-                if (!$services->has('ZF\Configuration\ModuleUtils')
-                    || !$services->has('ZF\Configuration\ConfigResourceFactory')
-                    || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
-                    || !$services->has('SharedEventManager')
-                ) {
+                    return new Model\DoctrineRestServiceModelFactory(
+                        $moduleUtils,
+                        $configFactory,
+                        $sharedEvents,
+                        $moduleModel
+                    );
+                },
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function ($services) {
+                    if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory')) {
+                        // @codeCoverageIgnoreStart
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource is missing one or more'
+                            . ' dependencies'
+                        );
+                        // @codeCoverageIgnoreEnd
+                    }
+                    if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
+                        // @codeCoverageIgnoreStart
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Admin\Model\RestServiceResource is missing one or more dependencies'
+                        );
+                        // @codeCoverageIgnoreEnd
+                    }
+                    $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
+                    $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
+                    $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
+
+                    return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
+                },
+
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
+                    if (!$services->has('ZF\Configuration\ModuleUtils')
+                        || !$services->has('ZF\Configuration\ConfigResourceFactory')
+                        || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
+                        || !$services->has('SharedEventManager')
+                    ) {
+                        // @codeCoverageIgnoreStart
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Admin\Model\RpcServiceModelFactory is missing one or more dependencies'
+                            . ' from ZF\Configuration'
+                        );
+                        // @codeCoverageIgnoreEnd
+                    }
+                    $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
+                    $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
+                    $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
+                    $sharedEvents  = $services->get('SharedEventManager');
+
+                    return new Model\DoctrineRpcServiceModelFactory(
+                        $moduleUtils,
+                        $configFactory,
+                        $sharedEvents,
+                        $moduleModel
+                    );
+                },
+
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
                     // @codeCoverageIgnoreStart
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory is missing one'
-                        . ' or more dependencies from ZF\Configuration'
-                    );
+                    if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory')) {
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Admin\Model\RpcServiceResource is missing RpcServiceModelFactory dependency'
+                        );
+                    }
+                    if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Admin\Model\RpcServiceResource is missing InputFilterModel dependency'
+                        );
+                    }
+                    if (!$services->has('ControllerManager')) {
+                        throw new ServiceNotCreatedException(
+                            'ZF\Apigility\Admin\Model\RpcServiceResource is missing ControllerManager dependency'
+                        );
+                    }
                     // @codeCoverageIgnoreEnd
-                }
-                $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
-                $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
-                $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
-                $sharedEvents  = $services->get('SharedEventManager');
 
-                // Wire Doctrine-Connected fetch listener
-                $sharedEvents->attach(
-                    __NAMESPACE__ . '\Admin\Model\DoctrineRestServiceModel',
-                    'fetch',
-                    'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel::onFetch'
-                );
+                    $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory');
+                    $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
+                    $controllerManager = $services->get('ControllerManager');
 
-                return new Model\DoctrineRestServiceModelFactory(
-                    $moduleUtils,
-                    $configFactory,
-                    $sharedEvents,
-                    $moduleModel
-                );
-            },
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function ($services) {
-                if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory')) {
-                    // @codeCoverageIgnoreStart
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource is missing one or more'
-                        . ' dependencies'
-                    );
-                    // @codeCoverageIgnoreEnd
-                }
-                if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
-                    // @codeCoverageIgnoreStart
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Admin\Model\RestServiceResource is missing one or more dependencies'
-                    );
-                    // @codeCoverageIgnoreEnd
-                }
-                $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory');
-                $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
-                $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
-
-                return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
-            },
-
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
-                if (!$services->has('ZF\Configuration\ModuleUtils')
-                    || !$services->has('ZF\Configuration\ConfigResourceFactory')
-                    || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
-                    || !$services->has('SharedEventManager')
-                ) {
-                    // @codeCoverageIgnoreStart
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Admin\Model\RpcServiceModelFactory is missing one or more dependencies'
-                        . ' from ZF\Configuration'
-                    );
-                    // @codeCoverageIgnoreEnd
-                }
-                $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
-                $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
-                $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
-                $sharedEvents  = $services->get('SharedEventManager');
-
-                return new Model\DoctrineRpcServiceModelFactory(
-                    $moduleUtils,
-                    $configFactory,
-                    $sharedEvents,
-                    $moduleModel
-                );
-            },
-
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
-                // @codeCoverageIgnoreStart
-                if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory')) {
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing RpcServiceModelFactory dependency'
-                    );
-                }
-                if (!$services->has('ZF\Apigility\Admin\Model\InputFilterModel')) {
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing InputFilterModel dependency'
-                    );
-                }
-                if (!$services->has('ControllerManager')) {
-                    throw new ServiceNotCreatedException(
-                        'ZF\Apigility\Admin\Model\RpcServiceResource is missing ControllerManager dependency'
-                    );
-                }
-                // @codeCoverageIgnoreEnd
-
-                $factory = $services->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory');
-                $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
-                $controllerManager = $services->get('ControllerManager');
-
-                return new Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
-            },
-        ));
+                    return new Model\DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
+                },
+            )
+        );
     }
 }
