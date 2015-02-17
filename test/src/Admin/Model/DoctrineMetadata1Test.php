@@ -65,14 +65,14 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         // Create DB
-        $resourceDefinition = [
+        $resourceDefinition = array(
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
             "entityClass" => "Db\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/db-test/artist",
-        ];
+        );
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
