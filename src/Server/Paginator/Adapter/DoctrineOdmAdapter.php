@@ -49,7 +49,6 @@ class DoctrineOdmAdapter implements AdapterInterface
      */
     public function getItems($offset, $itemCountPerPage)
     {
-
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->skip($offset);
         $queryBuilder->limit($itemCountPerPage);

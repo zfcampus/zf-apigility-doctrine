@@ -81,7 +81,6 @@ abstract class RpcController extends AbstractActionController
                 );
             }
                 // @codeCoverageIgnoreEnd
-
         } else {
             $query[] = array('type' => 'eq', 'field' => $sourceField, 'value' => $parentId);
 

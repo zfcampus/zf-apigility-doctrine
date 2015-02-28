@@ -45,7 +45,7 @@ class DoctrineRpcServiceModel
     protected $modules;
 
     /**
-     * @param string         $module
+     * @param ModuleEntity   $moduleEntity
      * @param ModuleUtils    $modules
      * @param ConfigResource $config
      */
@@ -120,6 +120,7 @@ class DoctrineRpcServiceModel
     /**
      * Fetch all services
      *
+     * @param string $version
      * @return DoctrineRpcServiceEntity[]
      */
     public function fetchAll($version = null)
@@ -232,7 +233,7 @@ class DoctrineRpcServiceModel
     /**
      * Delete the files which were automatically created
      *
-     * @param DoctrineRestServiceEntity $entity
+     * @param DoctrineRpcServiceEntity $entity
      */
     public function deleteFiles(DoctrineRpcServiceEntity $entity)
     {
@@ -246,7 +247,7 @@ class DoctrineRpcServiceModel
      * Create a controller in the current module named for the given service
      *
      * @param  string $serviceName
-     * @return stdClass
+     * @return mixed
      */
     public function createController($serviceName)
     {
@@ -365,7 +366,7 @@ class DoctrineRpcServiceModel
                 )
             ),
             'zf-versioning' => array(
-                'uri' => array (
+                'uri' => array(
                     $routeName
                 )
             )
@@ -376,13 +377,11 @@ class DoctrineRpcServiceModel
         return $routeName;
     }
 
-    /*
+    /**
      * Create the zf-rpc configuration for the controller service
      *
-     * @param  string               $controllerService
-     * @param  string               $routeName
-     * @param  array                $httpMethods
-     * @param  null|string|callable $callable
+     * @param $controllerService
+     * @param $options
      * @return array
      */
     public function createDoctrineRpcConfig($controllerService, $options)
@@ -394,7 +393,7 @@ class DoctrineRpcServiceModel
         return $this->configResource->patch($config, true);
     }
 
-    /*
+    /**
      * Create the zf-rpc configuration for the controller service
      *
      * @param  string               $controllerService

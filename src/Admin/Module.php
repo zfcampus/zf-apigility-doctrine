@@ -6,23 +6,19 @@
 
 namespace ZF\Apigility\Doctrine\Admin;
 
-use ZF\Hal\Resource;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use ZF\Apigility\Admin\Model\RestServiceResource;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 
-class Module
+class Module implements ConfigProviderInterface, AutoloaderProviderInterface, ServiceProviderInterface, DependencyIndicatorInterface
 {
     /**
-     * @var \Closure
+     * Return an array for passing to Zend\Loader\AutoloaderFactory.
+     *
+     * @return array
      */
-    protected $urlHelper;
-
-    /**
-     * @var \Zend\ServiceManager\ServiceLocatorInterface
-     */
-    protected $sm;
-
     public function getAutoloaderConfig()
     {
         return array(
@@ -34,11 +30,22 @@ class Module
         );
     }
 
+    /**
+     * Returns configuration to merge with application configuration
+     *
+     * @return array|\Traversable
+     */
     public function getConfig()
     {
         return include __DIR__ . '/../../config/admin.config.php';
     }
 
+    /**
+     * Expected to return \Zend\ServiceManager\Config object or array to
+     * seed such an object.
+     *
+     * @return array|\Zend\ServiceManager\Config
+     */
     public function getServiceConfig()
     {
         return array(
@@ -80,9 +87,9 @@ class Module
 
                     // Wire Doctrine-Connected fetch listener
                     $sharedEvents->attach(
-                        __NAMESPACE__ . '\Admin\Model\DoctrineRestServiceModel',
+                        __NAMESPACE__ . '\Model\DoctrineRestServiceModel',
                         'fetch',
-                        'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel::onFetch'
+                        __NAMESPACE__ . '\Model\DoctrineRestServiceModel::onFetch'
                     );
 
                     return new Model\DoctrineRestServiceModelFactory(
@@ -112,7 +119,7 @@ class Module
                     $inputFilterModel = $services->get('ZF\Apigility\Admin\Model\InputFilterModel');
                     $documentationModel = $services->get('ZF\Apigility\Admin\Model\DocumentationModel');
 
-                    return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
+                    return new Model\DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
                 },
 
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
@@ -168,5 +175,15 @@ class Module
                 },
             )
         );
+    }
+
+    /**
+     * Expected to return an array of modules on which the current one depends on
+     *
+     * @return array
+     */
+    public function getModuleDependencies()
+    {
+        return array('ZF\Apigility\Admin');
     }
 }

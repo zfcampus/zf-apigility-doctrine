@@ -30,6 +30,8 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     protected $restFactory;
 
     /**
+     * Constructor
+     *
      * @param DoctrineRestServiceModelFactory $restFactory
      */
     public function __construct(DoctrineRestServiceModelFactory $restFactory)
@@ -38,16 +40,20 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     }
 
     /**
-     * @return string
+     * Set module name
+     *
+     * @param string $moduleName
+     * @return DoctrineRestServiceResource
      */
-    public function setModuleName($value)
+    public function setModuleName($moduleName)
     {
-        $this->moduleName = $value;
-
+        $this->moduleName = $moduleName;
         return $this;
     }
 
     /**
+     * Get module name
+     *
      * @return string
      * @throws RuntimeException if module name is not present in route matches
      */
@@ -92,7 +98,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      * Create a new REST service
      *
      * @param  array|object $data
-     * @return RestServiceEntity
+     * @return DoctrineRestServiceEntity
      * @throws CreationException
      */
     public function create($data)
@@ -125,7 +131,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      * Fetch REST metadata
      *
      * @param  string $id
-     * @return RestServiceEntity|ApiProblem
+     * @return DoctrineRestServiceEntity|ApiProblem
      */
     public function fetch($id)
     {
@@ -142,7 +148,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      * Fetch metadata for all REST services
      *
      * @param  array $params
-     * @return RestServiceEntity[]
+     * @return DoctrineRestServiceEntity[]
      */
     public function fetchAll($params = array())
     {
@@ -156,7 +162,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      *
      * @param  string       $id
      * @param  object|array $data
-     * @return ApiProblem|RestServiceEntity
+     * @return ApiProblem|DoctrineRestServiceEntity
      * @throws PatchException               if unable to update configuration
      */
     public function patch($id, $data)

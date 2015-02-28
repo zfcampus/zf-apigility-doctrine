@@ -45,7 +45,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
             $key = strtolower($key);
             $key = str_replace('_', '', $key);
             switch ($key) {
-                case 'hydratorname':
+                case 'hydrator':
                     $this->hydratorName = $value;
                     break;
                 case 'objectmanager':

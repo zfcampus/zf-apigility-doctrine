@@ -46,7 +46,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
 
     /**
      * @param DoctrineRpcServiceModelFactory $rpcFactory
-     * @param InputFilterModel               $inputFilterModel
+     * @param InputFilterModel $inputFilterModel
+     * @param ControllerManager $controllerManager
      */
     public function __construct(
         DoctrineRpcServiceModelFactory $rpcFactory,
@@ -59,16 +60,19 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     }
 
     /**
+     * Set module name
      * @param string $moduleName
+     * @return DoctrineRpcServiceResource
      */
     public function setModuleName($moduleName)
     {
         $this->moduleName = $moduleName;
-
         return $this;
     }
 
     /**
+     * Get module name
+     *
      * @return string
      * @throws RuntimeException if module name is not present in route matches
      */

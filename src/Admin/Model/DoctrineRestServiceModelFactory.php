@@ -16,8 +16,37 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
     const TYPE_DEFAULT = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 
     /**
-     * @param  string $module
-     * @return RestServiceModel
+     * @var ServiceManager
+     */
+    protected $serviceManager;
+
+    /**
+     * Get service manager
+     *
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
+    /**
+     * Set service manager
+     *
+     * @param ServiceManager $serviceManager
+     * @return DoctrineRestServiceModelFactory
+     */
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+        return $this;
+    }
+
+
+    /**
+     * @param string $module
+     * @param string $type
+     * @return DoctrineRestServiceModel
      */
     public function factory($module, $type = self::TYPE_DEFAULT)
     {
@@ -52,19 +81,5 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements 
                 );
         }
             // @codeCoverageIgnoreEnd
-    }
-
-    protected $serviceManager;
-
-    public function setServiceManager(ServiceManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
-
-        return $this;
-    }
-
-    public function getServiceManager()
-    {
-        return $this->serviceManager;
     }
 }
