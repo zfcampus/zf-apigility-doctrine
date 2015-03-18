@@ -1,7 +1,7 @@
 namespace <?php echo $module ?>\V<?php echo $version ?>\Rest\<?php echo $resource ?>;
 
-use ZF\Apigility\Doctrine\Server\Resource\DoctrineResource;
+use <?php echo $module ?>\V<?php echo $version ?>\Rest\<?php echo $module?>DoctrineResource;
 
-class <?php echo $classname ?> extends DoctrineResource
+class <?php echo $classname ?> extends <?php echo $module?>DoctrineResource
 {
 }
