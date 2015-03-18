@@ -12,7 +12,11 @@ use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 
-class Module implements ConfigProviderInterface, AutoloaderProviderInterface, ServiceProviderInterface, DependencyIndicatorInterface
+class Module implements
+    ConfigProviderInterface,
+    AutoloaderProviderInterface,
+    ServiceProviderInterface,
+    DependencyIndicatorInterface
 {
     /**
      * Return an array for passing to Zend\Loader\AutoloaderFactory.
