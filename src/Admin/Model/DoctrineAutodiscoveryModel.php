@@ -23,17 +23,17 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
         $entities = array();
 
         /**
- * @var \Doctrine\ORM\EntityManager $em 
+ * @var \Doctrine\ORM\EntityManager $em
 */
         $em = $this->getServiceLocator()->get($adapter_name);
 
         /**
- * @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf 
+ * @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf
 */
         $cmf = $em->getMetadataFactory();
 
         /**
- * @var \Doctrine\ORM\Mapping\ClassMetadata $classMetadata 
+ * @var \Doctrine\ORM\Mapping\ClassMetadata $classMetadata
 */
         foreach ($cmf->getAllMetadata() as $classMetadata) {
             $service = substr($classMetadata->getName(), strrpos($classMetadata->getName(), '\\') + 1);
@@ -57,19 +57,19 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                     'validators' => array(),
                 );
                 switch ($mapping['type']) {
-                case 'string':
-                    $field['filters'] = $this->filters['text'];
-                    if (isset($mapping['length']) && $mapping['length']) {
-                        $validator = $this->validators['text'];
-                        $validator['options']['max'] = $mapping['length'];
-                        $field['validators'][] = $validator;
-                    }
-                    break;
-                case 'integer':
-                    $field['filters'] = $this->filters['integer'];
-                    break;
-                default:
-                    continue;
+                    case 'string':
+                        $field['filters'] = $this->filters['text'];
+                        if (isset($mapping['length']) && $mapping['length']) {
+                            $validator = $this->validators['text'];
+                            $validator['options']['max'] = $mapping['length'];
+                            $field['validators'][] = $validator;
+                        }
+                        break;
+                    case 'integer':
+                        $field['filters'] = $this->filters['integer'];
+                        break;
+                    default:
+                        continue;
                         break;
                 }
                 $entity['fields'][] = $field;
