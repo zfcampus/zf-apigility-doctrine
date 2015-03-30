@@ -13,22 +13,28 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
     /**
      * Fetch fields for an adapter
      *
-     * @param string $module
-     * @param int    $version
-     * @param string $adapter_name
+     * @param  string $module
+     * @param  int    $version
+     * @param  string $adapter_name
      * @return array
      */
     public function fetchFields($module, $version, $adapter_name)
     {
         $entities = array();
 
-        /** @var \Doctrine\ORM\EntityManager $em */
+        /**
+         * @var \Doctrine\ORM\EntityManager $em
+         */
         $em = $this->getServiceLocator()->get($adapter_name);
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf */
+        /**
+         * @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf
+         */
         $cmf = $em->getMetadataFactory();
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata $classMetadata */
+        /**
+         * @var \Doctrine\ORM\Mapping\ClassMetadata $classMetadata
+         */
         foreach ($cmf->getAllMetadata() as $classMetadata) {
             $service = substr($classMetadata->getName(), strrpos($classMetadata->getName(), '\\') + 1);
             if ($this->moduleHasService($module, $version, $service)) {
@@ -53,7 +59,7 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                 switch ($mapping['type']) {
                     case 'string':
                         $field['filters'] = $this->filters['text'];
-                        if ($mapping['length'] != '') {
+                        if (isset($mapping['length']) && $mapping['length']) {
                             $validator = $this->validators['text'];
                             $validator['options']['max'] = $mapping['length'];
                             $field['validators'][] = $validator;
