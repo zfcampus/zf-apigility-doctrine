@@ -80,7 +80,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_CREATE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestCreateFailure');
             }
@@ -145,7 +145,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_FETCH_POST,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchFailure');
             }
@@ -196,7 +196,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchAllFailure');
             }
@@ -257,7 +257,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_PATCH_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPatchFailure');
             }
@@ -358,7 +358,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_PATCH_LIST_POST,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPatchFailure');
             }
@@ -424,7 +424,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPutFailure');
             }
@@ -490,7 +490,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_DELETE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestDeleteFailure');
             }
