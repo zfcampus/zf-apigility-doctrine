@@ -14,6 +14,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
+use ZF\Apigility\Admin\Utility;
 use ZF\Configuration\ConfigResource;
 use ZF\Configuration\ModuleUtils;
 use ZF\Rest\Exception\CreationException;
@@ -21,6 +22,7 @@ use Zf\Apigility\Admin\Model\ModuleEntity;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use ZF\ApiProblem\ApiProblem;
+use ReflectionClass;
 
 class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceManagerAwareInterface
 {
@@ -68,7 +70,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         'pageSize'                 => 'page_size',
         'pageSizeParam'            => 'page_size_param',
         'entityClass'              => 'entity_class',
+        'entityIdentifierName'     => 'entity_identifier_name',
         'collectionClass'          => 'collection_class',
+        'collectionName'           => 'collection_name',
     );
 
     /**
@@ -112,20 +116,20 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Determine if the given entity is doctrine-connected, and, if so, recast to a DoctrineRestServiceEntity
      *
-     * @param  \Zend\EventManager\Event       $e
+     * @param  \Zend\EventManager\Event       $event
      * @return null|DoctrineRestServiceEntity
      */
     // @codeCoverageIgnoreStart
 
-    public static function onFetch($e)
+    public static function onFetch($event)
     {
-        $entity = $e->getParam('entity', false);
+        $entity = $event->getParam('entity', false);
         if (!$entity) {
             // No entity; nothing to do
             return;
         }
 
-        $config = $e->getParam('config', array());
+        $config = $event->getParam('config', array());
         if (!isset($config['zf-apigility'])
             || !isset($config['zf-apigility']['doctrine-connected'])
             || !isset($config['zf-apigility']['doctrine-connected'][$entity->resourceClass])
@@ -173,8 +177,27 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
     // @codeCoverageIgnoreEnd
 
+    /**
+     * @var ServiceManager
+     */
     protected $serviceManager;
 
+    /**
+     * Get service manager
+     *
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
+    /**
+     * Set service manager
+     *
+     * @param ServiceManager $serviceManager
+     * @return DoctrineRestServiceModel
+     */
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
@@ -182,10 +205,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         return $this;
     }
 
-    public function getServiceManager()
-    {
-        return $this->serviceManager;
-    }
 
     /**
      * Set the EventManager instance
@@ -224,7 +243,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
     /**
      * @param  string $controllerService
-     * @return RestServiceEntity|false
+     * @return DoctrineRestServiceEntity|false
      */
     public function fetch($controllerService)
     {
@@ -257,24 +276,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->mergeContentNegotiationConfig($controllerService, $entity, $config);
         $this->mergeHalConfig($controllerService, $entity, $config);
 
-        // Trigger an event, allowing a listener to alter the entity and/or
-        // curry a new one.
-        // @codeCoverageIgnoreStart
-        $eventResults = $this->getEventManager()->trigger(
-            __FUNCTION__,
-            $this,
-            array(
-            'entity' => $entity,
-            'config' => $config,
-            ),
-            function ($r) {
-                return ($r instanceof DoctrineRestServiceEntity);
-            }
-        );
-        if ($eventResults->stopped()) {
-            return $eventResults->last();
-        }
-
         if (!isset($entity->serviceName)
             || empty($entity->serviceName)
         ) {
@@ -297,14 +298,33 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             );
         }
 
+        // Trigger an event, allowing a listener to alter the entity and/or
+        // curry a new one.
+        // @codeCoverageIgnoreStart
+        $eventResults = $this->getEventManager()->trigger(
+            __FUNCTION__,
+            $this,
+            array(
+                'entity' => $entity,
+                'config' => $config,
+            ),
+            function ($r) {
+                return ($r instanceof DoctrineRestServiceEntity);
+            }
+        );
+        if ($eventResults->stopped()) {
+            return $eventResults->last();
+        }
+
         // @codeCoverageIgnoreEnd
         return $entity;
     }
 
     /**
-     * Fetch all services
+     * Fetch all Doctrine services
      *
-     * @return RestServiceEntity[]
+     * @param string $version
+     * @return array
      */
     public function fetchAll($version = null)
     {
@@ -379,8 +399,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create a new service using the details provided
      *
-     * @param  NewDoctrineServiceEntity $details
-     * @return RestServiceEntity
+     * @param NewDoctrineServiceEntity $details
+     * @return DoctrineRestServiceEntity
+     * @throws \Exception
      */
     public function createService(NewDoctrineServiceEntity $details)
     {
@@ -512,9 +533,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      *
      * @todo   Remove content-negotiation and/or HAL configuration?
      * @param  string $controllerService
+     * @param  bool $recursive
      * @return true
      */
-    public function deleteService($controllerService, $deleteFiles = true)
+    public function deleteService($controllerService, $recursive = false)
     {
         try {
             $service = $this->fetch($controllerService);
@@ -530,8 +552,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             // @codeCoverageIgnoreEnd
         }
 
-        if ($deleteFiles) {
+        /*if ($deleteFiles) {
             $this->deleteFiles($service);
+        }*/
+        if ($recursive) {
+            $reflection = new ReflectionClass($service->resourceClass);
+            Utility::recursiveDelete(dirname($reflection->getFileName()));
         }
         $this->deleteRoute($service);
         $response = $this->deleteDoctrineRestConfig($service);
@@ -737,10 +763,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Creates REST configuration
      *
-     * @param RestServiceEntity $details
-     * @param string            $controllerService
-     * @param string            $resourceClass
-     * @param string            $routeName
+     * @param DoctrineRestServiceEntity $details
+     * @param string                    $controllerService
+     * @param string                    $resourceClass
+     * @param string                    $routeName
      */
     public function createRestConfig(DoctrineRestServiceEntity $details, $controllerService, $resourceClass, $routeName)
     {
@@ -769,8 +795,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      * Create content negotiation configuration based on payload and discovered
      * controller service name
      *
-     * @param RestServiceEntity $details
-     * @param string            $controllerService
+     * @param DoctrineRestServiceEntity $details
+     * @param string                    $controllerService
      */
     public function createContentNegotiationConfig(DoctrineRestServiceEntity $details, $controllerService)
     {
@@ -794,10 +820,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create Doctrine configuration
      *
-     * @param RestServiceEntity $details
-     * @param string            $entityClass
-     * @param string            $collectionClass
-     * @param string            $routeName
+     * @param DoctrineRestServiceEntity $details
+     * @param string                    $entityClass
+     * @param string                    $collectionClass
+     * @param string                    $routeName
      */
     public function createDoctrineConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
@@ -841,6 +867,14 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $this->configResource->patch($config, true);
     }
 
+    /**
+     * Create Doctrine hydrator configuration
+     *
+     * @param DoctrineRestServiceEntity $details
+     * @param string                    $entityClass
+     * @param string                    $collectionClass
+     * @param string                    $routeName
+     */
     public function createDoctrineHydratorConfig(
         DoctrineRestServiceEntity $details,
         $entityClass,
@@ -880,10 +914,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
     /**
      * Create HAL configuration
      *
-     * @param RestServiceEntity $details
-     * @param string            $entityClass
-     * @param string            $collectionClass
-     * @param string            $routeName
+     * @param DoctrineRestServiceEntity $details
+     * @param string                    $entityClass
+     * @param string                    $collectionClass
+     * @param string                    $routeName
      */
     public function createHalConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
@@ -967,6 +1001,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
     }
 
+    /**
+     * Update Doctrine hydrator configuration
+     *
+     * @param DoctrineRestServiceEntity $original
+     * @param DoctrineRestServiceEntity $update
+     */
     public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
         $patch = array();
@@ -1015,6 +1055,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         }
     }
 
+    /**
+     * Update Doctrine configuration
+     *
+     * @param DoctrineRestServiceEntity $original
+     * @param DoctrineRestServiceEntity $update
+     */
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
         $patch = array();
@@ -1073,16 +1119,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      */
     public function deleteDoctrineRestConfig(DoctrineRestServiceEntity $entity)
     {
-         // Get hydrator name
+        // Get hydrator name
          $config = $this->configResource->fetch(true);
-         $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
-         $objectManagerClass = $config['doctrine-hydrator'][$hydratorName]['object_manager'];
+        $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
+        $objectManagerClass = $config['doctrine-hydrator'][$hydratorName]['object_manager'];
 
-         $key = array('doctrine-hydrator', $hydratorName);
-         $this->configResource->deleteKey($key);
+        $key = array('doctrine-hydrator', $hydratorName);
+        $this->configResource->deleteKey($key);
 
-         $key = array('zf-apigility', 'doctrine-connected', $entity->resourceClass);
-         $this->configResource->deleteKey($key);
+        $key = array('zf-apigility', 'doctrine-connected', $entity->resourceClass);
+        $this->configResource->deleteKey($key);
 
         $key = array('zf-rest', $entity->controllerServiceName);
         $this->configResource->deleteKey($key);
@@ -1101,11 +1147,17 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $key = array('zf-hal', 'metadata_map', $entity->entityClass);
         $this->configResource->deleteKey($key);
+
+        $validator = $config['zf-content-validation'][$entity->controllerServiceName]['input_filter'];
+
+        $key = array('zf-content-validation', $entity->controllerServiceName);
+        $this->configResource->deleteKey($key);
+
+        $key = array('input_filter_specs', $validator);
+        $this->configResource->deleteKey($key);
     }
 
     /**
-     * Create a class file
-     *
      * Creates a class file based on the view model passed, the type of resource,
      * and writes it to the path provided.
      *

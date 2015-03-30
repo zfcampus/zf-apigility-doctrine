@@ -6,6 +6,7 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 use Zend\Stdlib\ArraySerializableInterface;
 
@@ -46,7 +47,7 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySe
                 case 'objectmanager':
                     $this->objectManager = $value;
                     break;
-                case 'hydratorname':
+                case 'hydrator':
                     $this->hydratorName = $value;
                     break;
                 case 'byvalue':

@@ -116,7 +116,7 @@ class DoctrineRestServiceResourceTest extends AbstractHttpControllerTestCase //T
         //        $controller = new $controllerServiceName;
         //        $request    = new Request();
 
-        $query = [];
+        $query = array();
         $query[] = array('type' => 'eq', 'field' => 'id', 'value' => $found->getId());
 
         // Fetch test runs

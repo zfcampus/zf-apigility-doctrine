@@ -42,7 +42,7 @@ class DoctrineRpcServiceModelFactory
 
     /**
      * @param ModuleUtils                 $modules
-     * @param ConfigResource              $config
+     * @param ConfigResourceFactory       $configFactory
      * @param SharedEventManagerInterface $sharedEvents
      * @param ModuleModel                 $moduleModel
      */

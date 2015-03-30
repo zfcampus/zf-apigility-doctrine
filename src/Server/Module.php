@@ -6,11 +6,18 @@
 
 namespace ZF\Apigility\Doctrine\Server;
 
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManager;
 
-class Module implements DependencyIndicatorInterface
+class Module implements ConfigProviderInterface, AutoloaderProviderInterface, DependencyIndicatorInterface
 {
+    /**
+     * Return an array for passing to Zend\Loader\AutoloaderFactory.
+     *
+     * @return array
+     */
     public function getAutoloaderConfig()
     {
         return array(
@@ -22,11 +29,21 @@ class Module implements DependencyIndicatorInterface
         );
     }
 
+    /**
+     * Returns configuration to merge with application configuration
+     *
+     * @return array|\Traversable
+     */
     public function getConfig()
     {
         return include __DIR__ . '/../../config/server.config.php';
     }
 
+    /**
+     * Module init
+     *
+     * @param ModuleManager $moduleManager
+     */
     public function init(ModuleManager $moduleManager)
     {
         $sm = $moduleManager->getEvent()->getParam('ServiceManager');

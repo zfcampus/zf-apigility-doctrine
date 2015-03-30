@@ -80,7 +80,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_CREATE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestCreateFailure');
             }
@@ -123,6 +123,20 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals('ArtistTwo', $body['name']);
         $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
 
+        // Test fetch() of resource with non-primary key identifier
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+            'Accept' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+        $this->getRequest()->setContent(null);
+        $this->dispatch('/test/artist-by-name/' . $artist->getName());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertEquals(200, $this->getResponseStatusCode());
+        $this->assertEquals('ArtistTwo', $body['name']);
+
         // Test fetch() with listener that returns ApiProblem
         $this->reset();
         $this->setUp();
@@ -131,7 +145,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_FETCH_POST,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchFailure');
             }
@@ -182,7 +196,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchAllFailure');
             }
@@ -243,7 +257,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_PATCH_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPatchFailure');
             }
@@ -344,7 +358,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_PATCH_LIST_POST,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPatchFailure');
             }
@@ -410,7 +424,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestPutFailure');
             }
@@ -476,7 +490,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
             DoctrineResourceEvent::EVENT_DELETE_PRE,
-            function(DoctrineResourceEvent $e) {
+            function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestDeleteFailure');
             }
