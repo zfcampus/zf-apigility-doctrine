@@ -57,8 +57,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
     {
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_POST);
@@ -112,7 +112,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
+                'Accept' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_GET);
@@ -126,7 +126,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         // Test fetch() of resource with non-primary key identifier
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
+                'Accept' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_GET);
@@ -174,7 +174,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
+                'Accept' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_GET);
@@ -223,8 +223,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_PATCH);
@@ -284,8 +284,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_POST);
@@ -322,8 +322,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_PATCH);
@@ -390,8 +390,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_PUT);
@@ -458,7 +458,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
+                'Accept' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
@@ -468,8 +468,8 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEmpty($em->getRepository('ZFTestApigilityDb\Entity\Artist')->find($id));
         $this->validateTriggeredEvents(
             array(
-            DoctrineResourceEvent::EVENT_DELETE_PRE,
-            DoctrineResourceEvent::EVENT_DELETE_POST,
+                DoctrineResourceEvent::EVENT_DELETE_PRE,
+                DoctrineResourceEvent::EVENT_DELETE_POST,
             )
         );
 
@@ -515,7 +515,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
+                'Accept' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
@@ -525,12 +525,73 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array());
     }
 
+
+    public function testDeleteList()
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $deleteList = array();
+
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $deleteList[] = array(
+            'id' => $body['id'],
+        );
+
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistTwo","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $deleteList[] = array(
+            'id' => $body['id'],
+        );
+
+        $this->getRequest()->setMethod(Request::METHOD_POST);
+        $this->getRequest()->setContent('{"name": "ArtistThree","createdAt": "2011-12-18 13:17:17"}');
+        $this->dispatch('/test/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $deleteList[] = array(
+            'id' => $body['id'],
+        );
+
+        $em->clear();
+
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
+            )
+        );
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+        $this->getRequest()->setContent(json_encode($deleteList));
+        $this->dispatch('/test/artist');
+        $this->assertEquals(204, $this->getResponseStatusCode());
+
+        $this->validateTriggeredEventsContains(array(
+            DoctrineResourceEvent::EVENT_DELETE_PRE,
+            DoctrineResourceEvent::EVENT_DELETE_POST,
+            DoctrineResourceEvent::EVENT_DELETE_LIST_PRE,
+            DoctrineResourceEvent::EVENT_DELETE_LIST_POST,
+        ));
+    }
+
     public function testRpcController()
     {
         $this->getRequest()->getHeaders()->addHeaders(
             array(
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
+                'Accept' => 'application/json',
+                'Content-type' => 'application/json',
             )
         );
         $this->getRequest()->setMethod(Request::METHOD_POST);

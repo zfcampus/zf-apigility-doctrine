@@ -81,6 +81,9 @@ EVENT_PATCH_LIST_PRE = 'patch-all.pre';
 EVENT_PATCH_LIST_POST = 'patch-all.post';
 EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
+EVENT_DELETE_LIST_PRE = 'delete-list.pre';
+EVENT_DELETE_LIST_POST = 'delete-list.post';
+```
 ```
 
 Attach to events through the Shared Event Manager:

@@ -17,10 +17,10 @@
     ],
     "require-dev": {
         "zfcampus/zf-apigility-admin": "~1.0",
-        "zendframework/zend-test": ">=2.3",
-        "zendframework/zend-form": ">=2.3",
-        "zendframework/zend-serializer": ">=2.3",
-        "zendframework/zend-log": ">=2.3",
+        "zendframework/zend-test": ">=2.4",
+        "zendframework/zend-form": ">=2.4",
+        "zendframework/zend-serializer": ">=2.4",
+        "zendframework/zend-log": ">=2.4",
         "phpunit/phpunit": "3.7.*",
         "doctrine/doctrine-orm-module": "*",
         "doctrine/doctrine-mongo-odm-module": "*",
@@ -30,7 +30,8 @@
     "require": {
         "php": ">=5.3",
         "phpro/zf-doctrine-hydration-module": ">=0.1.5",
-        "zfcampus/zf-apigility": "~1.0"
+        "zfcampus/zf-apigility": "~1.0",
+        "zfcampus/zf-rest": ">=1.0.4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
