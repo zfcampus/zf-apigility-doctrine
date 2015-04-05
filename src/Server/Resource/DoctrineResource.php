@@ -400,25 +400,31 @@ class DoctrineResource extends AbstractResourceListener implements
     {
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data);
         if ($results->last() instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
             return $results->last();
         }
+            // @codeCoverageIgnoreEnd
 
         $this->getObjectManager()->getConnection()->beginTransaction();
         foreach ($data as $row) {
             $result = $this->delete($row[$this->getEntityIdentifierName()]);
 
             if ($result instanceof ApiProblem) {
+                // @codeCoverageIgnoreStart
                 $this->getObjectManager()->getConnection()->rollback();
 
                 return $result;
+                // @codeCoverageIgnoreEnd
             }
         }
         $this->getObjectManager()->getConnection()->commit();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true);
         if ($results->last() instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
             return $results->last();
         }
+            // @codeCoverageIgnoreEnd
 
         return true;
     }
