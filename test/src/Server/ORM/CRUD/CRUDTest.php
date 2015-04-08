@@ -49,7 +49,13 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
 
         foreach ($expectedEvents as $event) {
-            $this->assertTrue(in_array($event, $eventCatcher->getCaughtEvents()));
+            $this->assertTrue(
+                in_array($event, $eventCatcher->getCaughtEvents()),
+                sprintf(
+                    'Did not identify event "%s" in caught events',
+                    $event
+                )
+            );
         }
     }
 
@@ -525,7 +531,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array());
     }
 
-
     public function testDeleteList()
     {
         $serviceManager = $this->getApplication()->getServiceManager();
@@ -579,8 +584,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals(204, $this->getResponseStatusCode());
 
         $this->validateTriggeredEventsContains(array(
-            DoctrineResourceEvent::EVENT_DELETE_PRE,
-            DoctrineResourceEvent::EVENT_DELETE_POST,
             DoctrineResourceEvent::EVENT_DELETE_LIST_PRE,
             DoctrineResourceEvent::EVENT_DELETE_LIST_POST,
         ));
