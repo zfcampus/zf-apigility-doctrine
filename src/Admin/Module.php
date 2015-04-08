@@ -72,7 +72,7 @@ class Module implements
                     return new Model\DoctrineAutodiscoveryModel($config);
                 },
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
-                    if (!$services->has('ZF\Configuration\ModuleUtils')
+                    if (!$services->has('ZF\Apigility\Admin\Model\ModulePathSpec')
                         || !$services->has('ZF\Configuration\ConfigResourceFactory')
                         || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
                         || !$services->has('SharedEventManager')
@@ -85,7 +85,7 @@ class Module implements
                         // @codeCoverageIgnoreEnd
                     }
                     $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
-                    $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
+                    $modulePathSpec = $services->get('ZF\Apigility\Admin\Model\ModulePathSpec');
                     $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
                     $sharedEvents  = $services->get('SharedEventManager');
 
@@ -97,7 +97,7 @@ class Module implements
                     );
 
                     return new Model\DoctrineRestServiceModelFactory(
-                        $moduleUtils,
+                        $modulePathSpec,
                         $configFactory,
                         $sharedEvents,
                         $moduleModel
@@ -127,7 +127,7 @@ class Module implements
                 },
 
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
-                    if (!$services->has('ZF\Configuration\ModuleUtils')
+                    if (!$services->has('ZF\Apigility\Admin\Model\ModulePathSpec')
                         || !$services->has('ZF\Configuration\ConfigResourceFactory')
                         || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
                         || !$services->has('SharedEventManager')
@@ -140,12 +140,12 @@ class Module implements
                         // @codeCoverageIgnoreEnd
                     }
                     $moduleModel   = $services->get('ZF\Apigility\Admin\Model\ModuleModel');
-                    $moduleUtils   = $services->get('ZF\Configuration\ModuleUtils');
                     $configFactory = $services->get('ZF\Configuration\ConfigResourceFactory');
+                    $modulePathSpec = $services->get('ZF\Apigility\Admin\Model\ModulePathSpec');
                     $sharedEvents  = $services->get('SharedEventManager');
 
                     return new Model\DoctrineRpcServiceModelFactory(
-                        $moduleUtils,
+                        $modulePathSpec,
                         $configFactory,
                         $sharedEvents,
                         $moduleModel

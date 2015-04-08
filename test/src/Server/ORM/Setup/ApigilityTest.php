@@ -41,6 +41,7 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PATCH',
+                3 => 'DELETE',
             ),
         );
 
@@ -67,6 +68,7 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PATCH',
+                3 => 'DELETE',
             ),
         );
 
