@@ -16,7 +16,8 @@
         }
     ],
     "require-dev": {
-        "zfcampus/zf-apigility-admin": "~1.0",
+        "zfcampus/zf-apigility-admin": "~1.1-dev@dev",
+        "zfcampus/zf-apigility-admin-ui": "~1.1-dev@dev",
         "zendframework/zend-test": ">=2.4",
         "zendframework/zend-form": ">=2.4",
         "zendframework/zend-serializer": ">=2.4",
