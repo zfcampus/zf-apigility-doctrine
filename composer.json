@@ -29,7 +29,7 @@
     },
     "require": {
         "php": ">=5.3",
-        "phpro/zf-doctrine-hydration-module": ">=0.1.5",
+        "phpro/zf-doctrine-hydration-module": "^0.1.5",
         "zfcampus/zf-apigility": "~1.0",
         "zfcampus/zf-rest": "~1.1-dev@dev"
     },
