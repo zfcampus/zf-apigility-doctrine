@@ -435,6 +435,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             $details->collectionClass:
             $this->createCollectionClass($resourceName);
 
+        $serviceName = ($details->serviceName) ?
+            $details->serviceName:
+            $resourceName;
+
         if (!$entityClass = $details->entityClass or !class_exists($details->entityClass)) {
             // @codeCoverageIgnoreStart
             throw new \Exception('entityClass is required and must exist');
@@ -457,6 +461,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
         $entity->exchangeArray(
             array(
+            'service_name'            => $serviceName,
             'collection_class'        => $collectionClass,
             'controller_service_name' => $controllerService,
             'entity_class'            => $entityClass,
@@ -786,6 +791,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
                 'page_size_param'            => $details->pageSizeParam,
                 'entity_class'               => $details->entityClass,
                 'collection_class'           => $details->collectionClass,
+                'service_name'               => $details->serviceName,
             ),
         ));
         $this->configResource->patch($config, true);

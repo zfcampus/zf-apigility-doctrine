@@ -60,6 +60,9 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
                 case 'usegeneratedhydrator':
                     $this->useGeneratedHydrator = $value;
                     break;
+                case 'servicename':
+                    $this->serviceName = $value;
+                    break;
             }
         }
     }
@@ -72,6 +75,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
         $data['by_value'] = $this->byValue;
         $data['strategies'] = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
+        $data['service_name'] = $this->serviceName;
 
         return $data;
     }
