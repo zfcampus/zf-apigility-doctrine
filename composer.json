@@ -18,6 +18,11 @@
     "require-dev": {
         "zfcampus/zf-apigility-admin": "~1.1-dev@dev",
         "zfcampus/zf-apigility-admin-ui": "~1.1-dev@dev",
+        "zfcampus/zf-content-validation": "~1.1-dev@dev",
+        "zfcampus/zf-hal": "~1.1-dev@dev",
+        "zfcampus/zf-oauth2": "~1.1-dev@dev",
+        "zfcampus/zf-mvc-auth": "~1.1-dev@dev",
+        "zfcampus/zf-rest": "~1.1-dev@dev",
         "zendframework/zend-test": ">=2.4",
         "zendframework/zend-form": ">=2.4",
         "zendframework/zend-serializer": ">=2.4",
