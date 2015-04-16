@@ -18,7 +18,7 @@ use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Utility;
 use ZF\Configuration\ConfigResource;
-use ZF\Configuration\ModuleUtils;
+use ZF\Apigility\Admin\Model\ModulePathSpec;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
 use Zend\ServiceManager\ServiceManager;
@@ -107,10 +107,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
 
     /**
      * @param ModuleEntity   $moduleEntity
-     * @param ModuleUtils    $modules
+     * @param ModulePathSpec    $modules
      * @param ConfigResource $config
      */
-    public function __construct(ModuleEntity $moduleEntity, ModuleUtils $modules, ConfigResource $config)
+    public function __construct(ModuleEntity $moduleEntity, ModulePathSpec $modules, ConfigResource $config)
     {
         $this->module         = $moduleEntity->getName();
         $this->moduleEntity   = $moduleEntity;
@@ -1157,18 +1157,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
      */
     protected function getSourcePath($resourceName)
     {
-        $sourcePath = sprintf(
-            '%s/src/%s/V%s/Rest/%s',
-            $this->modulePath,
-            str_replace('\\', '/', $this->module),
+        $sourcePath = $this->modules->getRestPath(
+            $this->module,
             $this->moduleEntity->getLatestVersion(),
             $resourceName
         );
 
-        // @codeCoverageIgnoreStart
         if (! file_exists($sourcePath)) {
             mkdir($sourcePath, 0777, true);
         }
+
         return $sourcePath;
     }
 
