@@ -239,10 +239,10 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * Example
      * $objectManager->getRepository(...)->findOneBy(
-         'multi' => 1,
-         'keyed' => 2,
-         'routes' => 3
-      );
+     *   'multi' => 1,
+     *   'keyed' => 2,
+     *   'routes' => 3
+     * );
      *
      * @var string
      */
