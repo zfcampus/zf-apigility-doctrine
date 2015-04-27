@@ -15,11 +15,11 @@ Installation of this module uses composer. For composer documentation, please re
 $ php composer.phar require zfcampus/zf-apigility-doctrine "~0.3"
 ```
 
-This library provides two modules.  The first, ZF\Apigility\Doctrine\Server provides
-the classes to serve data created by the second, ZF\Apigility\Doctrine\Admin.  The
-Admin module is used to create apigility resources and the Server serves those
-created resoruces.  Generally you would include Admin in your development.config.php
-and Server in your application.config.php
+This library provides two modules.  The first, `ZF\Apigility\Doctrine\Server` provides
+the classes to serve data created by the second, `ZF\Apigility\Doctrine\Admin`.  The
+*Admin* module is used to create apigility resources and the Server serves those
+created resoruces.  Generally you would include *Admin* in your `development.config.php`
+and *Server* in your `application.config.php`
 
 
 API Resources
@@ -29,7 +29,7 @@ API Resources
 ***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
 
 This will return metadata for the named entity which is a member of the
-named object manager.  Querying without a name will return all metadata
+named object manager. Querying without a name will return all metadata
 for the object manager.
 
 
@@ -86,7 +86,7 @@ EVENT_DELETE_LIST_POST = 'delete-list.post';
 ```
 ```
 
-Attach to events through the Shared Event Manager:
+Attach to events through the *Shared Event Manager*:
 
 ```php
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
@@ -134,8 +134,8 @@ Complex queries through route parameters
 You may specify multiple route parameters and as long as the route
 matches then the route parameter names will be matched to the entity.
 
-For instance, a route of ```/api/artist/:artist_id/album/:album_id``` mapped to the Album
-entity will filter the Album for field names.  So, given an album with id, name, and artist
+For instance, a route of ```/api/artist/:artist_id/album/:album_id``` mapped to the *Album*
+entity will filter the *Album* for field names.  So, given an album with id, name, and artist
 fields the album_id matches to the resoruce configuration and will be queried by key
 and the artist is a field on album and will be queried by criteria so the final query
 would be
@@ -147,15 +147,15 @@ $objectManager->getRepository('Album')->findOneBy(
 );
 ```
 
-The album(_id) is not a field on the Album entity and will be ignored.
+The album(_id) is not a field on the *Album* entity and will be ignored.
 
 
 Query Providers
 ===============
 
-Query Providers are available for all find operations.  The find query provider is used to fetch an entity before it is acted upon for all DoctrineResource methods except create.
+Query Providers are available for all find operations.  The find query provider is used to fetch an entity before it is acted upon for all *DoctrineResource* methods except create.
 
-A query provider returns a QueryBuilder object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = ' . $event->getIdentity());``` in your query provider before returning the QueryBuilder created therein.  Other uses include soft deletes so the end user can only see the active records.
+A query provider returns a *QueryBuilder* object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = ' . $event->getIdentity());``` in your query provider before returning the *QueryBuilder* created therein.  Other uses include soft deletes so the end user can only see the active records.
 
 A custom plugin manager is available to register your own query providers.  This can be done through this configuration:
 
@@ -195,7 +195,7 @@ When the query provider is registered attach it to the doctrine-connected resour
 Query Create Filters
 ==============
 
-In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to Query Providers in their implementation.  
+In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to *Query Providers* in their implementation.  
 
 Create filters take the data as a parameter and return the data, modified or filtered.
 
