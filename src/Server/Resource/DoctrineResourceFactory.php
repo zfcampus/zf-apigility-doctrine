@@ -210,16 +210,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         $queryCreateFilter = $createFilterManager->get($filterManagerAlias);
 
-        // Load the oAuth2 server
-        $oAuth2Server = false;
-        try {
-            $oAuth2ServerFactory = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
-            $oAuth2Server = $oAuth2ServerFactory();
-            $queryCreateFilter->setOAuth2Server($oAuth2Server);
-        } catch (Exception $e) {
-            // If no oAuth2 server that's just fine.
-        }
-
         // Set object manager for all query providers
         $queryCreateFilter ->setObjectManager($objectManager);
 
@@ -262,21 +252,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             }
         }
 
-        // Load the oAuth2 server
-        $oAuth2Server = false;
-        try {
-            $oAuth2ServerFactory = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
-            $oAuth2Server = $oAuth2ServerFactory();
-        } catch (Exception $e) {
-            // If no oAuth2 server that's just fine.
-        }
-
         // Set object manager for all query providers
         foreach ($queryProviders as $provider) {
             $provider->setObjectManager($objectManager);
-            if ($oAuth2Server) {
-                $provider->setOAuth2Server($oAuth2Server);
-            }
         }
 
         return $queryProviders;
