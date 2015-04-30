@@ -52,7 +52,7 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                 }
                 $field = array(
                     'name' => $mapping['fieldName'],
-                    'required' => !$mapping['nullable'],
+                    'required' => (!isset($mapping['nullable']) || $mapping['nullable'] !== true),
                     'filters' => array(),
                     'validators' => array(),
                 );
