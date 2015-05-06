@@ -312,11 +312,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->persist($entity);
-        $this->getObjectManager()->flush();
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -343,12 +345,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->remove($entity);
-        $this->getObjectManager()->flush();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return true;
     }
@@ -475,13 +478,11 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        // Run fetch all pre with query builder
-        $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, $this);
-        $event->setQueryBuilder($queryBuilder);
-        $event->setResourceEvent($this->getEvent());
-        $event->setEntity($this->getEntityClass());
-        $eventManager = $this->getEventManager();
-        $response = $eventManager->trigger($event);
+        $response = $this->triggerDoctrineEvent(
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            $this->getEntityClass(),
+            null
+        );
         if ($response->last() instanceof ApiProblem) {
             return $response->last();
         }
@@ -490,7 +491,11 @@ class DoctrineResource extends AbstractResourceListener implements
         $reflection = new \ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
+        $results = $this->triggerDoctrineEvent(
+            DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
+            $this->getEntityClass(),
+            $collection
+        );
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -543,19 +548,20 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        // Hydrate entity with patched data
-        $this->getHydrator()->hydrate((array) $data, $entity);
-
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
-        $this->getObjectManager()->flush();
+        // Hydrate entity with patched data
+        $this->getHydrator()->hydrate((array) $data, $entity);
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -589,18 +595,19 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $this->getHydrator()->hydrate((array) $data, $entity);
-
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
-        $this->getObjectManager()->flush();
+        $this->getHydrator()->hydrate((array) $data, $entity);
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -621,6 +628,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $event = new DoctrineResourceEvent($name, $this);
         $event->setEntity($entity);
         $event->setCollection($collection);
+        $event->setObjectManager($this->getObjectManager());
         $event->setResourceEvent($this->getEvent());
 
         $eventManager = $this->getEventManager();
