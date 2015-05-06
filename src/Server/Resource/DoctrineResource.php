@@ -312,11 +312,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->persist($entity);
-        $this->getObjectManager()->flush();
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -343,12 +345,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->remove($entity);
-        $this->getObjectManager()->flush();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return true;
     }
@@ -545,19 +548,20 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        // Hydrate entity with patched data
-        $this->getHydrator()->hydrate((array) $data, $entity);
-
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
-        $this->getObjectManager()->flush();
+        // Hydrate entity with patched data
+        $this->getHydrator()->hydrate((array) $data, $entity);
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -591,18 +595,19 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $this->getHydrator()->hydrate((array) $data, $entity);
-
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
-        $this->getObjectManager()->flush();
+        $this->getHydrator()->hydrate((array) $data, $entity);
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
