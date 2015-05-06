@@ -44,26 +44,26 @@ class DoctrineResourceEvent extends Event
     protected $collection;
 
     /**
-     * @var Doctrine\ORM\QueryBuilder
+     * @var object
      */
-    protected $queryBuilder;
+    protected $objectManager;
 
     /**
-     * @param Doctrine\ORM\QueryBuilder $queryBuilder
+     * @param object
      */
-    public function setQueryBuilder($queryBuilder)
+    public function setObjectManager($objectManager)
     {
-        $this->queryBuilder = $queryBuilder;
+        $this->objectManager = $objectManager;
 
         return $this;
     }
 
     /**
-     * @return Doctrine\ORM\QueryBuilder
+     * @return object
      */
-    public function getQueryBuilder()
+    public function getObjectManager()
     {
-        return $this->queryBuilder;
+        return $this->objectManager;
     }
 
     /**
