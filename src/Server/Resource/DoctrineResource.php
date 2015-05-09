@@ -2,26 +2,28 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
-use Zend\EventManager\EventManagerAwareInterface;
-use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
-use Zend\Stdlib\Hydrator\HydratorInterface;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use Traversable;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use ZF\Configuration\Exception\InvalidArgumentException;
 use ZF\Rest\AbstractResourceListener;
+use Zend\EventManager\EventManager;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\StaticEventManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\Stdlib\ArrayUtils;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\EventManager;
-use Doctrine\Common\Persistence\ObjectManager;
-use Traversable;
-use Doctrine\ORM\NoResultException;
-use Doctrine\Common\Collections\ArrayCollection;
-use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use Zend\Stdlib\Hydrator\HydratorAwareInterface;
+use Zend\Stdlib\Hydrator\HydratorInterface;
 
 /**
  * Class DoctrineResource
@@ -94,7 +96,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Set the object manager
      *
-     * @param ObjectManager $objectManager
+     * @param ObjectManager|EntityManagerInterface $objectManager
      */
     public function setObjectManager(ObjectManager $objectManager)
     {
@@ -104,7 +106,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Get the object manager
      *
-     * @return ObjectManager
+     * @return ObjectManager|EntityManagerInterface
      */
     public function getObjectManager()
     {
@@ -122,7 +124,7 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
-     * @var queryProviders array
+     * @var array
      */
     protected $queryProviders;
 
@@ -147,7 +149,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param QueryProviderInterface
      */
     public function setQueryProviders(array $queryProviders)
     {
@@ -156,6 +158,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
     /**
      * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     *
+     * @return queryProviders
      */
     public function getQueryProviders()
     {
@@ -163,7 +167,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return QueryProviderInterface
      */
     public function getQueryProvider($method)
     {
@@ -177,7 +181,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var entityIdentifierName string
+     * @var string entityIdentifierName
      */
     protected $entityIdentifierName;
 
@@ -191,6 +195,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
     /**
      * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     *
+     * @return $this
      */
     public function setEntityIdentifierName($value)
     {
@@ -267,16 +273,16 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected $hydrator;
 
-	/**
-	 * @param HydratorInterface $hydrator
-	 *
-	 * @return $this
-	 */
+    /**
+     * @param HydratorInterface $hydrator
+     *
+     * @return $this
+     */
     public function setHydrator(HydratorInterface $hydrator)
     {
         $this->hydrator = $hydrator;
 
-	    return $this;
+        return $this;
     }
 
     /**
@@ -309,21 +315,21 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $entity = new $entityClass;
-	    $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
-	    if ($results->last() instanceof ApiProblem) {
-		    return $results->last();
-	    }elseif(!$results->isEmpty()){
-		    // TODO Change to be a more logical/secure way to see if data was acted and and we have the expected response
-		    $preEventData = $results->last();
-	    }else{
-		    $preEventData = $data;
-	    }
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        } elseif (!$results->isEmpty()) {
+            // TODO Change to a more logical/secure way to see if data was acted and and we have the expected response
+            $preEventData = $results->last();
+        } else {
+            $preEventData = $data;
+        }
 
-	    $hydrator = $this->getHydrator();
-	    $hydrator->hydrate((array) $preEventData, $entity);
+        $hydrator = $this->getHydrator();
+        $hydrator->hydrate((array) $preEventData, $entity);
 
 
-	    $this->getObjectManager()->persist($entity);
+        $this->getObjectManager()->persist($entity);
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
@@ -382,6 +388,10 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
+        }
+
+        if (!$this->getObjectManager() instanceof EntityManagerInterface) {
+            throw new InvalidArgumentException('Invalid Object Manager, must implement EntityManagerInterface');
         }
 
         $this->getObjectManager()->getConnection()->beginTransaction();
@@ -493,7 +503,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $response = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             $this->getEntityClass(),
-	        $data
+            $data
         );
         if ($response->last() instanceof ApiProblem) {
             return $response->last();
@@ -506,7 +516,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
             $this->getEntityClass(),
-	        $data
+            $data
         );
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
@@ -610,11 +620,11 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
-        }elseif(!$results->isEmpty()){
-	        // TODO Change to be a more logical/secure way to see if data was acted and and we have the expected response
-	        $preEventData = $results->last();
-        }else{
-	        $preEventData = $data;
+        } elseif (!$results->isEmpty()) {
+            // TODO Change to a more logical/secure way to see if data was acted on and we have the expected response
+            $preEventData = $results->last();
+        } else {
+            $preEventData = $data;
         }
 
         $this->getHydrator()->hydrate((array) $preEventData, $entity);
@@ -644,7 +654,7 @@ class DoctrineResource extends AbstractResourceListener implements
     {
         $event = new DoctrineResourceEvent($name, $this);
         $event->setEntity($entity);
-	    $event->setData($data);
+        $event->setData($data);
         $event->setObjectManager($this->getObjectManager());
         $event->setResourceEvent($this->getEvent());
 
@@ -657,6 +667,8 @@ class DoctrineResource extends AbstractResourceListener implements
      * Gets an entity by route params and/or the specified id
      *
      * @param $id
+     *
+     * @param $method
      *
      * @return object
      */
