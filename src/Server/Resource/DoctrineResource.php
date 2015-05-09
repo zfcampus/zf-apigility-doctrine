@@ -5,6 +5,7 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
 use Zend\EventManager\EventManagerAwareInterface;
+use Zend\Stdlib\Hydrator\HydratorAwareInterface;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
@@ -30,7 +31,8 @@ use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
 class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
     ServiceManagerAwareInterface,
-    EventManagerAwareInterface
+    EventManagerAwareInterface,
+	HydratorAwareInterface
 {
     /**
      * @var EventManagerInterface
@@ -265,16 +267,20 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected $hydrator;
 
-    /**
-     * @param \Zend\Stdlib\Hydrator\HydratorInterface $hydrator
-     */
-    public function setHydrator($hydrator)
+	/**
+	 * @param HydratorInterface $hydrator
+	 *
+	 * @return $this
+	 */
+    public function setHydrator(HydratorInterface $hydrator)
     {
         $this->hydrator = $hydrator;
+
+	    return $this;
     }
 
     /**
-     * @return \Zend\Stdlib\Hydrator\HydratorInterface
+     * @return HydratorInterface
      */
     public function getHydrator()
     {
@@ -303,17 +309,23 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $entity = new $entityClass;
-        $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array) $data, $entity);
+	    $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
+	    if ($results->last() instanceof ApiProblem) {
+		    return $results->last();
+	    }elseif(!$results->isEmpty()){
+		    // TODO Change to be a more logical/secure way to see if data was acted and and we have the expected response
+		    $preEventData = $results->last();
+	    }else{
+		    $preEventData = $data;
+	    }
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
-        if ($results->last() instanceof ApiProblem) {
-            return $results->last();
-        }
+	    $hydrator = $this->getHydrator();
+	    $hydrator->hydrate((array) $preEventData, $entity);
 
-        $this->getObjectManager()->persist($entity);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
+	    $this->getObjectManager()->persist($entity);
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -367,7 +379,7 @@ class DoctrineResource extends AbstractResourceListener implements
     {
         $return = new ArrayCollection();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -385,7 +397,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
         $this->getObjectManager()->getConnection()->commit();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_POST, $return);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_POST, $return, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -401,7 +413,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function deleteList($data)
     {
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $results->last();
@@ -422,7 +434,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
         $this->getObjectManager()->getConnection()->commit();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true, $data);
         if ($results->last() instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $results->last();
@@ -481,7 +493,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $response = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             $this->getEntityClass(),
-            null
+	        $data
         );
         if ($response->last() instanceof ApiProblem) {
             return $response->last();
@@ -494,7 +506,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
             $this->getEntityClass(),
-            $collection
+	        $data
         );
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
@@ -548,7 +560,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -556,7 +568,7 @@ class DoctrineResource extends AbstractResourceListener implements
         // Hydrate entity with patched data
         $this->getHydrator()->hydrate((array) $data, $entity);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -595,14 +607,19 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
+        }elseif(!$results->isEmpty()){
+	        // TODO Change to be a more logical/secure way to see if data was acted and and we have the expected response
+	        $preEventData = $results->last();
+        }else{
+	        $preEventData = $data;
         }
 
-        $this->getHydrator()->hydrate((array) $data, $entity);
+        $this->getHydrator()->hydrate((array) $preEventData, $entity);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -619,15 +636,15 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @param $name
      * @param $entity
-     * @param null   $collection
+     * @param $data mixed The original data supplied to the resource method, if any
      *
      * @return \Zend\EventManager\ResponseCollection
      */
-    protected function triggerDoctrineEvent($name, $entity, $collection = null)
+    protected function triggerDoctrineEvent($name, $entity, $data = null)
     {
         $event = new DoctrineResourceEvent($name, $this);
         $event->setEntity($entity);
-        $event->setCollection($collection);
+	    $event->setData($data);
         $event->setObjectManager($this->getObjectManager());
         $event->setResourceEvent($this->getEvent());
 
