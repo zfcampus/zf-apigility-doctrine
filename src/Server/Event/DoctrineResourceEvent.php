@@ -2,6 +2,7 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Zend\EventManager\Event;
 use ZF\Rest\ResourceEvent;
 
@@ -43,15 +44,22 @@ class DoctrineResourceEvent extends Event
      */
     protected $collection;
 
+	/**
+	 * @var array|mixed Should be the original data that was supplied the resource
+	 */
+	protected $data;
+
     /**
-     * @var object
+     * @var ObjectManager
      */
     protected $objectManager;
 
-    /**
-     * @param object
-     */
-    public function setObjectManager($objectManager)
+	/**
+	 * @param ObjectManager $objectManager
+	 *
+	 * @return $this
+	 */
+    public function setObjectManager(ObjectManager $objectManager)
     {
         $this->objectManager = $objectManager;
 
@@ -59,16 +67,19 @@ class DoctrineResourceEvent extends Event
     }
 
     /**
-     * @return object
+     * @return ObjectManager
      */
     public function getObjectManager()
     {
         return $this->objectManager;
     }
 
-    /**
-     * @param mixed $collection
-     */
+	/**
+	 * @param mixed $collection
+	 *
+	 * @deprecated Callers have been removed in Commit b1cf74e
+	 * @return $this
+	 */
     public function setCollection($collection)
     {
         $this->collection = $collection;
@@ -78,15 +89,18 @@ class DoctrineResourceEvent extends Event
 
     /**
      * @return mixed
+     * @deprecated Should almost certainly be null at all times as of commit b1cf74e
      */
     public function getCollection()
     {
         return $this->collection;
     }
 
-    /**
-     * @param mixed $entity
-     */
+	/**
+	 * @param mixed $entity
+	 *
+	 * @return $this
+	 */
     public function setEntity($entity)
     {
         $this->entity = $entity;
@@ -102,9 +116,29 @@ class DoctrineResourceEvent extends Event
         return $this->entity;
     }
 
-    /**
-     * @param \ZF\Rest\ResourceEvent $resourceEvent
-     */
+	/**
+	 * @return mixed
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
+	/**
+	 * @param mixed $data The Original Data supplied to the Resource Method
+	 *
+	 * @return $this
+	 */
+	public function setData( $data ) {
+		$this->data = $data;
+
+		return $this;
+	}
+
+	/**
+	 * @param \ZF\Rest\ResourceEvent $resourceEvent
+	 *
+	 * @return $this
+	 */
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
