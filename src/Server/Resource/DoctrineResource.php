@@ -11,9 +11,9 @@ use DoctrineModule\Stdlib\Hydrator;
 use Traversable;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
 use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
-use ZF\Configuration\Exception\InvalidArgumentException;
 use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -34,7 +34,7 @@ class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
     ServiceManagerAwareInterface,
     EventManagerAwareInterface,
-	HydratorAwareInterface
+    HydratorAwareInterface
 {
     /**
      * @var EventManagerInterface
@@ -149,17 +149,28 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param QueryProviderInterface
+     * @param QueryProviderInterface[]
+     *
+     * @throws InvalidArgumentException if parameter is not an array or \Traversable object
+     * @throws InvalidArgumentException if parameter contains item not an instance of QueryProviderInterface
      */
-    public function setQueryProviders(array $queryProviders)
+    public function setQueryProviders($queryProviders)
     {
-        $this->queryProviders = $queryProviders;
+        if (!is_array($queryProviders) || !$queryProviders instanceof Traversable) {
+            throw new InvalidArgumentException('queryProviders must be array or Traversable object');
+        }
+
+        foreach ($queryProviders as $qp) {
+            if (!$qp instanceof QueryProviderInterface) {
+                throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
+            }
+        }
+
+        $this->queryProviders = (array) $queryProviders;
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
-     *
-     * @return queryProviders
+     * @return QueryProviderInterface[]
      */
     public function getQueryProviders()
     {
@@ -167,7 +178,9 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return QueryProviderInterface
+     * @param $method
+     *
+     * @return QueryProviderInterface Either the default queryProvider or method specific queryProvider if supplied
      */
     public function getQueryProvider($method)
     {
@@ -194,7 +207,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param string
      *
      * @return $this
      */
@@ -327,8 +340,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $preEventData, $entity);
-
-
+        
         $this->getObjectManager()->persist($entity);
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity, $data);
