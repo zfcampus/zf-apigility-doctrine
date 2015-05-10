@@ -2,11 +2,11 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event\Listener;
 
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 /**
  * Class CollectionListener
