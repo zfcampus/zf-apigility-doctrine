@@ -156,7 +156,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function setQueryProviders($queryProviders)
     {
-        if (!is_array($queryProviders) || !$queryProviders instanceof Traversable) {
+        if (!is_array($queryProviders) && !$queryProviders instanceof Traversable) {
             throw new InvalidArgumentException('queryProviders must be array or Traversable object');
         }
 
@@ -331,7 +331,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
-        } elseif (!$results->isEmpty()) {
+        } elseif (!$results->isEmpty() && $results->last() !== null) {
             // TODO Change to a more logical/secure way to see if data was acted and and we have the expected response
             $preEventData = $results->last();
         } else {
@@ -632,7 +632,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
-        } elseif (!$results->isEmpty()) {
+        } elseif (!$results->isEmpty() && $results->last() !== null) {
             // TODO Change to a more logical/secure way to see if data was acted on and we have the expected response
             $preEventData = $results->last();
         } else {
