@@ -340,7 +340,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $hydrator = $this->getHydrator();
         $hydrator->hydrate((array) $preEventData, $entity);
-        
+
         $this->getObjectManager()->persist($entity);
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity, $data);
