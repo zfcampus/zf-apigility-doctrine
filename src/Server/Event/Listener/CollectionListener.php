@@ -2,7 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event\Listener;
 
-use ContactHopper\Sms\Service;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Phpro\DoctrineHydrationModule\Service\DoctrineHydratorFactory;
