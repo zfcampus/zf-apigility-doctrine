@@ -207,14 +207,36 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param string
-     *
+     * @param string $value
      * @return $this
      */
     public function setEntityIdentifierName($value)
     {
         $this->entityIdentifierName = $value;
 
+        return $this;
+    }
+
+    /**
+     * @var string
+     */
+    protected $routeIdentifierName;
+
+    /**
+     * @return string
+     */
+    public function getRouteIdentifierName()
+    {
+        return $this->routeIdentifierName;
+    }
+
+    /**
+     * @param string $routeIdentifierName
+     * @return $this
+     */
+    public function setRouteIdentifierName($routeIdentifierName)
+    {
+        $this->routeIdentifierName = $routeIdentifierName;
         return $this;
     }
 
@@ -709,18 +731,20 @@ class DoctrineResource extends AbstractResourceListener implements
         $routeMatch = $this->getEvent()->getRouteMatch();
         $associationMappings = $classMetaData->getAssociationNames();
         $fieldNames = $classMetaData->getFieldNames();
+        $routeParams = $routeMatch->getParams();
 
-        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
+        if (array_key_exists($this->getRouteIdentifierName(), $routeParams)) {
+            unset($routeParams[$this->getRouteIdentifierName()]);
+        }
+
+        foreach ($routeParams as $routeMatchParam => $value) {
             $stripped = false;
-            if (substr(
-                $routeMatchParam,
-                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix())
-            )) {
-                $routeMatchParam = substr(
+            if ($this->getStripRouteParameterSuffix() === substr(
                     $routeMatchParam,
-                    0,
-                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix())
-                );
+                    -1 * strlen($this->getStripRouteParameterSuffix())
+                )
+            ) {
+                $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
                 $stripped = true;
             }
 
