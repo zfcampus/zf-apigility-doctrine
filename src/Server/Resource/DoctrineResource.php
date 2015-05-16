@@ -711,6 +711,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $fieldNames = $classMetaData->getFieldNames();
 
         foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
+            $stripped = false;
             if (substr(
                 $routeMatchParam,
                 (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix())
@@ -720,10 +721,11 @@ class DoctrineResource extends AbstractResourceListener implements
                     0,
                     strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix())
                 );
+                $stripped = true;
             }
 
             if (in_array($routeMatchParam, $associationMappings)
-                or in_array($routeMatchParam, $fieldNames)
+                || (!$stripped && in_array($routeMatchParam, $fieldNames))
             ) {
                 $criteria[$routeMatchParam] = $value;
             }
