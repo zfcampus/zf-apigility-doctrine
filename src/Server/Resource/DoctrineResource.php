@@ -4,10 +4,11 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
+use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerAwareInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\StaticEventManager;
@@ -120,7 +121,7 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
-     * @var queryProviders array
+     * @var array|QueryProviderInterface
      */
     protected $queryProviders;
 
@@ -145,7 +146,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
      */
     public function setQueryProviders(array $queryProviders)
     {
@@ -153,7 +154,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return array|QueryProviderInterface[]
      */
     public function getQueryProviders()
     {
@@ -161,7 +162,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return QueryProviderInterface
      */
     public function getQueryProvider($method)
     {
@@ -524,7 +525,8 @@ class DoctrineResource extends AbstractResourceListener implements
         StaticEventManager::getInstance()->attach(
             'ZF\Rest\RestController',
             'getList.post',
-            function ($e) use ($queryProvider, $entityClass, $data) {
+            function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
+                /** @var \ZF\Hal\Collection $halCollection */
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
 
@@ -535,7 +537,7 @@ class DoctrineResource extends AbstractResourceListener implements
                     array(
                     'count' => $collection->getCurrentItemCount(),
                     'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass),
+                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass)
                     )
                 );
 
@@ -666,13 +668,13 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = array();
 
-        if (sizeof($ids) != sizeof($keys)) {
+        if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
                 'Invalid multi identifier count.  '
-                . sizeof($ids)
+                . count($ids)
                 . ' must equal '
-                . sizeof($keys)
+                . count($keys)
             );
         }
 
