@@ -8,12 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
-use Traversable;
-use ZF\ApiProblem\ApiProblem;
+use Zend\EventManager\EventInterface;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use ZF\ApiProblem\ApiProblem;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
-use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -24,6 +26,7 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\HydratorAwareInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
+use Traversable;
 
 /**
  * Class DoctrineResource
@@ -124,7 +127,11 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
+<<<<<<< HEAD
      * @var array
+=======
+     * @var array|QueryProviderInterface
+>>>>>>> DoctrineResource refactoring and PHPCS
      */
     protected $queryProviders;
 
@@ -149,10 +156,14 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
+<<<<<<< HEAD
      * @param QueryProviderInterface[]
      *
      * @throws InvalidArgumentException if parameter is not an array or \Traversable object
      * @throws InvalidArgumentException if parameter contains item not an instance of QueryProviderInterface
+=======
+     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
+>>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function setQueryProviders($queryProviders)
     {
@@ -170,7 +181,11 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
+<<<<<<< HEAD
      * @return QueryProviderInterface[]
+=======
+     * @return array|QueryProviderInterface[]
+>>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function getQueryProviders()
     {
@@ -178,9 +193,13 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
+<<<<<<< HEAD
      * @param $method
      *
      * @return QueryProviderInterface Either the default queryProvider or method specific queryProvider if supplied
+=======
+     * @return QueryProviderInterface
+>>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function getQueryProvider($method)
     {
@@ -561,7 +580,8 @@ class DoctrineResource extends AbstractResourceListener implements
         StaticEventManager::getInstance()->attach(
             'ZF\Rest\RestController',
             'getList.post',
-            function ($e) use ($queryProvider, $entityClass, $data) {
+            function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
+                /** @var \ZF\Hal\Collection $halCollection */
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
 
@@ -572,7 +592,7 @@ class DoctrineResource extends AbstractResourceListener implements
                     array(
                     'count' => $collection->getCurrentItemCount(),
                     'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass),
+                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass)
                     )
                 );
 
@@ -713,13 +733,13 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = array();
 
-        if (sizeof($ids) != sizeof($keys)) {
+        if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
                 'Invalid multi identifier count.  '
-                . sizeof($ids)
+                . count($ids)
                 . ' must equal '
-                . sizeof($keys)
+                . count($keys)
             );
         }
 
