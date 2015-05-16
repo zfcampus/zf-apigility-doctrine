@@ -693,10 +693,9 @@ class DoctrineResource extends AbstractResourceListener implements
         foreach ($routeParams as $routeMatchParam => $value) {
             $stripped = false;
             if ($this->getStripRouteParameterSuffix() === substr(
-                    $routeMatchParam,
-                    -1 * strlen($this->getStripRouteParameterSuffix())
-                )
-            ) {
+                $routeMatchParam,
+                -1 * strlen($this->getStripRouteParameterSuffix())
+            )) {
                 $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
                 $stripped = true;
             }
