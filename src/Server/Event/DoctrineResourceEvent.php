@@ -13,20 +13,21 @@ use ZF\Rest\ResourceEvent;
  */
 class DoctrineResourceEvent extends Event
 {
-    const EVENT_FETCH_POST = 'fetch.post';
-    const EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
-    const EVENT_FETCH_ALL_POST = 'fetch-all.post';
-    const EVENT_CREATE_PRE = 'create.pre';
-    const EVENT_CREATE_POST = 'create.post';
-    const EVENT_UPDATE_PRE = 'update.pre';
-    const EVENT_UPDATE_POST = 'update.post';
-    const EVENT_PATCH_PRE = 'patch.pre';
-    const EVENT_PATCH_POST = 'patch.post';
-    const EVENT_PATCH_LIST_PRE = 'patch-list.pre';
-    const EVENT_PATCH_LIST_POST = 'patch-list.post';
-    const EVENT_DELETE_PRE = 'delete.pre';
-    const EVENT_DELETE_POST = 'delete.post';
-    const EVENT_DELETE_LIST_PRE = 'delete-list.pre';
+    const EVENT_FETCH_PRE        = 'fetch.pre';
+    const EVENT_FETCH_POST       = 'fetch.post';
+    const EVENT_FETCH_ALL_PRE    = 'fetch-all.pre';
+    const EVENT_FETCH_ALL_POST   = 'fetch-all.post';
+    const EVENT_CREATE_PRE       = 'create.pre';
+    const EVENT_CREATE_POST      = 'create.post';
+    const EVENT_UPDATE_PRE       = 'update.pre';
+    const EVENT_UPDATE_POST      = 'update.post';
+    const EVENT_PATCH_PRE        = 'patch.pre';
+    const EVENT_PATCH_POST       = 'patch.post';
+    const EVENT_PATCH_LIST_PRE   = 'patch-list.pre';
+    const EVENT_PATCH_LIST_POST  = 'patch-list.post';
+    const EVENT_DELETE_PRE       = 'delete.pre';
+    const EVENT_DELETE_POST      = 'delete.post';
+    const EVENT_DELETE_LIST_PRE  = 'delete-list.pre';
     const EVENT_DELETE_LIST_POST = 'delete-list.post';
 
     /**
@@ -50,7 +51,20 @@ class DoctrineResourceEvent extends Event
     protected $data;
 
     /**
+<<<<<<< HEAD
      * @var ObjectManager
+=======
+     * @var string
+     */
+    protected $entityClassName;
+
+    /**
+     * @var string
+     */
+    protected $entityId;
+
+    /**
+     * @param objectManager
      */
     protected $objectManager;
 
@@ -145,6 +159,7 @@ class DoctrineResourceEvent extends Event
     }
 
     /**
+<<<<<<< HEAD
      * @param \ZF\Rest\ResourceEvent $resourceEvent
      *
      * @return $this
@@ -152,6 +167,40 @@ class DoctrineResourceEvent extends Event
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
+
+=======
+     * @return string
+     */
+    public function getEntityClassName()
+    {
+        return $this->entityClassName;
+    }
+
+    /**
+     * @param string $entityClassName
+     * @return $this
+     */
+    public function setEntityClassName($entityClassName)
+    {
+        $this->entityClassName = $entityClassName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @param string $entityId
+     * @return $this
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
 
         return $this;
     }

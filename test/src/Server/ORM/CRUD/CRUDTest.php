@@ -135,7 +135,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
-        $this->validateTriggeredEvents(array(DoctrineResourceEvent::EVENT_FETCH_POST));
+        $this->validateTriggeredEvents(array(
+            DoctrineResourceEvent::EVENT_FETCH_PRE,
+            DoctrineResourceEvent::EVENT_FETCH_POST
+        ));
 
         // Test fetch() of resource with non-primary key identifier
         $this->getRequest()->getHeaders()->addHeaders(
@@ -172,7 +175,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
         $sharedEvents->attach(
             'ZF\Apigility\Doctrine\DoctrineResource',
-            DoctrineResourceEvent::EVENT_FETCH_POST,
+            DoctrineResourceEvent::EVENT_FETCH_PRE,
             function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchFailure');
@@ -182,7 +185,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->dispatch('/test/rest/artist/' . $artist->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
-        $this->assertEquals(404, $this->getResponseStatusCode());
+        $this->assertEquals(400, $this->getResponseStatusCode());
     }
 
     public function testFetchAll()
