@@ -440,6 +440,15 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function fetch($id)
     {
+        $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_PRE, $this);
+        $event->setEntityClassName($this->getEntityClass());
+        $event->setEntityId($id);
+        $eventManager = $this->getEventManager();
+        $response = $eventManager->trigger($event);
+        if ($response->last() instanceof ApiProblem) {
+            return $response->last();
+        }
+
         $entity = $this->findEntity($id, 'fetch');
 
         if ($entity instanceof ApiProblem) {
