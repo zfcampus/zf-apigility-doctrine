@@ -66,6 +66,7 @@ This way, it is possible to alter the doctrine entities or collections before or
 
 Supported events:
 ```
+EVENT_FETCH_PRE = 'fetch.pre';
 EVENT_FETCH_POST = 'fetch.post';
 EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
 EVENT_FETCH_ALL_POST = 'fetch-all.post';
