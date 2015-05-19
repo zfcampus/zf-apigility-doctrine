@@ -693,18 +693,14 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         foreach ($routeParams as $routeMatchParam => $value) {
-            $stripped = false;
             if ($this->getStripRouteParameterSuffix() === substr(
                 $routeMatchParam,
                 -1 * strlen($this->getStripRouteParameterSuffix())
             )) {
                 $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
-                $stripped = true;
             }
 
-            if (in_array($routeMatchParam, $associationMappings)
-                || (!$stripped && in_array($routeMatchParam, $fieldNames))
-            ) {
+            if (in_array($routeMatchParam, $associationMappings) || in_array($routeMatchParam, $fieldNames)) {
                 $criteria[$routeMatchParam] = $value;
             }
         }
