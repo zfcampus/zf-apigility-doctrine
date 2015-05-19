@@ -36,7 +36,7 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
             "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
-            "routeMatch" => "/test/artist",
+            "routeMatch" => "/test/rest/artist",
             "collectionHttpMethods" => array(
                 0 => 'GET',
                 1 => 'POST',
@@ -51,19 +51,20 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
             "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_name",
             "entityIdentifierName" => "name",
-            "routeMatch" => "/test/artist-by-name",
+            "routeMatch" => "/test/rest/artist-by-name",
             "collectionHttpMethods" => array(
                 0 => 'GET',
             ),
         );
 
+        // This route is what should be an rpc service, but an user could do
         $albumResourceDefinition = array(
             "objectManager"=> "doctrine.entitymanager.orm_default",
             "serviceName" => "Album",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Album",
             "routeIdentifierName" => "album_id",
             "entityIdentifierName" => "id",
-            "routeMatch" => "/test/album",
+            "routeMatch" => "/test/rest[/artist/:artist_id]/album[/:album_id]",
             "collectionHttpMethods" => array(
                 0 => 'GET',
                 1 => 'POST',
