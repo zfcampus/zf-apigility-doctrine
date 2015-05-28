@@ -495,5 +495,4 @@ class CollectionListener implements ListenerAggregateInterface
         return $this;
 
     }
-
 }
