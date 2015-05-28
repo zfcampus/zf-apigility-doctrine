@@ -2,12 +2,17 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event\Listener;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Phpro\DoctrineHydrationModule\Service\DoctrineHydratorFactory;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\InputFilter\CollectionInputFilter;
+use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Stdlib\ArrayObject;
 use Zend\Stdlib\Hydrator\HydratorAwareInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
@@ -26,14 +31,53 @@ use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
  */
 class CollectionListener implements ListenerAggregateInterface
 {
+    /**
+     * @var array
+     */
     protected $listeners = array();
+    /**
+     * @var null
+     */
     protected $entityHydratorMap = null;
+
+    /**
+     * @var array
+     */
+    protected $classMetadataMap = array();
+
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * @var array
+     */
+    protected $entityCollectionValuedAssociations = array();
+
+    /**
+     * @var
+     */
+    protected $rootEntity;
+
+    /**
+     * @var InputFilterInterface
+     */
+    protected $inputFilter;
+
+    /**
+     * @var array Data supplied to be processed, likely from POST or PUT body
+     */
+    protected $objectData;
 
     /**
      * @var ServiceLocatorInterface
      */
     protected $serviceManager;
 
+    /**
+     * @param EventManagerInterface $events
+     */
     public function attach(EventManagerInterface $events)
     {
         $this->listeners[] = $events->attach(
@@ -47,6 +91,9 @@ class CollectionListener implements ListenerAggregateInterface
         );
     }
 
+    /**
+     * @param EventManagerInterface $events
+     */
     public function detach(EventManagerInterface $events)
     {
         foreach ($this->listeners as $index => $listener) {
@@ -56,74 +103,230 @@ class CollectionListener implements ListenerAggregateInterface
         }
     }
 
+    /**
+     * @param DoctrineResourceEvent $event
+     *
+     * @return array
+     */
     public function handleCollections(DoctrineResourceEvent $event)
     {
-        $objectManager = $event->getObjectManager();
-        $entity        = $event->getEntity();
-        $originalData  = (array) $event->getData();
-        $inputFilter   = $event->getResourceEvent()->getInputFilter();
-
+        // Setup the dependencies
+        $this->setObjectManager($event->getObjectManager());
+        $this->setRootEntity($event->getEntity());
+        $this->setObjectData((array) $event->getData());
+        $this->setInputFilter($event->getResourceEvent()->getInputFilter());
         $this->setServiceManager($event->getTarget()->getServiceManager());
-        $metadata = $objectManager->getClassMetadata(get_class($entity));
 
-        $associations = $metadata->getAssociationNames();
+        // Start processing with the root entity, if any nested entities will be handled by the iterateEntity method
+        $this->setObjectData(
+            $this->iterateEntity($this->getRootEntity(), $this->getObjectData(), $this->getInputFilter())
+        );
 
-        foreach ($associations as $association) {
-            if ($metadata->isCollectionValuedAssociation($association)) {
-                // Skip handling associations that aren't in the data
-                if (array_key_exists($association, $originalData)
-                    && !empty( $originalData[$association] )
-                    && ( is_array($originalData[$association])
-                         || $originalData[$association] instanceof \Traversable )
-                ) {
-                    // Ensure the collection value has an input filter
-                    if (!$inputFilter->has($association)) {
-                        /*
-                         * If we got here it means the value wasn't in the input filter and wasn't stripped out.
-                         * Treat as hostile and stop execution.
-                         */
-                        throw new InvalidArgumentException('Non-validated input detected');
-                    }
+        $event->setData($this->getObjectData());
 
+        return $this->getObjectData();
+    }
 
-                    foreach ($originalData[$association] as &$subEntityData) {
-                        $target          = $metadata->getAssociationTargetClass($association);
-                        $identifierNames = $metadata->getIdentifierFieldNames($target);
-                        if (empty( $identifierNames )) {
-                            continue;
+    /**
+     * @param $entity Object|string
+     * @param $data array
+     * @param $inputFilter InputFilterInterface
+     *
+     * @return mixed
+     */
+    protected function iterateEntity($entity, $data, InputFilterInterface $inputFilter)
+    {
+        $metadata     = $this->getClassMetadata($entity);
+        $associations = $this->getEntityCollectionValuedAssociations($entity, $data, true);
+
+        if ($associations->count() > 0) {
+            foreach ($associations->getIterator() as $association) {
+                // Skip associations that don't have data
+                if ($this->validateAssociationData($association, $data)) {
+                    foreach ($data[$association] as &$subEntityData) {
+                        $associationTargetClass = $metadata->getAssociationTargetClass($association);
+                        // Handle nested / subresource by recursion
+                        if ($this
+                                ->getEntityCollectionValuedAssociations($associationTargetClass, $subEntityData, true)
+                                ->count() > 0
+                        ) {
+                            $subEntityData = $this->iterateEntity(
+                                $metadata->getAssociationTargetClass($association),
+                                $subEntityData,
+                                $this->getAssociatedEntityInputFilter($association, $inputFilter)
+                            );
                         }
 
-                        $identifierValues = [ ];
-                        foreach ($identifierNames as $identifierName) {
-                            if (!isset( $subEntityData[$identifierName] ) || empty( $subEntityData[$identifierName] )) {
-                                continue; // Should mean we are working with a new entity to be created
-                            }
-                            $identifierValues[$identifierName] = $subEntityData[$identifierName];
-                        }
-
-                        $subEntity = false;
-                        if (count($identifierValues) === count($identifierNames)) {
-                            $subEntity = $objectManager->find($target, $identifierValues);
-                        }
-
-                        if (!$subEntity) {
-                            $subEntity = new $target;
-                        }
-
-                        $hydrator = $this->getEntityHydrator($target, $objectManager);
-                        $hydrator->hydrate($subEntityData, $subEntity);
-                        $objectManager->persist($subEntity);
-
-                        // Replace the data with the entity and let the downstream parent hydrator handle persistence
-                        $subEntityData = $subEntity;
+                        $subEntityData = $this->processEntity($associationTargetClass, $subEntityData);
                     }
                 }
             }
         }
 
-        $event->setData($originalData);
+        return $data;
+    }
 
-        return $originalData;
+    /**
+     * @param $targetEntityClassName
+     * @param $data
+     *
+     * @return object|null
+     */
+    protected function processEntity($targetEntityClassName, $data)
+    {
+        $metadata        = $this->getClassMetadata($targetEntityClassName);
+        $identifierNames = $metadata->getIdentifierFieldNames($targetEntityClassName);
+        if (empty( $identifierNames )) {
+            return null; // Not really sure what would cause this or how to handle, skipping for now
+        }
+
+        $identifierValues = [ ];
+        foreach ($identifierNames as $identifierName) {
+            if (!isset( $data[$identifierName] ) || empty( $data[$identifierName] )) {
+                continue; // Should mean we are working with a new entity to be created
+            }
+            $identifierValues[$identifierName] = $data[$identifierName];
+        }
+
+        // Investigate if we are performing an update or creating a new entity based on identifiers
+        $entity = false;
+        if (count($identifierValues) === count($identifierNames)) {
+            $entity = $this->getObjectManager()->find($targetEntityClassName, $identifierValues);
+        }
+
+        if (!$entity) {
+            $entity = new $targetEntityClassName;
+        }
+
+        $hydrator = $this->getEntityHydrator($targetEntityClassName, $this->getObjectManager());
+        $hydrator->hydrate($data, $entity);
+        $this->getObjectManager()->persist($entity);
+
+        return $entity;
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return ClassMetadata
+     *
+     * Retrieve the Doctrine MetaData for whichever entity we are currently processing
+     */
+    protected function getClassMetadata($entity)
+    {
+        if (is_object($entity)) {
+            $entity = get_class($entity);
+        }
+        if (!array_key_exists($entity, $this->classMetadataMap)) {
+            $metadata = $this->getObjectManager()->getClassMetadata($entity);
+            if (!$metadata || !$metadata instanceof ClassMetadata) {
+                throw new InvalidArgumentException('Metadata could not be found for requested entity');
+            }
+
+            $this->classMetadataMap[$entity] = $metadata;
+        }
+
+        return $this->classMetadataMap[$entity];
+    }
+
+    /**
+     * @param $entity
+     * @param $data array
+     * @param $stripEmptyAssociations bool
+     *
+     * @return ArrayObject
+     */
+    protected function getEntityCollectionValuedAssociations($entity, $data = null, $stripEmptyAssociations = false)
+    {
+        if (is_object($entity)) {
+            $entity = get_class($entity);
+        }
+        if (!array_key_exists($entity, $this->entityCollectionValuedAssociations)) {
+            $collectionValuedAssociations = [ ];
+            $metadata                     = $this->getClassMetadata($entity);
+            $associations                 = $metadata->getAssociationNames();
+
+            foreach ($associations as $association) {
+                if ($metadata->isCollectionValuedAssociation($association)) {
+                    $collectionValuedAssociations[] = $association;
+                }
+            }
+
+            $this->entityCollectionValuedAssociations[$entity] = new ArrayObject($collectionValuedAssociations);
+        }
+
+        if ($stripEmptyAssociations === true && !empty( $data ) && is_array($data)) {
+            return $this->stripEmptyAssociations($this->entityCollectionValuedAssociations[$entity], $data);
+        } else {
+            return $this->entityCollectionValuedAssociations[$entity];
+        }
+
+
+    }
+
+    /**
+     * @param $associations ArrayObject
+     * @param $data array
+     *
+     * @return mixed array
+     */
+    protected function stripEmptyAssociations(ArrayObject $associations, $data)
+    {
+        $associationsArray = $associations->getArrayCopy();
+        foreach ($associationsArray as $key => $association) {
+            if (!( array_key_exists($association, $data)
+                   && !empty( $data[$association] )
+                   && ( is_array($data[$association])
+                        || $data[$association] instanceof \Traversable )
+            )
+            ) {
+                unset( $associationsArray[$key] );
+            }
+        }
+
+        return new ArrayObject($associationsArray);
+    }
+
+    /**
+     * @param $association
+     * @param $data
+     *
+     * @return bool
+     */
+    protected function validateAssociationData($association, $data)
+    {
+        return array_key_exists($association, $data)
+               && !empty( $data[$association] )
+               && ( is_array($data[$association])
+                    || $data[$association] instanceof \Traversable );
+
+    }
+
+    /**
+     * @param $association
+     * @param $inputFilter
+     *
+     * @return InputFilterInterface
+     */
+    protected function getAssociatedEntityInputFilter($association, InputFilterInterface $inputFilter)
+    {
+        // Skip handling associations that aren't in the data
+        // Ensure the collection value has an input filter
+        if (!$inputFilter->has($association)) {
+            /*
+             * Value must not have been in the inputFilter and wasn't stripped out.
+             * Treat as hostile and stop execution.
+             */
+            throw new InvalidArgumentException('Non-validated input detected: ' . $association);
+        }
+
+        $childInputFilter = $inputFilter->get($association);
+        if ($childInputFilter instanceof CollectionInputFilter) {
+            return $childInputFilter->getInputFilter();
+        } else {
+            return $childInputFilter;
+        }
+
     }
 
     /**
@@ -157,8 +360,6 @@ class CollectionListener implements ListenerAggregateInterface
         $this->entityHydratorMap[$entityClass] = $hydrator;
 
         return $this->entityHydratorMap[$entityClass];
-
-
     }
 
     /**
@@ -184,6 +385,93 @@ class CollectionListener implements ListenerAggregateInterface
         }
 
         return $this->entityHydratorMap;
+
+    }
+
+    /**
+     * @return InputFilterInterface
+     */
+    public function getInputFilter()
+    {
+        return $this->inputFilter;
+
+    }
+
+    /**
+     * @param InputFilterInterface $inputFilter
+     *
+     * @return $this
+     */
+    public function setInputFilter(InputFilterInterface $inputFilter)
+    {
+        $this->inputFilter = $inputFilter;
+
+        return $this;
+
+    }
+
+    /**
+     * @return array
+     */
+    public function getObjectData()
+    {
+        return $this->objectData;
+    }
+
+    /**
+     * @param array $objectData
+     *
+     * @return $this
+     */
+    public function setObjectData($objectData)
+    {
+        $this->objectData = $objectData;
+
+        return $this;
+
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    public function getObjectManager()
+    {
+        return $this->objectManager;
+    }
+
+    /**
+     * @param ObjectManager $objectManager
+     *
+     * @return $this
+     */
+    public function setObjectManager(ObjectManager $objectManager)
+    {
+        $this->objectManager = $objectManager;
+
+        return $this;
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRootEntity()
+    {
+        return $this->rootEntity;
+
+    }
+
+    /**
+     * @param mixed $rootEntity
+     *
+     * @return $this
+     */
+    public function setRootEntity($rootEntity)
+    {
+        $this->rootEntity = $rootEntity;
+
+        return $this;
+
     }
 
     /**
@@ -192,6 +480,7 @@ class CollectionListener implements ListenerAggregateInterface
     public function getServiceManager()
     {
         return $this->serviceManager;
+
     }
 
     /**
@@ -199,10 +488,12 @@ class CollectionListener implements ListenerAggregateInterface
      *
      * @return $this
      */
-    public function setServiceManager($serviceManager)
+    public function setServiceManager(ServiceLocatorInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
 
         return $this;
+
     }
+
 }
