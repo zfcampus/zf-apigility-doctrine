@@ -5,8 +5,6 @@ namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\ResourceEvent;
-use OAuth2\Request as OAuth2Request;
-use OAuth2\Server as OAuth2Server;
 
 class DefaultOdm extends AbstractQueryProvider
 {
