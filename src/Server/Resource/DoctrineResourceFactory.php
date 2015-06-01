@@ -274,7 +274,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // Set object manager for all query providers
         foreach ($queryProviders as $provider) {
             $provider->setObjectManager($objectManager);
-            if ($oAuth2Server) {
+            if ($oAuth2Server && method_exists($provider, 'setOAuth2Server')) {
                 $provider->setOAuth2Server($oAuth2Server);
             }
         }
