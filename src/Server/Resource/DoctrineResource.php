@@ -4,10 +4,11 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
+use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerAwareInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\StaticEventManager;
@@ -120,7 +121,7 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
-     * @var queryProviders array
+     * @var array|QueryProviderInterface
      */
     protected $queryProviders;
 
@@ -145,7 +146,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
      */
     public function setQueryProviders(array $queryProviders)
     {
@@ -153,7 +154,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return array|QueryProviderInterface[]
      */
     public function getQueryProviders()
     {
@@ -161,7 +162,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return QueryProviderInterface
      */
     public function getQueryProvider($method)
     {
@@ -175,7 +176,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var entityIdentifierName string
+     * @var string
      */
     protected $entityIdentifierName;
 
@@ -188,12 +189,36 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param string $value
+     * @return $this
      */
     public function setEntityIdentifierName($value)
     {
         $this->entityIdentifierName = $value;
 
+        return $this;
+    }
+
+    /**
+     * @var string
+     */
+    protected $routeIdentifierName;
+
+    /**
+     * @return string
+     */
+    public function getRouteIdentifierName()
+    {
+        return $this->routeIdentifierName;
+    }
+
+    /**
+     * @param string $routeIdentifierName
+     * @return $this
+     */
+    public function setRouteIdentifierName($routeIdentifierName)
+    {
+        $this->routeIdentifierName = $routeIdentifierName;
         return $this;
     }
 
@@ -500,7 +525,8 @@ class DoctrineResource extends AbstractResourceListener implements
         StaticEventManager::getInstance()->attach(
             'ZF\Rest\RestController',
             'getList.post',
-            function ($e) use ($queryProvider, $entityClass, $data) {
+            function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
+                /** @var \ZF\Hal\Collection $halCollection */
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
 
@@ -511,7 +537,7 @@ class DoctrineResource extends AbstractResourceListener implements
                     array(
                     'count' => $collection->getCurrentItemCount(),
                     'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass),
+                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass)
                     )
                 );
 
@@ -642,13 +668,13 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = array();
 
-        if (sizeof($ids) != sizeof($keys)) {
+        if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
                 'Invalid multi identifier count.  '
-                . sizeof($ids)
+                . count($ids)
                 . ' must equal '
-                . sizeof($keys)
+                . count($keys)
             );
         }
 
@@ -660,22 +686,21 @@ class DoctrineResource extends AbstractResourceListener implements
         $routeMatch = $this->getEvent()->getRouteMatch();
         $associationMappings = $classMetaData->getAssociationNames();
         $fieldNames = $classMetaData->getFieldNames();
+        $routeParams = $routeMatch->getParams();
 
-        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
-            if (substr(
+        if (array_key_exists($this->getRouteIdentifierName(), $routeParams)) {
+            unset($routeParams[$this->getRouteIdentifierName()]);
+        }
+
+        foreach ($routeParams as $routeMatchParam => $value) {
+            if ($this->getStripRouteParameterSuffix() === substr(
                 $routeMatchParam,
-                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix())
+                -1 * strlen($this->getStripRouteParameterSuffix())
             )) {
-                $routeMatchParam = substr(
-                    $routeMatchParam,
-                    0,
-                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix())
-                );
+                $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
             }
 
-            if (in_array($routeMatchParam, $associationMappings)
-                or in_array($routeMatchParam, $fieldNames)
-            ) {
+            if (in_array($routeMatchParam, $associationMappings) || in_array($routeMatchParam, $fieldNames)) {
                 $criteria[$routeMatchParam] = $value;
             }
         }

@@ -11,5 +11,10 @@
         <join-column name="artist_id" referenced-column-name="id"/>
       </join-columns>
     </many-to-one>
+    <many-to-one field="album" target-entity="ZFTestApigilityDb\Entity\Album">
+      <join-columns>
+        <join-column name="album_id" referenced-column-name="id" nullable="true"/>
+      </join-columns>
+    </many-to-one>
   </entity>
 </doctrine-mapping>

@@ -109,11 +109,16 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $config = $serviceLocator->get('Config');
         $doctrineConnectedConfig = $config['zf-apigility']['doctrine-connected'][$requestedName];
 
+        $restConfig = null;
         foreach ($config['zf-rest'] as $restControllerConfig) {
             if ($restControllerConfig['listener'] == $requestedName) {
                 $restConfig = $restControllerConfig;
                 break;
             }
+        }
+
+        if (null === $restConfig) {
+            throw new \RuntimeException(sprintf('No zf-rest configuration found for resource %s', $requestedName));
         }
 
         $className = isset($doctrineConnectedConfig['class']) ? $doctrineConnectedConfig['class'] : $requestedName;
@@ -125,6 +130,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
 
+        /** @var DoctrineResource $listener */
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
@@ -132,6 +138,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener->setQueryCreateFilter($queryCreateFilter);
         $listener->setServiceManager($serviceLocator);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
+        $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
                 $listener->getEventManager()->attach($configuredListener);

@@ -52,4 +52,31 @@ class Album
 
         return $this;
     }
+
+    protected $album;
+
+    /**
+     * Parent Album
+     *
+     * @return null|Album
+     */
+    public function getAlbum()
+    {
+        return $this->album;
+    }
+
+    /**
+     * Parent Album
+     *
+     * @param null|Album $album
+     * @return $this
+     */
+    public function setAlbum($album)
+    {
+        if (null !== $album && !$album instanceof Album) {
+            throw new \InvalidArgumentException('Invalid album argument');
+        }
+        $this->album = $album;
+        return $this;
+    }
 }
