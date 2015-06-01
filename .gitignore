@@ -11,3 +11,4 @@ test/build
 .settings/
 .idea
 test/coverage
+.DS_Store
