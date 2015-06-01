@@ -82,7 +82,6 @@ EVENT_DELETE_POST = 'delete.post';
 EVENT_DELETE_LIST_PRE = 'delete-list.pre';
 EVENT_DELETE_LIST_POST = 'delete-list.post';
 ```
-```
 
 Attach to events through the *Shared Event Manager*:
 
@@ -138,7 +137,7 @@ fields the album_id matches to the resoruce configuration and will be queried by
 and the artist is a field on album and will be queried by criteria so the final query
 would be
 
-```
+```php
 $objectManager->getRepository('Album')->findOneBy(
     'id' => :album_id,
     'artist' => :artist_id
