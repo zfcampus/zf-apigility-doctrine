@@ -127,11 +127,7 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $serviceManager;
 
     /**
-<<<<<<< HEAD
-     * @var array
-=======
      * @var array|QueryProviderInterface
->>>>>>> DoctrineResource refactoring and PHPCS
      */
     protected $queryProviders;
 
@@ -156,14 +152,10 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-<<<<<<< HEAD
      * @param QueryProviderInterface[]
      *
      * @throws InvalidArgumentException if parameter is not an array or \Traversable object
-     * @throws InvalidArgumentException if parameter contains item not an instance of QueryProviderInterface
-=======
      * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
->>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function setQueryProviders($queryProviders)
     {
@@ -181,11 +173,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-<<<<<<< HEAD
-     * @return QueryProviderInterface[]
-=======
      * @return array|QueryProviderInterface[]
->>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function getQueryProviders()
     {
@@ -193,13 +181,9 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-<<<<<<< HEAD
      * @param $method
      *
-     * @return QueryProviderInterface Either the default queryProvider or method specific queryProvider if supplied
-=======
      * @return QueryProviderInterface
->>>>>>> DoctrineResource refactoring and PHPCS
      */
     public function getQueryProvider($method)
     {
@@ -226,7 +210,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param string $value
+     * @param string
      * @return $this
      */
     public function setEntityIdentifierName($value)

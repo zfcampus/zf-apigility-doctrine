@@ -51,9 +51,6 @@ class DoctrineResourceEvent extends Event
     protected $data;
 
     /**
-<<<<<<< HEAD
-     * @var ObjectManager
-=======
      * @var string
      */
     protected $entityClassName;
@@ -159,7 +156,6 @@ class DoctrineResourceEvent extends Event
     }
 
     /**
-<<<<<<< HEAD
      * @param \ZF\Rest\ResourceEvent $resourceEvent
      *
      * @return $this
@@ -167,8 +163,11 @@ class DoctrineResourceEvent extends Event
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
+        
+        return $this;
+    }
 
-=======
+    /*
      * @return string
      */
     public function getEntityClassName()
