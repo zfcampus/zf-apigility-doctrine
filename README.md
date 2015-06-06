@@ -174,8 +174,6 @@ When the query provider is registered attach it to the doctrine-connected resour
 * patch
 * delete
 
-* patch_all delegates to patch
-
 ```php
 'zf-apigility' => array(
     'doctrine-connected' => array(

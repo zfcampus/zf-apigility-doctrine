@@ -10,7 +10,7 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
-use Exception;
+use RuntimeException;
 
 /**
  * Class AbstractDoctrineResourceFactory
@@ -117,9 +117,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             }
         }
 
-        if (null === $restConfig) {
-            throw new \RuntimeException(sprintf('No zf-rest configuration found for resource %s', $requestedName));
+        if (is_null($restConfig)) {
+            // @codeCoverageIgnoreStart
+            throw new RuntimeException(
+                'No zf-rest configuration found for resource ' . $requestedName
+            );
         }
+            // @codeCoverageIgnoreEnd
 
         $className = isset($doctrineConnectedConfig['class']) ? $doctrineConnectedConfig['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
@@ -136,7 +140,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
         $listener->setQueryCreateFilter($queryCreateFilter);
-        $listener->setServiceManager($serviceLocator);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
         if (count($configuredListeners)) {

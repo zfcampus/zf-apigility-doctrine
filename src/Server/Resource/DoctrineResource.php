@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
 use Zend\EventManager\EventInterface;
@@ -21,12 +22,11 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\StaticEventManager;
-use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\HydratorAwareInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Traversable;
+use ReflectionClass;
 
 /**
  * Class DoctrineResource
@@ -35,7 +35,6 @@ use Traversable;
  */
 class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
-    ServiceManagerAwareInterface,
     EventManagerAwareInterface,
     HydratorAwareInterface
 {
@@ -122,43 +121,18 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
 
     /**
-     * @var ServiceManager
-     */
-    protected $serviceManager;
-
-    /**
      * @var array|QueryProviderInterface
      */
     protected $queryProviders;
 
     /**
-     * @param ServiceManager $serviceManager
-     *
-     * @return $this
-     */
-    public function setServiceManager(ServiceManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
-
-        return $this;
-    }
-
-    /**
-     * @return ServiceManager
-     */
-    public function getServiceManager()
-    {
-        return $this->serviceManager;
-    }
-
-    /**
-     * @param QueryProviderInterface[]
+     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
      *
      * @throws InvalidArgumentException if parameter is not an array or \Traversable object
-     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
      */
     public function setQueryProviders($queryProviders)
     {
+        // @codeCoverageIgnoreStart
         if (!is_array($queryProviders) && !$queryProviders instanceof Traversable) {
             throw new InvalidArgumentException('queryProviders must be array or Traversable object');
         }
@@ -168,6 +142,7 @@ class DoctrineResource extends AbstractResourceListener implements
                 throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
             }
         }
+        // @codeCoverageIgnoreEnd
 
         $this->queryProviders = (array) $queryProviders;
     }
@@ -556,7 +531,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $adapter = $queryProvider->getPaginatedQuery($queryBuilder);
-        $reflection = new \ReflectionClass($this->getCollectionClass());
+        $reflection = new ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
         $results = $this->triggerDoctrineEvent(
@@ -726,6 +701,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = array();
 
+        // @codeCoverageIgnoreStart
         if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
@@ -735,6 +711,7 @@ class DoctrineResource extends AbstractResourceListener implements
                 . count($keys)
             );
         }
+        // @codeCoverageIgnoreEnd
 
         foreach ($keys as $index => $identifier) {
             $criteria[$identifier] = $ids[$index];
@@ -775,7 +752,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         // Add criteria
         foreach ($criteria as $key => $value) {
-            if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
+            if ($queryBuilder instanceof MongoDBQueryBuilder) {
                 $queryBuilder->field($key)->equals($value);
             } else {
                 $parameterName = 'a' . md5(rand());

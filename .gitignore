@@ -2,7 +2,7 @@ vendor
 composer.lock
 composer.phar
 test/data
-test/code-coverage
+test/coverage
 test/assets/module/*
 !test/assets/module/*Original
 test/build
