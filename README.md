@@ -1,4 +1,4 @@
-Apigility for Doctrine
+Apigility with Doctrine
 ==============================
 
 [![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
