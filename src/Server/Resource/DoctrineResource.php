@@ -2,25 +2,29 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
-use Zend\EventManager\EventManagerAwareInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\EventManager\EventInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
-use Zend\EventManager\StaticEventManager;
-use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
-use Zend\Stdlib\ArrayUtils;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\EventManager;
-use Doctrine\Common\Persistence\ObjectManager;
-use Traversable;
-use Doctrine\ORM\NoResultException;
-use Doctrine\Common\Collections\ArrayCollection;
+use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Rest\AbstractResourceListener;
+use Zend\EventManager\EventManager;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\StaticEventManager;
+use Zend\Stdlib\ArrayUtils;
+use Zend\Stdlib\Hydrator\HydratorAwareInterface;
+use Zend\Stdlib\Hydrator\HydratorInterface;
+use Traversable;
+use ReflectionClass;
 
 /**
  * Class DoctrineResource
@@ -29,8 +33,8 @@ use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
  */
 class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
-    ServiceManagerAwareInterface,
-    EventManagerAwareInterface
+    EventManagerAwareInterface,
+    HydratorAwareInterface
 {
     /**
      * @var EventManagerInterface
@@ -92,7 +96,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Set the object manager
      *
-     * @param ObjectManager $objectManager
+     * @param ObjectManager|EntityManagerInterface $objectManager
      */
     public function setObjectManager(ObjectManager $objectManager)
     {
@@ -102,7 +106,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Get the object manager
      *
-     * @return ObjectManager
+     * @return ObjectManager|EntityManagerInterface
      */
     public function getObjectManager()
     {
@@ -115,45 +119,34 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
 
     /**
-     * @var ServiceManager
-     */
-    protected $serviceManager;
-
-    /**
-     * @var queryProviders array
+     * @var array|QueryProviderInterface
      */
     protected $queryProviders;
 
     /**
-     * @param ServiceManager $serviceManager
+     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
      *
-     * @return $this
+     * @throws InvalidArgumentException if parameter is not an array or \Traversable object
      */
-    public function setServiceManager(ServiceManager $serviceManager)
+    public function setQueryProviders($queryProviders)
     {
-        $this->serviceManager = $serviceManager;
+        // @codeCoverageIgnoreStart
+        if (!is_array($queryProviders) && !$queryProviders instanceof Traversable) {
+            throw new InvalidArgumentException('queryProviders must be array or Traversable object');
+        }
 
-        return $this;
+        foreach ($queryProviders as $qp) {
+            if (!$qp instanceof QueryProviderInterface) {
+                throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
+            }
+        }
+        // @codeCoverageIgnoreEnd
+
+        $this->queryProviders = (array) $queryProviders;
     }
 
     /**
-     * @return ServiceManager
-     */
-    public function getServiceManager()
-    {
-        return $this->serviceManager;
-    }
-
-    /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
-     */
-    public function setQueryProviders(array $queryProviders)
-    {
-        $this->queryProviders = $queryProviders;
-    }
-
-    /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @return array|QueryProviderInterface[]
      */
     public function getQueryProviders()
     {
@@ -161,7 +154,9 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @return ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param $method
+     *
+     * @return QueryProviderInterface
      */
     public function getQueryProvider($method)
     {
@@ -175,7 +170,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var entityIdentifierName string
+     * @var string entityIdentifierName
      */
     protected $entityIdentifierName;
 
@@ -188,12 +183,36 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @param ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface
+     * @param string
+     * @return $this
      */
     public function setEntityIdentifierName($value)
     {
         $this->entityIdentifierName = $value;
 
+        return $this;
+    }
+
+    /**
+     * @var string
+     */
+    protected $routeIdentifierName;
+
+    /**
+     * @return string
+     */
+    public function getRouteIdentifierName()
+    {
+        return $this->routeIdentifierName;
+    }
+
+    /**
+     * @param string $routeIdentifierName
+     * @return $this
+     */
+    public function setRouteIdentifierName($routeIdentifierName)
+    {
+        $this->routeIdentifierName = $routeIdentifierName;
         return $this;
     }
 
@@ -266,15 +285,19 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $hydrator;
 
     /**
-     * @param \Zend\Stdlib\Hydrator\HydratorInterface $hydrator
+     * @param HydratorInterface $hydrator
+     *
+     * @return $this
      */
-    public function setHydrator($hydrator)
+    public function setHydrator(HydratorInterface $hydrator)
     {
         $this->hydrator = $hydrator;
+
+        return $this;
     }
 
     /**
-     * @return \Zend\Stdlib\Hydrator\HydratorInterface
+     * @return HydratorInterface
      */
     public function getHydrator()
     {
@@ -303,20 +326,27 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $entity = new $entityClass;
-        $hydrator = $this->getHydrator();
-        $hydrator->hydrate((array) $data, $entity);
-
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
+        } elseif (!$results->isEmpty() && $results->last() !== null) {
+            // TODO Change to a more logical/secure way to see if data was acted and and we have the expected response
+            $preEventData = $results->last();
+        } else {
+            $preEventData = $data;
         }
+
+        $hydrator = $this->getHydrator();
+        $hydrator->hydrate((array) $preEventData, $entity);
 
         $this->getObjectManager()->persist($entity);
-        $this->getObjectManager()->flush();
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity);
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return $entity;
     }
@@ -343,12 +373,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->remove($entity);
-        $this->getObjectManager()->flush();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
+
+        $this->getObjectManager()->flush();
 
         return true;
     }
@@ -364,9 +395,13 @@ class DoctrineResource extends AbstractResourceListener implements
     {
         $return = new ArrayCollection();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
+        }
+
+        if (!$this->getObjectManager() instanceof EntityManagerInterface) {
+            throw new InvalidArgumentException('Invalid Object Manager, must implement EntityManagerInterface');
         }
 
         $this->getObjectManager()->getConnection()->beginTransaction();
@@ -382,7 +417,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
         $this->getObjectManager()->getConnection()->commit();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_POST, $return);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_LIST_POST, $return, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -398,7 +433,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function deleteList($data)
     {
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $results->last();
@@ -419,7 +454,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
         $this->getObjectManager()->getConnection()->commit();
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true, $data);
         if ($results->last() instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $results->last();
@@ -440,6 +475,15 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function fetch($id)
     {
+        $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_PRE, $this);
+        $event->setEntityClassName($this->getEntityClass());
+        $event->setEntityId($id);
+        $eventManager = $this->getEventManager();
+        $response = $eventManager->trigger($event);
+        if ($response->last() instanceof ApiProblem) {
+            return $response->last();
+        }
+
         $entity = $this->findEntity($id, 'fetch');
 
         if ($entity instanceof ApiProblem) {
@@ -475,22 +519,24 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        // Run fetch all pre with query builder
-        $event = new DoctrineResourceEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_PRE, $this);
-        $event->setQueryBuilder($queryBuilder);
-        $event->setResourceEvent($this->getEvent());
-        $event->setEntity($this->getEntityClass());
-        $eventManager = $this->getEventManager();
-        $response = $eventManager->trigger($event);
+        $response = $this->triggerDoctrineEvent(
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            $this->getEntityClass(),
+            $data
+        );
         if ($response->last() instanceof ApiProblem) {
             return $response->last();
         }
 
         $adapter = $queryProvider->getPaginatedQuery($queryBuilder);
-        $reflection = new \ReflectionClass($this->getCollectionClass());
+        $reflection = new ReflectionClass($this->getCollectionClass());
         $collection = $reflection->newInstance($adapter);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_ALL_POST, null, $collection);
+        $results = $this->triggerDoctrineEvent(
+            DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
+            $this->getEntityClass(),
+            $data
+        );
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
@@ -500,7 +546,8 @@ class DoctrineResource extends AbstractResourceListener implements
         StaticEventManager::getInstance()->attach(
             'ZF\Rest\RestController',
             'getList.post',
-            function ($e) use ($queryProvider, $entityClass, $data) {
+            function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
+                /** @var \ZF\Hal\Collection $halCollection */
                 $halCollection = $e->getParam('collection');
                 $collection = $halCollection->getCollection();
 
@@ -511,7 +558,7 @@ class DoctrineResource extends AbstractResourceListener implements
                     array(
                     'count' => $collection->getCurrentItemCount(),
                     'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass),
+                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass)
                     )
                 );
 
@@ -543,19 +590,20 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         // Hydrate entity with patched data
         $this->getHydrator()->hydrate((array) $data, $entity);
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
         $this->getObjectManager()->flush();
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity);
-        if ($results->last() instanceof ApiProblem) {
-            return $results->last();
-        }
 
         return $entity;
     }
@@ -589,18 +637,24 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
-        $this->getHydrator()->hydrate((array) $data, $entity);
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        } elseif (!$results->isEmpty() && $results->last() !== null) {
+            // TODO Change to a more logical/secure way to see if data was acted on and we have the expected response
+            $preEventData = $results->last();
+        } else {
+            $preEventData = $data;
+        }
 
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity);
+        $this->getHydrator()->hydrate((array) $preEventData, $entity);
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
         }
 
         $this->getObjectManager()->flush();
-        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST, $entity);
-        if ($results->last() instanceof ApiProblem) {
-            return $results->last();
-        }
 
         return $entity;
     }
@@ -612,15 +666,16 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @param $name
      * @param $entity
-     * @param null   $collection
+     * @param $data mixed The original data supplied to the resource method, if any
      *
      * @return \Zend\EventManager\ResponseCollection
      */
-    protected function triggerDoctrineEvent($name, $entity, $collection = null)
+    protected function triggerDoctrineEvent($name, $entity, $data = null)
     {
         $event = new DoctrineResourceEvent($name, $this);
         $event->setEntity($entity);
-        $event->setCollection($collection);
+        $event->setData($data);
+        $event->setObjectManager($this->getObjectManager());
         $event->setResourceEvent($this->getEvent());
 
         $eventManager = $this->getEventManager();
@@ -633,6 +688,8 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @param $id
      *
+     * @param $method
+     *
      * @return object
      */
     protected function findEntity($id, $method)
@@ -642,15 +699,17 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = array();
 
-        if (sizeof($ids) != sizeof($keys)) {
+        // @codeCoverageIgnoreStart
+        if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
                 'Invalid multi identifier count.  '
-                . sizeof($ids)
+                . count($ids)
                 . ' must equal '
-                . sizeof($keys)
+                . count($keys)
             );
         }
+        // @codeCoverageIgnoreEnd
 
         foreach ($keys as $index => $identifier) {
             $criteria[$identifier] = $ids[$index];
@@ -660,22 +719,21 @@ class DoctrineResource extends AbstractResourceListener implements
         $routeMatch = $this->getEvent()->getRouteMatch();
         $associationMappings = $classMetaData->getAssociationNames();
         $fieldNames = $classMetaData->getFieldNames();
+        $routeParams = $routeMatch->getParams();
 
-        foreach ($routeMatch->getParams() as $routeMatchParam => $value) {
-            if (substr(
+        if (array_key_exists($this->getRouteIdentifierName(), $routeParams)) {
+            unset($routeParams[$this->getRouteIdentifierName()]);
+        }
+
+        foreach ($routeParams as $routeMatchParam => $value) {
+            if ($this->getStripRouteParameterSuffix() === substr(
                 $routeMatchParam,
-                (-1 * abs(strlen($this->getStripRouteParameterSuffix())) == $this->getStripRouteParameterSuffix())
+                -1 * strlen($this->getStripRouteParameterSuffix())
             )) {
-                $routeMatchParam = substr(
-                    $routeMatchParam,
-                    0,
-                    strlen($routeMatchParam) - strlen($this->getStripRouteParameterSuffix())
-                );
+                $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
             }
 
-            if (in_array($routeMatchParam, $associationMappings)
-                or in_array($routeMatchParam, $fieldNames)
-            ) {
+            if (in_array($routeMatchParam, $associationMappings) || in_array($routeMatchParam, $fieldNames)) {
                 $criteria[$routeMatchParam] = $value;
             }
         }
@@ -692,7 +750,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         // Add criteria
         foreach ($criteria as $key => $value) {
-            if ($queryBuilder instanceof \Doctrine\ODM\MongoDB\Query\Builder) {
+            if ($queryBuilder instanceof MongoDBQueryBuilder) {
                 $queryBuilder->field($key)->equals($value);
             } else {
                 $parameterName = 'a' . md5(rand());

@@ -4,8 +4,6 @@ namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\ResourceEvent;
-use OAuth2\Request as OAuth2Request;
-use OAuth2\Server as OAuth2Server;
 
 /**
  * Class FetchAllOrm

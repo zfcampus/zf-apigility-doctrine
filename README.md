@@ -1,4 +1,4 @@
-Apigility for Doctrine
+Apigility with Doctrine
 ==============================
 
 [![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
@@ -66,6 +66,7 @@ This way, it is possible to alter the doctrine entities or collections before or
 
 Supported events:
 ```
+EVENT_FETCH_PRE = 'fetch.pre';
 EVENT_FETCH_POST = 'fetch.post';
 EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
 EVENT_FETCH_ALL_POST = 'fetch-all.post';
@@ -172,8 +173,6 @@ When the query provider is registered attach it to the doctrine-connected resour
 * update
 * patch
 * delete
-
-* patch_all delegates to patch
 
 ```php
 'zf-apigility' => array(

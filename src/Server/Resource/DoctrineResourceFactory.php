@@ -10,7 +10,7 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
-use Exception;
+use RuntimeException;
 
 /**
  * Class AbstractDoctrineResourceFactory
@@ -109,12 +109,21 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $config = $serviceLocator->get('Config');
         $doctrineConnectedConfig = $config['zf-apigility']['doctrine-connected'][$requestedName];
 
+        $restConfig = null;
         foreach ($config['zf-rest'] as $restControllerConfig) {
             if ($restControllerConfig['listener'] == $requestedName) {
                 $restConfig = $restControllerConfig;
                 break;
             }
         }
+
+        if (is_null($restConfig)) {
+            // @codeCoverageIgnoreStart
+            throw new RuntimeException(
+                'No zf-rest configuration found for resource ' . $requestedName
+            );
+        }
+            // @codeCoverageIgnoreEnd
 
         $className = isset($doctrineConnectedConfig['class']) ? $doctrineConnectedConfig['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
@@ -125,13 +134,14 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
 
+        /** @var DoctrineResource $listener */
         $listener = new $className();
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
         $listener->setQueryCreateFilter($queryCreateFilter);
-        $listener->setServiceManager($serviceLocator);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
+        $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
                 $listener->getEventManager()->attach($configuredListener);
@@ -210,16 +220,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         $queryCreateFilter = $createFilterManager->get($filterManagerAlias);
 
-        // Load the oAuth2 server
-        $oAuth2Server = false;
-        try {
-            $oAuth2ServerFactory = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
-            $oAuth2Server = $oAuth2ServerFactory();
-            $queryCreateFilter->setOAuth2Server($oAuth2Server);
-        } catch (Exception $e) {
-            // If no oAuth2 server that's just fine.
-        }
-
         // Set object manager for all query providers
         $queryCreateFilter ->setObjectManager($objectManager);
 
@@ -262,21 +262,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             }
         }
 
-        // Load the oAuth2 server
-        $oAuth2Server = false;
-        try {
-            $oAuth2ServerFactory = $serviceLocator->get('ZF\OAuth2\Service\OAuth2Server');
-            $oAuth2Server = $oAuth2ServerFactory();
-        } catch (Exception $e) {
-            // If no oAuth2 server that's just fine.
-        }
-
         // Set object manager for all query providers
         foreach ($queryProviders as $provider) {
             $provider->setObjectManager($objectManager);
-            if ($oAuth2Server) {
-                $provider->setOAuth2Server($oAuth2Server);
-            }
         }
 
         return $queryProviders;
