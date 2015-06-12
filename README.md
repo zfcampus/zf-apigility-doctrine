@@ -35,9 +35,10 @@ for the object manager.
 
 ***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
-This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` To create a resource post to `../doctrine` and _not_ `.../doctrine[/:controller_service_name]`
+This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` 
+To create a resource do not include `[/:controller_service_name]`
 
-POST Parameters:
+POST Parameters
 ```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
