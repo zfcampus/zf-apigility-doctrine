@@ -13,6 +13,7 @@ use ZF\Rest\ResourceEvent;
  */
 class DoctrineResourceEvent extends Event
 {
+    const EVENT_FETCH_PRE        = 'fetch.pre';
     const EVENT_FETCH_POST = 'fetch.post';
     const EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
     const EVENT_FETCH_ALL_POST = 'fetch-all.post';
@@ -53,6 +54,16 @@ class DoctrineResourceEvent extends Event
      * @var ObjectManager
      */
     protected $objectManager;
+
+    /**
+     * @var string
+     */
+    protected $entityClassName;
+
+    /**
+     * @var string
+     */
+    protected $entityId;
 
     /**
      * @return ObjectManager
@@ -152,7 +163,42 @@ class DoctrineResourceEvent extends Event
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
+        return $this;
+    }
 
+    /*
+     * @return string
+     */
+    public function getEntityClassName()
+    {
+        return $this->entityClassName;
+    }
+
+    /**
+     * @param string $entityClassName
+     * @return $this
+     */
+    public function setEntityClassName($entityClassName)
+    {
+        $this->entityClassName = $entityClassName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @param string $entityId
+     * @return $this
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
         return $this;
     }
 }

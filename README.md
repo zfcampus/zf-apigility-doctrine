@@ -1,4 +1,4 @@
-Apigility for Doctrine
+Apigility with Doctrine
 ==============================
 
 [![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
@@ -12,7 +12,7 @@ Installation of this module uses composer. For composer documentation, please re
 [getcomposer.org](http://getcomposer.org/).
 
 ```sh
-$ php composer.phar require zfcampus/zf-apigility-doctrine "~0.3"
+$ php composer.phar require zfcampus/zf-apigility-doctrine
 ```
 
 This library provides two modules.  The first, `ZF\Apigility\Doctrine\Server` provides
@@ -35,9 +35,10 @@ for the object manager.
 
 ***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
-This is a Doctrine resource creation route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
-POST Parameters:
+This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` 
+To create a resource do not include `[/:controller_service_name]`
 
+POST Parameters
 ```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
@@ -66,6 +67,7 @@ This way, it is possible to alter the doctrine entities or collections before or
 
 Supported events:
 ```
+EVENT_FETCH_PRE = 'fetch.pre';
 EVENT_FETCH_POST = 'fetch.post';
 EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
 EVENT_FETCH_ALL_POST = 'fetch-all.post';
@@ -75,15 +77,12 @@ EVENT_UPDATE_PRE = 'update.pre';
 EVENT_UPDATE_POST = 'update.post';
 EVENT_PATCH_PRE = 'patch.pre';
 EVENT_PATCH_POST = 'patch.post';
-EVENT_PATCH_PRE = 'patch.pre';
-EVENT_PATCH_POST = 'patch.post';
 EVENT_PATCH_LIST_PRE = 'patch-all.pre';
 EVENT_PATCH_LIST_POST = 'patch-all.post';
 EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
 EVENT_DELETE_LIST_PRE = 'delete-list.pre';
 EVENT_DELETE_LIST_POST = 'delete-list.post';
-```
 ```
 
 Attach to events through the *Shared Event Manager*:
@@ -140,7 +139,7 @@ fields the album_id matches to the resoruce configuration and will be queried by
 and the artist is a field on album and will be queried by criteria so the final query
 would be
 
-```
+```php
 $objectManager->getRepository('Album')->findOneBy(
     'id' => :album_id,
     'artist' => :artist_id
@@ -175,8 +174,6 @@ When the query provider is registered attach it to the doctrine-connected resour
 * update
 * patch
 * delete
-
-* patch_all delegates to patch
 
 ```php
 'zf-apigility' => array(
@@ -220,3 +217,4 @@ Register your Query Create Filter as:
     ),
 ),
 ```
+
