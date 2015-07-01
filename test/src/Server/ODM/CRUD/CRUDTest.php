@@ -63,6 +63,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
+            DoctrineResourceEvent::EVENT_CREATE_FLUSH,
         ));
 
         // Test create() with listener that returns ApiProblem
@@ -221,6 +222,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_PATCH_PRE,
             DoctrineResourceEvent::EVENT_PATCH_POST,
+            DoctrineResourceEvent::EVENT_PATCH_FLUSH,
         ));
     }
 
@@ -250,6 +252,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
             DoctrineResourceEvent::EVENT_UPDATE_POST,
+            DoctrineResourceEvent::EVENT_UPDATE_FLUSH,
         ));
     }
 
@@ -277,6 +280,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_DELETE_PRE,
             DoctrineResourceEvent::EVENT_DELETE_POST,
+            DoctrineResourceEvent::EVENT_DELETE_FLUSH,
         ));
 
         // Test DELETE: entity not found
