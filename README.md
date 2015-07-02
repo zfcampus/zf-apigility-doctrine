@@ -122,6 +122,18 @@ It is also possible to add custom event listeners to the configuration of a sing
 ),
 ```
 
+Flush events
+------------
+
+In 1.0.2 version some _POST events have changed the place where are fired.
+As the result of this change, `EVENT_CREATE_POST`, `EVENT_UPDATE_POST`,
+`EVENT_PATCH_POST` and `EVENT_DELETE_POST` events are fired _before_
+Doctrine's flush(). Since 1.0.3 new _FLUSH events were introduced to
+maintain this problem and allow to create listeners triggered after flush().
+
+Also it is worth to noting that _FLUSH event listeners could return an `ApiProblem`
+which will produce API error, but the entity will be actually persisted in the DB.
+
 Querying Single Entities
 ========================
 
