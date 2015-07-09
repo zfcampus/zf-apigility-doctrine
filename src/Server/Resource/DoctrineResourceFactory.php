@@ -136,6 +136,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         /** @var DoctrineResource $listener */
         $listener = new $className();
+        $listener->setServiceManager($serviceLocator);
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);

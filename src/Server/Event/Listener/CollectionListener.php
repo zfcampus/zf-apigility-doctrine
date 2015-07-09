@@ -98,7 +98,7 @@ class CollectionListener implements ListenerAggregateInterface
     {
         foreach ($this->listeners as $index => $listener) {
             if ($events->detach($listener)) {
-                unset( $this->listeners[$index] );
+                unset($this->listeners[$index]);
             }
         }
     }
@@ -176,13 +176,13 @@ class CollectionListener implements ListenerAggregateInterface
     {
         $metadata        = $this->getClassMetadata($targetEntityClassName);
         $identifierNames = $metadata->getIdentifierFieldNames($targetEntityClassName);
-        if (empty( $identifierNames )) {
+        if (empty($identifierNames)) {
             return null; // Not really sure what would cause this or how to handle, skipping for now
         }
 
         $identifierValues = [ ];
         foreach ($identifierNames as $identifierName) {
-            if (!isset( $data[$identifierName] ) || empty( $data[$identifierName] )) {
+            if (!isset($data[$identifierName]) || empty($data[$identifierName])) {
                 continue; // Should mean we are working with a new entity to be created
             }
             $identifierValues[$identifierName] = $data[$identifierName];
@@ -255,7 +255,7 @@ class CollectionListener implements ListenerAggregateInterface
             $this->entityCollectionValuedAssociations[$entity] = new ArrayObject($collectionValuedAssociations);
         }
 
-        if ($stripEmptyAssociations === true && !empty( $data ) && is_array($data)) {
+        if ($stripEmptyAssociations === true && !empty($data) && is_array($data)) {
             return $this->stripEmptyAssociations($this->entityCollectionValuedAssociations[$entity], $data);
         } else {
             return $this->entityCollectionValuedAssociations[$entity];
@@ -275,12 +275,12 @@ class CollectionListener implements ListenerAggregateInterface
         $associationsArray = $associations->getArrayCopy();
         foreach ($associationsArray as $key => $association) {
             if (!( array_key_exists($association, $data)
-                   && !empty( $data[$association] )
+                   && !empty($data[$association])
                    && ( is_array($data[$association])
                         || $data[$association] instanceof \Traversable )
             )
             ) {
-                unset( $associationsArray[$key] );
+                unset($associationsArray[$key]);
             }
         }
 
@@ -296,7 +296,7 @@ class CollectionListener implements ListenerAggregateInterface
     protected function validateAssociationData($association, $data)
     {
         return array_key_exists($association, $data)
-               && !empty( $data[$association] )
+               && !empty($data[$association])
                && ( is_array($data[$association])
                     || $data[$association] instanceof \Traversable );
 
@@ -371,7 +371,7 @@ class CollectionListener implements ListenerAggregateInterface
             $config = $this->getServiceManager()->get('Config');
             $config = $config[DoctrineHydratorFactory::FACTORY_NAMESPACE];
 
-            if (!empty( $config )) {
+            if (!empty($config)) {
                 $this->entityHydratorMap = [ ];
                 foreach ($config as $hydratorKey => $configParams) {
                     $this->entityHydratorMap[$configParams['entity_class']] = $hydratorKey;

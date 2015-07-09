@@ -12,7 +12,7 @@ Installation of this module uses composer. For composer documentation, please re
 [getcomposer.org](http://getcomposer.org/).
 
 ```sh
-$ php composer.phar require zfcampus/zf-apigility-doctrine "~0.3"
+$ php composer.phar require zfcampus/zf-apigility-doctrine
 ```
 
 This library provides two modules.  The first, `ZF\Apigility\Doctrine\Server` provides
@@ -35,9 +35,10 @@ for the object manager.
 
 ***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
 
-This is a Doctrine resource creation route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
-POST Parameters:
+This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` 
+To create a resource do not include `[/:controller_service_name]`
 
+POST Parameters
 ```json
 {
     "objectManager": "doctrine.entitymanager.orm_default",
@@ -216,3 +217,4 @@ Register your Query Create Filter as:
     ),
 ),
 ```
+
