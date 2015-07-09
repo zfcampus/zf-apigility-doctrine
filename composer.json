@@ -22,16 +22,17 @@
         }
     },
     "require-dev": {
-        "zfcampus/zf-apigility-admin": "~1.1",
-        "zendframework/zend-test": ">=2.4",
-        "zendframework/zend-form": ">=2.4",
-        "zendframework/zend-serializer": ">=2.4",
-        "zendframework/zend-log": ">=2.4",
-        "phpunit/phpunit": "3.7.*",
-        "doctrine/doctrine-orm-module": "^0.8.0",
         "doctrine/doctrine-mongo-odm-module": "^0.8.0",
+        "doctrine/doctrine-orm-module": "^0.8.0",
         "doctrine/mongodb-odm": "~1.0.0@beta",
-        "squizlabs/php_codesniffer": "~2.0"
+        "phpunit/phpunit": "~4.7",
+        "squizlabs/php_codesniffer": "^2.3.0",
+        "zendframework/zend-form": "~2.4.0",
+        "zendframework/zend-log": "~2.4.0",
+        "zendframework/zend-serializer": "~2.4.0",
+        "zendframework/zend-test": "~2.4.0",
+        "zfcampus/zf-apigility-admin": "~1.1",
+        "zendframework/zend-i18n": "~2.4.0"
     },
     "require": {
         "php": ">=5.3",

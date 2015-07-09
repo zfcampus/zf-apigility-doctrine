@@ -163,7 +163,7 @@ class DoctrineResourceEvent extends Event
     public function setResourceEvent($resourceEvent)
     {
         $this->resourceEvent = $resourceEvent;
-        
+
         return $this;
     }
 
