@@ -35,7 +35,7 @@ before_install:
   - composer self-update
 
 install:
-  - pecl install -f mongo-1.4.1 || return 0
+  - if [[ $TRAVIS_PHP_VERSION != "hhvm" ]]; then pecl install -f mongo-1.4.1 ; fi
   - travis_retry composer install --no-interaction --ignore-platform-reqs --prefer-source
 
 script:
