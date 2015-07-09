@@ -10,6 +10,10 @@ class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTest
 {
     public function setUp()
     {
+        if (! extension_loaded('mongo')) {
+            $this->markTestSkipped(sprintf('Tests for %s can only be run with the Mongo extension', __CLASS__));
+        }
+
         $this->setApplicationConfig(
             include __DIR__ . '/../../../../config/ODM/application.config.php'
         );
