@@ -12,7 +12,6 @@ services:
 matrix:
   fast_finish: true
   include:
-    - php: 5.3
     - php: 5.4
     - php: 5.5
       env:
@@ -31,7 +30,7 @@ notifications:
   email: false
 
 before_install:
-  - phpenv config-add .travis-config.ini
+  - phpenv config-add .travis-config.ini || return 0
   - if [[ $EXECUTE_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
   - composer self-update
 
