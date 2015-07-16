@@ -376,6 +376,11 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getObjectManager()->flush();
 
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_FLUSH, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         return $entity;
     }
 
@@ -408,6 +413,11 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->flush();
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_FLUSH, $entity);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return true;
     }
@@ -633,6 +643,11 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getObjectManager()->flush();
 
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_FLUSH, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
+
         return $entity;
     }
 
@@ -683,6 +698,11 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->flush();
+
+        $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_FLUSH, $entity, $data);
+        if ($results->last() instanceof ApiProblem) {
+            return $results->last();
+        }
 
         return $entity;
     }

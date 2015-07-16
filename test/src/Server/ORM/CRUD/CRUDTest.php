@@ -77,6 +77,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
+            DoctrineResourceEvent::EVENT_CREATE_FLUSH,
         ));
 
         // Test create() with listener that returns ApiProblem
@@ -137,7 +138,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->assertEquals('ArtistTwo', $body['name']);
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_FETCH_PRE,
-            DoctrineResourceEvent::EVENT_FETCH_POST
+            DoctrineResourceEvent::EVENT_FETCH_POST,
         ));
 
         // Test fetch() of resource with non-primary key identifier
@@ -269,6 +270,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_PATCH_PRE,
             DoctrineResourceEvent::EVENT_PATCH_POST,
+            DoctrineResourceEvent::EVENT_PATCH_FLUSH,
         ));
 
         // Test patch() with listener that returns ApiProblem
@@ -436,6 +438,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->validateTriggeredEvents(array(
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
             DoctrineResourceEvent::EVENT_UPDATE_POST,
+            DoctrineResourceEvent::EVENT_UPDATE_FLUSH,
         ));
 
         // Test put() with listener that returns ApiProblem
@@ -501,6 +504,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
             array(
                 DoctrineResourceEvent::EVENT_DELETE_PRE,
                 DoctrineResourceEvent::EVENT_DELETE_POST,
+                DoctrineResourceEvent::EVENT_DELETE_FLUSH,
             )
         );
 
