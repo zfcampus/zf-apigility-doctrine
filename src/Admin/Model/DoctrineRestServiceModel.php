@@ -744,11 +744,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         );
         $whitelist = $details->acceptWhitelist;
         if (! empty($whitelist)) {
-            $config['accept-whitelist'] = array($controllerService => $whitelist);
+            $config['accept_whitelist'] = array($controllerService => $whitelist);
         }
         $whitelist = $details->contentTypeWhitelist;
         if (! empty($whitelist)) {
-            $config['content-type-whitelist'] = array($controllerService => $whitelist);
+            $config['content_type_whitelist'] = array($controllerService => $whitelist);
         }
         $config = array('zf-content-negotiation' => $config);
         $this->configResource->patch($config, true);
@@ -969,7 +969,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (is_array($acceptWhitelist)
             && ! empty($acceptWhitelist)
         ) {
-            $key = $baseKey . 'accept-whitelist.' . $service;
+            $key = $baseKey . 'accept_whitelist.' . $service;
             $this->configResource->patchKey($key, $acceptWhitelist);
         }
 
@@ -977,7 +977,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         if (is_array($contentTypeWhitelist)
             && ! empty($contentTypeWhitelist)
         ) {
-            $key = $baseKey . 'content-type-whitelist.' . $service;
+            $key = $baseKey . 'content_type_whitelist.' . $service;
             $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
     }
@@ -1063,10 +1063,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $key = array('zf-content-negotiation', 'controllers', $entity->controllerServiceName);
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'accept-whitelist', $entity->controllerServiceName);
+        $key = array('zf-content-negotiation', 'accept_whitelist', $entity->controllerServiceName);
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'content-type-whitelist', $entity->controllerServiceName);
+        $key = array('zf-content-negotiation', 'content_type_whitelist', $entity->controllerServiceName);
         $this->configResource->deleteKey($key);
 
         $key = array('zf-hal', 'metadata_map', $entity->collectionClass);
@@ -1239,22 +1239,22 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
             );
         }
 
-        if (isset($config['accept-whitelist'])
-            && isset($config['accept-whitelist'][$controllerServiceName])
+        if (isset($config['accept_whitelist'])
+            && isset($config['accept_whitelist'][$controllerServiceName])
         ) {
             $metadata->exchangeArray(
                 array(
-                'accept_whitelist' => $config['accept-whitelist'][$controllerServiceName],
+                'accept_whitelist' => $config['accept_whitelist'][$controllerServiceName],
                 )
             );
         }
 
-        if (isset($config['content-type-whitelist'])
-            && isset($config['content-type-whitelist'][$controllerServiceName])
+        if (isset($config['content_type_whitelist'])
+            && isset($config['content_type_whitelist'][$controllerServiceName])
         ) {
             $metadata->exchangeArray(
                 array(
-                'content-type-whitelist' => $config['content-type-whitelist'][$controllerServiceName],
+                'content_type_whitelist' => $config['content_type_whitelist'][$controllerServiceName],
                 )
             );
         }
