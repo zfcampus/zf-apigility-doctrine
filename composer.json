@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-mongo-odm-module": "^0.8.0",
-        "doctrine/doctrine-orm-module": "^0.8.0",
+        "doctrine/doctrine-orm-module": "~0.8.0",
         "doctrine/mongodb-odm": "~1.0.0@beta",
         "phpunit/phpunit": "~4.7",
         "squizlabs/php_codesniffer": "^2.3.0",
