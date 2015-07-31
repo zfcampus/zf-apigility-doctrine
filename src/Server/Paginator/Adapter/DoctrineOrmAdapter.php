@@ -16,7 +16,7 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
      * @var array
     */
     public $cache = array();
-    
+
     /**
      * @param $offset
      * @param $itemCountPerPage
@@ -37,7 +37,7 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
         if (! array_key_exists($offset, $this->cache)) {
             $this->cache[$offset] = array();
         }
-        
+
         $this->cache[$offset][$itemCountPerPage] =  $this->getQuery()->getResult();
 
         return $this->cache[$offset][$itemCountPerPage];

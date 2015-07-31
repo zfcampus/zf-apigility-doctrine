@@ -21,6 +21,8 @@ the classes to serve data created by the second, `ZF\Apigility\Doctrine\Admin`. 
 created resoruces.  Generally you would include *Admin* in your `development.config.php`
 and *Server* in your `application.config.php`
 
+`ZF\Apigility\Doctrine\Server` has a dependency with `Phpro\DoctrineHydrationModule` to handle entity hydration. See [documentation and instructions](https://github.com/phpro/zf-doctrine-hydration-module) on how to set up this module.
+
 
 API Resources
 -------------

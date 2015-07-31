@@ -2,6 +2,8 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,11 +34,37 @@ use ReflectionClass;
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener implements
+    ServiceManagerAwareInterface,
     ObjectManagerAwareInterface,
     ServiceManagerAwareInterface,
     EventManagerAwareInterface,
     HydratorAwareInterface
 {
+    /**
+     * @var ServiceManager
+     */
+    protected $serviceManager;
+
+    /**
+     * @param ServiceManager $serviceManager
+     *
+     * @return $this
+     */
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+
+        return $this;
+    }
+
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
     /**
      * @var EventManagerInterface
      */

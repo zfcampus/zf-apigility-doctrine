@@ -63,12 +63,16 @@ standards using [phpcs](https://github.com/squizlabs/PHP_CodeSniffer) (which is
 installed via Composer with other dependencies). To check for CS issues:
 
 ```console
-$ ./vendor/bin/php-cs-fixer fix . --dry-run
+$ ./vendor/bin/phpcs
 ```
 
-This will report CS issues. Alternately, you can have the tool fix them for you
-by omitting the `--dry-run` switch:
+This will report CS issues.
+
+`phpcs` also provides a tool for automatically fixing many issues, `phpcbf`:
 
 ```console
-$ ./vendor/bin/php-cs-fixer fix .
+$ ./vendor/bin/phpcbf
 ```
+
+If you use the tool and it fixes any files, make sure you run tests to confirm
+nothing was broken as a result, and then add and commit any changed files.
