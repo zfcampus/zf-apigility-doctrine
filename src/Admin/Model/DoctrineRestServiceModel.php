@@ -1164,7 +1164,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         );
 
         if (! file_exists($sourcePath)) {
-            mkdir($sourcePath, 0777, true);
+            mkdir($sourcePath, 0775, true);
         }
 
         return $sourcePath;
