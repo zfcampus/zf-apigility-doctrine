@@ -330,7 +330,7 @@ class DoctrineRpcServiceModel
 //
 //        if (!file_exists($srcPath)) {
 //            // @codeCoverageIgnoreStart
-//            mkdir($srcPath, 0777, true);
+//            mkdir($srcPath, 0775, true);
 //        }
 //            // @codeCoverageIgnoreEnd
 //
