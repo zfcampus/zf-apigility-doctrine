@@ -139,6 +139,12 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
             }
         );
 
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+                'Accept' => 'application/json',
+            )
+        );
+
         $this->dispatch('/test/meta/' . 111);
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
@@ -189,6 +195,12 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchAllFailure');
             }
+        );
+
+        $this->getRequest()->getHeaders()->addHeaders(
+            array(
+                'Accept' => 'application/json',
+            )
         );
 
         $this->getRequest()->setContent(null);
