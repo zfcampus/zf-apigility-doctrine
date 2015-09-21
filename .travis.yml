@@ -40,4 +40,4 @@ install:
 
 script:
   - ./vendor/bin/phpunit
-  - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/phpcs ; fi
+  - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/phpcs --extensions=php --standard=PSR2 --ignore=test/Bootstrap.php src; fi
