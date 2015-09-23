@@ -2,7 +2,7 @@
 
 namespace ZF\Apigility\Doctrine\Server\Exception;
 
-use InvalidArgumentExcpetion as PHPInvalidArgumentException;
+use InvalidArgumentException as PHPInvalidArgumentException;
 
 /**
  * Class InvalidArgumentException
