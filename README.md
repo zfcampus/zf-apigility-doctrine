@@ -23,6 +23,7 @@ and *Server* in your `application.config.php`
 
 `ZF\Apigility\Doctrine\Server` has a dependency with `Phpro\DoctrineHydrationModule` to handle entity hydration. See [documentation and instructions](https://github.com/phpro/zf-doctrine-hydration-module) on how to set up this module.
 
+For Apache installations it is recommended the [AllowEncodedSlashes-directive is set to On](http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes) so the configuration can be read.
 
 API Resources
 -------------
