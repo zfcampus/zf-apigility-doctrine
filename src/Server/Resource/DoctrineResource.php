@@ -8,15 +8,16 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
-use Zend\EventManager\EventInterface;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
-use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use Traversable;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
+use Zend\EventManager\EventInterface;
 use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -25,7 +26,6 @@ use Zend\EventManager\StaticEventManager;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\HydratorAwareInterface;
 use Zend\Stdlib\Hydrator\HydratorInterface;
-use Traversable;
 use ReflectionClass;
 
 /**
@@ -36,6 +36,7 @@ use ReflectionClass;
 class DoctrineResource extends AbstractResourceListener implements
     ServiceManagerAwareInterface,
     ObjectManagerAwareInterface,
+    ServiceManagerAwareInterface,
     EventManagerAwareInterface,
     HydratorAwareInterface
 {
@@ -147,18 +148,23 @@ class DoctrineResource extends AbstractResourceListener implements
     protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
 
     /**
+     * @var ServiceManager
+     */
+    protected $serviceManager;
+
+    /**
      * @var array|QueryProviderInterface
      */
     protected $queryProviders;
 
     /**
-     * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
+     * @param QueryProviderInterface[]
      *
      * @throws InvalidArgumentException if parameter is not an array or \Traversable object
+     * @throws InvalidArgumentException if parameter contains item not an instance of QueryProviderInterface
      */
     public function setQueryProviders($queryProviders)
     {
-        // @codeCoverageIgnoreStart
         if (!is_array($queryProviders) && !$queryProviders instanceof Traversable) {
             throw new InvalidArgumentException('queryProviders must be array or Traversable object');
         }
@@ -168,13 +174,12 @@ class DoctrineResource extends AbstractResourceListener implements
                 throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
             }
         }
-        // @codeCoverageIgnoreEnd
 
         $this->queryProviders = (array) $queryProviders;
     }
 
     /**
-     * @return array|QueryProviderInterface[]
+     * @return QueryProviderInterface[]
      */
     public function getQueryProviders()
     {
@@ -184,7 +189,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * @param $method
      *
-     * @return QueryProviderInterface
+     * @return QueryProviderInterface Either the default queryProvider or method specific queryProvider if supplied
      */
     public function getQueryProvider($method)
     {
