@@ -752,8 +752,16 @@ class DoctrineResource extends AbstractResourceListener implements
         if (array_key_exists($this->getRouteIdentifierName(), $routeParams)) {
             unset($routeParams[$this->getRouteIdentifierName()]);
         }
-
-        foreach ($routeParams as $routeMatchParam => $value) {
+        
+        $reservedRouteParams = ['controller','action',
+            \Zend\Mvc\ModuleRouteListener::MODULE_NAMESPACE,\Zend\Mvc\ModuleRouteListener::ORIGINAL_CONTROLLER
+        ];
+        $allowedRouteParams = array_diff_key($routeParams, array_flip( $reservedRouteParams ) );
+        
+        /**
+         * Append query selection parameters by route match.
+         */
+        foreach ($allowedRouteParams as $routeMatchParam => $value) {
             if ($this->getStripRouteParameterSuffix() === substr(
                 $routeMatchParam,
                 -1 * strlen($this->getStripRouteParameterSuffix())
@@ -769,7 +777,7 @@ class DoctrineResource extends AbstractResourceListener implements
         // Build query
         $queryProvider = $this->getQueryProvider($method);
         $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), null);
-
+        
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
             return $queryBuilder;
