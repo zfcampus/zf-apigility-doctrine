@@ -37,6 +37,7 @@
     "require": {
         "php": ">=5.4",
         "phpro/zf-doctrine-hydration-module": "^0.1.5",
+        "zendframework/zend-hydrator": "^1.0",
         "zfcampus/zf-apigility": "^1.0"
     },
     "prefer-stable": true,
