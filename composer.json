@@ -40,6 +40,10 @@
         "zendframework/zend-hydrator": "^1.0",
         "zfcampus/zf-apigility": "^1.0"
     },
+    "suggest": {
+        "doctrine/doctrine-orm-module": "For ORM mapping",
+        "doctrine/doctrine-mongo-odm-module": "For Mongo ODM mapping"
+    },
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
