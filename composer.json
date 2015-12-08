@@ -31,6 +31,7 @@
         "zendframework/zend-log": "^2.5.0",
         "zendframework/zend-serializer": "^2.5.0",
         "zendframework/zend-test": "^2.5.0",
+        "zendframework/zend-hydrator": "~1",
         "zfcampus/zf-apigility-admin": "^1.1",
         "zendframework/zend-i18n": "^2.5.0"
     },
