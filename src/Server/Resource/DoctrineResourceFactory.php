@@ -130,7 +130,12 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $className = $this->normalizeClassname($className);
 
         $objectManager = $this->loadObjectManager($serviceLocator, $doctrineConnectedConfig);
-        $hydrator = $this->loadHydrator($serviceLocator, $doctrineConnectedConfig, $doctrineHydratorConfig, $objectManager);
+        $hydrator = $this->loadHydrator(
+            $serviceLocator,
+            $doctrineConnectedConfig,
+            $doctrineHydratorConfig,
+            $objectManager
+        );
         $queryProviders = $this->loadQueryProviders($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
@@ -192,8 +197,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         ServiceLocatorInterface $serviceLocator,
         array $doctrineConnectedConfig,
         array $doctrineHydratorConfig,
-        $objectManager)
-    {
+        $objectManager
+    ) {
+
         // @codeCoverageIgnoreStart
         if (!isset($doctrineConnectedConfig['hydrator'])) {
             return null;
