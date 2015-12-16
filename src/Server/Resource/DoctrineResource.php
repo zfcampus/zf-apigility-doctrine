@@ -592,7 +592,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function patch($id, $data)
     {
-        $entity = $this->findEntity($id, 'patch');
+        $entity = $this->findEntity($id, 'patch', $data);
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -639,7 +639,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function update($id, $data)
     {
-        $entity = $this->findEntity($id, 'update');
+        $entity = $this->findEntity($id, 'update', $data);
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -702,7 +702,7 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @return object
      */
-    protected function findEntity($id, $method)
+    protected function findEntity($id, $method, $data = null)
     {
         // Match identiy identifier name(s) with id(s)
         $ids = explode($this->getMultiKeyDelimiter(), $id);
@@ -758,7 +758,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         // Build query
         $queryProvider = $this->getQueryProvider($method);
-        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), null);
+        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
