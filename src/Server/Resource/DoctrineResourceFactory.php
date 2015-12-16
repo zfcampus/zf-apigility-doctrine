@@ -19,7 +19,6 @@ use RuntimeException;
  */
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
-
     /**
      * Cache of canCreateServiceWithName lookups
      * @var array
@@ -39,11 +38,13 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         if (array_key_exists($requestedName, $this->lookupCache)) {
+
             return $this->lookupCache[$requestedName];
         }
 
         if (!$serviceLocator->has('Config')) {
             // @codeCoverageIgnoreStart
+
             return false;
         }
             // @codeCoverageIgnoreEnd
@@ -142,13 +143,14 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         /** @var DoctrineResource $listener */
         $listener = new $className();
-        $listener->setServiceManager($serviceLocator);
+        $listener->setSharedEventManager($serviceLocator->get('Application')->getEventManager()->getSharedManager());
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
         $listener->setQueryCreateFilter($queryCreateFilter);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
+
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
                 $listener->getEventManager()->attach($configuredListener);
@@ -184,6 +186,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
         // @codeCoverageIgnoreEnd
+
         return $objectManager;
     }
 
@@ -225,6 +228,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         }
 
         // @codeCoverageIgnoreEnd
+
         return $hydratorManager->get($doctrineConnectedConfig['hydrator']);
     }
 
@@ -309,6 +313,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         foreach ($config['listeners'] as $listener) {
             $listeners[] = $serviceLocator->get($listener);
         }
+
         return $listeners;
     }
 }
