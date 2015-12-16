@@ -656,7 +656,7 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->getRequest()->setContent(null);
         $this->dispatch("/test/artist/$artistId/album");
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(2, $body['count']);
+        $this->assertEquals(2, $body['total_items']);
 
         $this->dispatch("/test/artist/$artistId/album/$albumId");
         $body = json_decode($this->getResponse()->getBody(), true);
