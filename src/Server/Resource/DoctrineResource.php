@@ -536,6 +536,9 @@ class DoctrineResource extends AbstractResourceListener implements
         }
             // @codeCoverageIgnoreEnd
 
+        $criteria = $this->getRouteCriteria();
+        $this->injectCriteria($criteria, $queryBuilder);
+
         $response = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             $this->getEntityClass(),
@@ -725,6 +728,43 @@ class DoctrineResource extends AbstractResourceListener implements
             $criteria[$identifier] = $ids[$index];
         }
 
+        $criteria = array_merge($criteria,$this->getRouteCriteria());
+
+        // Build query
+        $queryProvider = $this->getQueryProvider($method);
+        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
+
+        if ($queryBuilder instanceof ApiProblem) {
+            // @codeCoverageIgnoreStart
+            return $queryBuilder;
+        }
+            // @codeCoverageIgnoreEnd
+
+        $this->injectCriteria($criteria, $queryBuilder);
+
+        try {
+            $entity = $queryBuilder->getQuery()->getSingleResult();
+        } catch (NoResultException $e) {
+            $entity = null;
+        }
+
+        if (!$entity) {
+            $entity = new ApiProblem(404, 'Entity was not found');
+        }
+
+        return $entity;
+    }
+    
+    /**
+     * Gets criteria in route params
+     *
+     * @return array
+     */
+    protected function getRouteCriteria() {
+
+        $criteria = array();
+    	
+
         $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
         $routeMatch = $this->getEvent()->getRouteMatch();
         $associationMappings = $classMetaData->getAssociationNames();
@@ -755,18 +795,21 @@ class DoctrineResource extends AbstractResourceListener implements
                 $criteria[$routeMatchParam] = $value;
             }
         }
-
-        // Build query
-        $queryProvider = $this->getQueryProvider($method);
-        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
-
-        if ($queryBuilder instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
-            return $queryBuilder;
-        }
-            // @codeCoverageIgnoreEnd
-
-        // Add criteria
+        
+        return $criteria;
+        
+    }
+    
+    /**
+     * Inject criteria in query builder
+     *
+     * @param $criteria
+     * @param $queryBuilder
+     * 
+     * @return QueryBuilder
+     */
+    protected function injectCriteria(array $criteria,QueryBuilder $queryBuilder) {
+ 
         foreach ($criteria as $key => $value) {
             if ($queryBuilder instanceof MongoDBQueryBuilder) {
                 $queryBuilder->field($key)->equals($value);
@@ -776,17 +819,7 @@ class DoctrineResource extends AbstractResourceListener implements
                 $queryBuilder->setParameter($parameterName, $value);
             }
         }
-
-        try {
-            $entity = $queryBuilder->getQuery()->getSingleResult();
-        } catch (NoResultException $e) {
-            $entity = null;
-        }
-
-        if (!$entity) {
-            $entity = new ApiProblem(404, 'Entity was not found');
-        }
-
-        return $entity;
+       
+        return $queryBuilder;
     }
 }
