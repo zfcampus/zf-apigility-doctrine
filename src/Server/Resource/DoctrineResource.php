@@ -809,7 +809,7 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @return QueryBuilder
      */
-    protected function injectCriteria(array $criteria, QueryBuilder $queryBuilder)
+    protected function injectCriteria(array $criteria, $queryBuilder)
     {
  
         foreach ($criteria as $key => $value) {
