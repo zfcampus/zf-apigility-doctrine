@@ -728,7 +728,7 @@ class DoctrineResource extends AbstractResourceListener implements
             $criteria[$identifier] = $ids[$index];
         }
 
-        $criteria = array_merge($criteria,$this->getRouteCriteria());
+        $criteria = array_merge($criteria, $this->getRouteCriteria());
 
         // Build query
         $queryProvider = $this->getQueryProvider($method);
@@ -760,10 +760,11 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @return array
      */
-    protected function getRouteCriteria() {
+    protected function getRouteCriteria()
+    {
 
         $criteria = array();
-    	
+
 
         $classMetaData = $this->getObjectManager()->getClassMetadata($this->getEntityClass());
         $routeMatch = $this->getEvent()->getRouteMatch();
@@ -805,10 +806,11 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @param $criteria
      * @param $queryBuilder
-     * 
+     *
      * @return QueryBuilder
      */
-    protected function injectCriteria(array $criteria,QueryBuilder $queryBuilder) {
+    protected function injectCriteria(array $criteria, QueryBuilder $queryBuilder)
+    {
  
         foreach ($criteria as $key => $value) {
             if ($queryBuilder instanceof MongoDBQueryBuilder) {
