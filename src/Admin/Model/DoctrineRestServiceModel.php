@@ -768,23 +768,6 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceMan
         $objectManager      = $this->getServiceManager()->get($details->objectManager);
         $hydratorStrategies = array();
 
-        // Add all ORM collections to Hydrator Strategies
-        if ($objectManager instanceof \Doctrine\ORM\EntityManager) {
-            $collectionStrategyName = 'ZF\Apigility\Doctrine\Server\Hydrator\Strategy\CollectionLink';
-            $metadataFactory = $objectManager->getMetadataFactory();
-            $metadata = $metadataFactory->getMetadataFor($entityClass);
-
-            foreach ($metadata->associationMappings as $relationName => $relationMapping) {
-                switch ($relationMapping['type']) {
-                    case 4:
-                        $hydratorStrategies[$relationName] = $collectionStrategyName;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
         $config = array(
             'zf-apigility' => array(
