@@ -28,15 +28,17 @@ For Apache installations it is recommended the [AllowEncodedSlashes-directive is
 API Resources
 -------------
 
+**NOTE!**  This section was/is intended for the authors of [zf-apigility-admin-ui](https://github.com/zfcampus/zf-apigility-admin-ui).  While it is possible to use these instructions to manually create Apigility Doctrine resources it is strongly recommended to use the UI.
 
-***/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]***
+
+`/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]`
 
 This will return metadata for the named entity which is a member of the
 named object manager. Querying without a name will return all metadata
 for the object manager.
 
 
-***/apigility/api/module[/:name]/doctrine[/:controller_service_name]***
+`/apigility/api/module[/:name]/doctrine[/:controller_service_name]`
 
 This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` 
 To create a resource do not include `[/:controller_service_name]`
