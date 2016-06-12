@@ -37,7 +37,7 @@
     },
     "require": {
         "php": ">=5.4 || ^7.0",
-        "phpro/zf-doctrine-hydration-module": "*",
+        "phpro/zf-doctrine-hydration-module": "dev-master#d037ee6de443bedf39c807f295fe0e69bdca64cb",
         "zfcampus/zf-apigility": "^1.1"
     },
     "suggest": {
