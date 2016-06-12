@@ -42,7 +42,9 @@
     },
     "suggest": {
         "doctrine/doctrine-orm-module": "For ORM mapping",
-        "doctrine/doctrine-mongo-odm-module": "For Mongo ODM mapping"
+        "doctrine/doctrine-mongo-odm-module": "For Mongo ODM mapping",
+        "api-skeletons/zf-doctrine-hydrator": "Hydrator strategies for Doctrine in Apipgility",
+        "api-skeletons/zf-oauth2-doctrine": "OAuth2 Doctrine Adapter for Apigility"
     },
     "prefer-stable": true,
     "autoload": {
