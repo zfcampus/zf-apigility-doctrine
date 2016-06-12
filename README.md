@@ -76,14 +76,18 @@ EVENT_FETCH_ALL_PRE = 'fetch-all.pre';
 EVENT_FETCH_ALL_POST = 'fetch-all.post';
 EVENT_CREATE_PRE = 'create.pre';
 EVENT_CREATE_POST = 'create.post';
+EVENT_CREATE_FLUSH = 'create.flush';
 EVENT_UPDATE_PRE = 'update.pre';
 EVENT_UPDATE_POST = 'update.post';
+EVENT_UPDATE_FLUSH = 'update.flush';
 EVENT_PATCH_PRE = 'patch.pre';
 EVENT_PATCH_POST = 'patch.post';
+EVENT_PATCH_FLUSH = 'patch.flush';
 EVENT_PATCH_LIST_PRE = 'patch-all.pre';
 EVENT_PATCH_LIST_POST = 'patch-all.post';
 EVENT_DELETE_PRE = 'delete.pre';
 EVENT_DELETE_POST = 'delete.post';
+EVENT_DELETE_FLUSH = 'delete.flush';
 EVENT_DELETE_LIST_PRE = 'delete-list.pre';
 EVENT_DELETE_LIST_POST = 'delete-list.post';
 ```
@@ -118,6 +122,18 @@ It is also possible to add custom event listeners to the configuration of a sing
     ),
 ),
 ```
+
+Flush events
+------------
+
+In version 1.0.2 some _POST events were triggered differently. 
+As the result of this change, `EVENT_CREATE_POST`, `EVENT_UPDATE_POST`,
+`EVENT_PATCH_POST` and `EVENT_DELETE_POST` events are fired _before_
+Doctrine's flush(). Now _FLUSH events are introduced to
+remedy this problem and allow listeners triggered after flush().
+
+It is worth to noting that _FLUSH event listeners could return an `ApiProblem`
+which will produce API error, but the entity will be already be persisted in the DB.
 
 Querying Single Entities
 ========================

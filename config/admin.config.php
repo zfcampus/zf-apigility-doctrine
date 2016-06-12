@@ -63,7 +63,7 @@ return array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService'      => 'HalJson',
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
         ),
-        'accept-whitelist' => array(
+        'accept_whitelist' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
                 'application/json',
                 'application/*+json',
@@ -81,7 +81,7 @@ return array(
                 'application/*+json',
             ),
         ),
-        'content-type-whitelist' => array(
+        'content_type_whitelist' => array(
             'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
                 'application/json',
                 'application/*+json',
