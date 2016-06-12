@@ -38,7 +38,6 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         if (array_key_exists($requestedName, $this->lookupCache)) {
-
             return $this->lookupCache[$requestedName];
         }
 
