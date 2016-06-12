@@ -13,8 +13,8 @@ use Zend\InputFilter\CollectionInputFilter;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayObject;
-use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorAwareInterface;
+use Zend\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 
