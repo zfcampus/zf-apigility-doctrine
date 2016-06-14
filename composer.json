@@ -22,8 +22,8 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-mongo-odm-module": "^0.9",
-        "doctrine/doctrine-orm-module": "^0.9",
+        "doctrine/doctrine-mongo-odm-module": "~0.9 || ^1.0",
+        "doctrine/doctrine-orm-module": "^0.10 || ^1.0",
         "doctrine/mongodb-odm": "^1",
         "phpunit/phpunit": "^4.7",
         "squizlabs/php_codesniffer": "^2.3.0",
@@ -31,14 +31,15 @@
         "zendframework/zend-log": "~2.4",
         "zendframework/zend-serializer": "~2.4",
         "zendframework/zend-test": "~2.4",
-        "zendframework/zend-stdlib": "2.4.9",
+        "zendframework/zend-stdlib": "~2.4 || ^3.0",
         "zfcampus/zf-apigility-admin": "^1.1",
         "zendframework/zend-i18n": "~2.4"
     },
     "require": {
-        "php": ">=5.4",
-        "phpro/zf-doctrine-hydration-module": "^0.1.5",
-        "zfcampus/zf-apigility": "^1.0"
+        "php": ">=5.4 || ^7.0",
+        "phpro/zf-doctrine-hydration-module": "^2.0",
+        "api-skeletons/zf-doctrine-module-zend-hydrator": "^1.0",
+        "zfcampus/zf-apigility": "^1.1"
     },
     "suggest": {
         "doctrine/doctrine-orm-module": "For ORM mapping",
