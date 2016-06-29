@@ -11,6 +11,7 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource;
 
 class Module implements
     ConfigProviderInterface,
@@ -53,12 +54,16 @@ class Module implements
     public function getServiceConfig()
     {
         return array(
-            'invokables' => array(
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' =>
-                    'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
-            ),
             'factories' => array(
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel' => function ($services) {
+                // This resource pulls the object manager dynamically
+                // so it needs access to the service manager
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource' => function($services) {
+                    $instance = new DoctrineMetadataServiceResource();
+                    $instance->setServiceManager($services);
+
+                    return $instance;
+                },
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel' => function($services) {
                     if (!$services->has('Config')) {
                         // @codeCoverageIgnoreStart
                         throw new ServiceNotCreatedException(
@@ -71,7 +76,7 @@ class Module implements
 
                     return new Model\DoctrineAutodiscoveryModel($config);
                 },
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function($services) {
                     if (!$services->has('ZF\Apigility\Admin\Model\ModulePathSpec')
                         || !$services->has('ZF\Configuration\ConfigResourceFactory')
                         || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
@@ -96,14 +101,17 @@ class Module implements
                         __NAMESPACE__ . '\Model\DoctrineRestServiceModel::onFetch'
                     );
 
-                    return new Model\DoctrineRestServiceModelFactory(
+                    $instance = new Model\DoctrineRestServiceModelFactory(
                         $modulePathSpec,
                         $configFactory,
                         $sharedEvents,
                         $moduleModel
                     );
+                    $instance->setServiceManager($services);
+
+                    return $instance;
                 },
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function ($services) {
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource' => function($services) {
                     if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory')) {
                         // @codeCoverageIgnoreStart
                         throw new ServiceNotCreatedException(
@@ -126,7 +134,7 @@ class Module implements
                     return new Model\DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
                 },
 
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function ($services) {
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory' => function($services) {
                     if (!$services->has('ZF\Apigility\Admin\Model\ModulePathSpec')
                         || !$services->has('ZF\Configuration\ConfigResourceFactory')
                         || !$services->has('ZF\Apigility\Admin\Model\ModuleModel')
@@ -152,7 +160,7 @@ class Module implements
                     );
                 },
 
-                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function ($services) {
+                'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource' => function($services) {
                     // @codeCoverageIgnoreStart
                     if (!$services->has('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory')) {
                         throw new ServiceNotCreatedException(
