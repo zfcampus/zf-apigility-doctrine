@@ -20,8 +20,8 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Stdlib\ArrayUtils;
-use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorAwareInterface;
+use Zend\Hydrator\HydratorInterface;
 use Zend\EventManager\SharedEventManager;
 use Traversable;
 use ReflectionClass;
@@ -266,34 +266,6 @@ class DoctrineResource extends AbstractResourceListener implements
     public function getMultiKeyDelimiter()
     {
         return $this->multiKeyDelimiter;
-    }
-
-    /**
-     * For /multi/1/keyed/2/routes/3 the route parameter
-     * names may include an id suffix (e.g. id, _id, Id)
-     * and this will be striped to create criteria
-     *
-     * Example
-     * $objectManager->getRepository(...)->findOneBy(
-     *   'multi' => 1,
-     *   'keyed' => 2,
-     *   'routes' => 3
-     * );
-     *
-     * @var string
-     */
-    protected $stripRouteParameterSuffix = '_id';
-
-    public function setStripRouteParameterSuffix($value)
-    {
-        $this->stripRouteParameterSuffix = $value;
-
-        return $this;
-    }
-
-    public function getStripRouteParameterSuffix()
-    {
-        return $this->stripRouteParameterSuffix;
     }
 
     /**
@@ -744,13 +716,6 @@ class DoctrineResource extends AbstractResourceListener implements
          * Append query selection parameters by route match.
          */
         foreach ($allowedRouteParams as $routeMatchParam => $value) {
-            if ($this->getStripRouteParameterSuffix() === substr(
-                $routeMatchParam,
-                -1 * strlen($this->getStripRouteParameterSuffix())
-            )) {
-                $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
-            }
-
             if (in_array($routeMatchParam, $associationMappings) || in_array($routeMatchParam, $fieldNames)) {
                 $criteria[$routeMatchParam] = $value;
             }

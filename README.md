@@ -1,7 +1,8 @@
-Apigility with Doctrine
+Doctrine in Apigility
 ==============================
 
 [![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
+[![Total Downloads](https://poser.pugx.org/zfcampus/zf-apigility-doctrine/downloads)](https://packagist.org/packages/zfcampus/zf-apigility-doctrine)
 
 This module provides the classes for integrating Doctrine with Apigility.
 
@@ -40,7 +41,7 @@ for the object manager.
 
 `/apigility/api/module[/:name]/doctrine[/:controller_service_name]`
 
-This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]` 
+This is a Doctrine resource route _like_ Apigility Rest `/apigility/api/module[/:name]/rest[/:controller_service_name]`
 To create a resource do not include `[/:controller_service_name]`
 
 POST Parameters
@@ -135,23 +136,12 @@ setting the DoctrineResource::setMultiKeyDelimiter($value)
 Complex queries through route parameters
 ----------------------------------------
 
-You may specify multiple route parameters and as long as the route
-matches then the route parameter names will be matched to the entity.
+NO LONGER SUPPORTED.  As of version 2.0.4 this functionality has been removed from
+this module.  The intended use of this module is a 1:1 mapping of entities to resources
+and using subroutes is not in the spirit of this intention.  It is STRONGLY recommended
+you use [zfcampus/zf-doctrine-querybuilder](https://github.com/zfcampus/zf-doctrine-querybuilder)
+for complex query-ability.
 
-For instance, a route of ```/api/artist/:artist_id/album/:album_id``` mapped to the *Album*
-entity will filter the *Album* for field names.  So, given an album with id, name, and artist
-fields the album_id matches to the resoruce configuration and will be queried by key
-and the artist is a field on album and will be queried by criteria so the final query
-would be
-
-```php
-$objectManager->getRepository('Album')->findOneBy(
-    'id' => :album_id,
-    'artist' => :artist_id
-);
-```
-
-The album(_id) is not a field on the *Album* entity and will be ignored.
 
 
 Query Providers
@@ -197,7 +187,7 @@ When the query provider is registered attach it to the doctrine-connected resour
 Query Create Filters
 ==============
 
-In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to *Query Providers* in their implementation.  
+In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to *Query Providers* in their implementation.
 
 Create filters take the data as a parameter and return the data, modified or filtered.
 
