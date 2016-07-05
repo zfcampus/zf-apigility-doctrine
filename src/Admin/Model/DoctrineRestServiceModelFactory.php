@@ -9,9 +9,8 @@ namespace ZF\Apigility\Doctrine\Admin\Model;
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
 use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-class DoctrineRestServiceModelFactory extends RpcServiceModelFactory implements ServiceManagerAwareInterface
+class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
 {
     const TYPE_DEFAULT = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
 

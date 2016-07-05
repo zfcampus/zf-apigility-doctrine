@@ -22,10 +22,10 @@ use ZF\Apigility\Admin\Model\ModulePathSpec;
 use ZF\Rest\Exception\CreationException;
 use Zf\Apigility\Admin\Model\ModuleEntity;
 use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use ZF\ApiProblem\ApiProblem;
 
-class DoctrineRestServiceModel implements EventManagerAwareInterface, ServiceManagerAwareInterface
+class DoctrineRestServiceModel implements
+    EventManagerAwareInterface
 {
     /**
      * @var ConfigResource
