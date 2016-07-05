@@ -73,8 +73,9 @@ class Module implements
                         // @codeCoverageIgnoreEnd
                     }
                     $config = $services->get('Config');
-
-                    return new Model\DoctrineAutodiscoveryModel($config);
+                    $model= new Model\DoctrineAutodiscoveryModel($config);
+                    $model->setServiceLocator($services);
+                    return $model;
                 },
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModelFactory' => function ($services) {
                     if (!$services->has('ZF\Apigility\Admin\Model\ModulePathSpec')
