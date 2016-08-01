@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
+
 // Because of the code-generating of Apigility this script
 // is used to setup the tests.  Use ~/test/bin/reset-tests
 // to reset the output of this test if the unit tests
@@ -51,22 +56,20 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
     public function testCreate()
     {
-        $this->getRequest()->getHeaders()->addHeaders(
-            array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
-            )
-        );
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
         $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
-        ));
+        ]);
 
         // Test create() with listener that returns ApiProblem
         $this->reset();
@@ -82,10 +85,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
             }
         );
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
-        ));
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setContent('{"name": "ArtistEleven","createdAt": "2011-12-18 13:17:17"}');
         $this->dispatch('/test/meta');
@@ -107,21 +110,19 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $dm->persist($meta);
         $dm->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(
-            array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
-            )
-        );
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
         $this->dispatch('/test/meta/' . $meta->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals('ArtistTwo', $body['name']);
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_FETCH_PRE,
             DoctrineResourceEvent::EVENT_FETCH_POST,
-        ));
+        ]);
 
         // Test fetch() with listener that returns ApiProblem
         // Listener will not run because ApiProblem of 404 returns first
@@ -161,21 +162,19 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $dm->persist($meta);
         $dm->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(
-            array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
-            )
-        );
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_GET);
         $this->getRequest()->setContent(null);
         $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
         $this->assertEquals(200, $this->getResponseStatusCode());
         $this->assertEquals(2, count($body['_embedded']['meta']));
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
-        ));
+        ]);
 
         // Test fetchAll() with listener that returns ApiProblem
         $this->reset();
@@ -211,10 +210,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $em->persist($artist);
         $em->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
-        ));
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_PATCH);
         $this->getRequest()->setContent('{"name":"ArtistOnePatchEdit"}');
         $this->dispatch('/test/artist/' . $artist->getId());
@@ -223,10 +222,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistOnePatchEdit', $foundEntity->getName());
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_PATCH_PRE,
             DoctrineResourceEvent::EVENT_PATCH_POST,
-        ));
+        ]);
     }
 
     public function testPut()
@@ -240,10 +239,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $em->persist($artist);
         $em->flush();
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
-        ));
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_PUT);
         $this->getRequest()->setContent('{"name": "ArtistSevenPutEdit","createdAt": "2012-12-18 13:17:17"}');
         $this->dispatch('/test/artist/' . $artist->getId());
@@ -252,10 +251,10 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
         $this->assertEquals('ArtistSevenPutEdit', $foundEntity->getName());
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
             DoctrineResourceEvent::EVENT_UPDATE_POST,
-        ));
+        ]);
     }
 
     public function testDelete()
@@ -271,18 +270,18 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $id = $artist->getId();
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
-        ));
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
         $this->dispatch('/test/artist/' . $artist->getId());
         $this->assertEquals(204, $this->getResponseStatusCode());
 
         $this->assertEmpty($em->getRepository('Db\Entity\Artist')->find($id));
-        $this->validateTriggeredEvents(array(
+        $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_DELETE_PRE,
             DoctrineResourceEvent::EVENT_DELETE_POST,
-        ));
+        ]);
 
         // Test DELETE: entity not found
 
@@ -291,13 +290,12 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
 
         $id = -1;
 
-        $this->getRequest()->getHeaders()->addHeaders(array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
-        ));
+        ]);
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
         $this->dispatch('/test/artist/' . $artist->getId());
         $this->assertEquals(404, $this->getResponseStatusCode());
-
     }
 
     */

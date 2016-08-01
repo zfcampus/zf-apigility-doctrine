@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Server;
@@ -71,6 +71,6 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface, De
      */
     public function getModuleDependencies()
     {
-        return array('Phpro\DoctrineHydrationModule');
+        return ['Phpro\DoctrineHydrationModule'];
     }
 }

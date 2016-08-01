@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -20,7 +20,7 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
      */
     public function fetchFields($module, $version, $adapter_name)
     {
-        $entities = array();
+        $entities = [];
 
         /**
          * @var \Doctrine\ORM\EntityManager $em
@@ -40,22 +40,22 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
             if ($this->moduleHasService($module, $version, $service)) {
                 continue;
             }
-            $entity = array(
+            $entity = [
                 'entity_class' => $classMetadata->getName(),
                 'service_name' => $service,
-                'fields' => array(),
-            );
+                'fields' => [],
+            ];
 
             foreach ($classMetadata->fieldMappings as $mapping) {
                 if ($classMetadata->isIdentifier($mapping['fieldName'])) {
                     continue;
                 }
-                $field = array(
+                $field = [
                     'name' => $mapping['fieldName'],
-                    'required' => (!isset($mapping['nullable']) || $mapping['nullable'] !== true),
-                    'filters' => array(),
-                    'validators' => array(),
-                );
+                    'required' => (! isset($mapping['nullable']) || $mapping['nullable'] !== true),
+                    'filters' => [],
+                    'validators' => [],
+                ];
                 switch ($mapping['type']) {
                     case 'string':
                         $field['filters'] = $this->filters['text'];

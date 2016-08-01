@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Query\CreateFilter\Service;
 
@@ -8,7 +12,7 @@ use Zend\ServiceManager\Exception;
 
 class QueryCreateFilterManager extends AbstractPluginManager
 {
-    protected $invokableClasses = array();
+    protected $invokableClasses = [];
 
     /**
      * @param mixed $plugin

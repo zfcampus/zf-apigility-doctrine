@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Paginator\Adapter;
 
@@ -15,7 +19,7 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
     /**
      * @var array
     */
-    public $cache = array();
+    public $cache = [];
 
     /**
      * @param $offset
@@ -35,10 +39,10 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
         $this->getQuery()->setMaxResults($itemCountPerPage);
 
         if (! array_key_exists($offset, $this->cache)) {
-            $this->cache[$offset] = array();
+            $this->cache[$offset] = [];
         }
 
-        $this->cache[$offset][$itemCountPerPage] =  $this->getQuery()->getResult();
+        $this->cache[$offset][$itemCountPerPage] = $this->getQuery()->getResult();
 
         return $this->cache[$offset][$itemCountPerPage];
     }

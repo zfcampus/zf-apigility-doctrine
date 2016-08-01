@@ -1,18 +1,14 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
-use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use Doctrine\ORM\Tools\SchemaTool;
-
-use Zend\Http\Request;
-use Zend\Mvc\Router\RouteMatch;
 use Zend\Filter\FilterChain;
+use Zend\Http\Request;
 
 class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
 {
@@ -37,11 +33,9 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
-        $this->getRequest()->getHeaders()->addHeaders(
-            array(
+        $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
-            )
-        );
+        ]);
 
         $this->dispatch(
             '/apigility/api/doctrine/doctrine.entitymanager.orm_default/metadata/Db%5CEntity%5CArtist',
@@ -65,14 +59,14 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
         $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         // Create DB
-        $resourceDefinition = array(
-            "objectManager"=> "doctrine.entitymanager.orm_default",
+        $resourceDefinition = [
+            "objectManager" => "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
             "entityClass" => "Db\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/db-test/artist",
-        );
+        ];
 
         $this->resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
         $this->resource->setModuleName('DbApi');
@@ -99,26 +93,25 @@ class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpCo
                         'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource'
                     );
                     $rpcServiceResource->setModuleName('DbApi');
-                    $rpcServiceResource->create(
-                        array(
+                    $rpcServiceResource->create([
                         'service_name' => 'Artist' . $mapping['fieldName'],
                         'route' => '/db-test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
-                        'http_methods' => array(
-                        'GET', 'PUT', 'POST'
-                        ),
-                        'options' => array(
-                        'target_entity' => $mapping['targetEntity'],
-                        'source_entity' => $mapping['sourceEntity'],
-                        'field_name' => $mapping['fieldName'],
-                        ),
+                        'http_methods' => [
+                            'GET',
+                            'PUT',
+                            'POST',
+                        ],
+                        'options' => [
+                            'target_entity' => $mapping['targetEntity'],
+                            'source_entity' => $mapping['sourceEntity'],
+                            'field_name' => $mapping['fieldName'],
+                        ],
                         'selector' => 'custom selector',
-                        )
-                    );
+                    ]);
                     break;
                 default:
                     break;
             }
         }
-
     }
 }

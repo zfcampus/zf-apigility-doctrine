@@ -8,13 +8,13 @@ use Zend\EventManager\EventManagerInterface;
 
 class ArtistAggregateListener implements ListenerAggregateInterface
 {
-    protected $listeners = array();
+    protected $listeners = [];
 
     public function attach(EventManagerInterface $events)
     {
         $this->listeners[] = $events->attach(
             DoctrineResourceEvent::EVENT_CREATE_POST,
-            array($this, 'createPost')
+            [$this, 'createPost']
         );
     }
 

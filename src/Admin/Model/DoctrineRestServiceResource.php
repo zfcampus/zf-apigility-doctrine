@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -64,7 +64,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         }
 
         $moduleName = $this->getEvent()->getRouteParam('name', false);
-        if (!$moduleName) {
+        if (! $moduleName) {
             // @codeCoverageIgnoreStart
             throw new RuntimeException(
                 sprintf(
@@ -136,7 +136,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     public function fetch($id)
     {
         $service = $this->getModel()->fetch($id);
-        if (!$service instanceof DoctrineRestServiceEntity) {
+        if (! $service instanceof DoctrineRestServiceEntity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'REST service not found');
         }
@@ -150,7 +150,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
      * @param  array $params
      * @return DoctrineRestServiceEntity[]
      */
-    public function fetchAll($params = array())
+    public function fetchAll($params = [])
     {
         $version = $this->getEvent()->getQueryParam('version', null);
 
@@ -172,7 +172,7 @@ class DoctrineRestServiceResource extends AbstractResourceListener
             $data = (array) $data;
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return new ApiProblem(400, 'Invalid data provided for update');
         }
 

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
@@ -70,7 +74,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function setEventManager(EventManagerInterface $events)
     {
-        $identifiers = array(__CLASS__, get_class($this));
+        $identifiers = [__CLASS__, get_class($this)];
         if (isset($this->eventIdentifier)) {
             if ((is_string($this->eventIdentifier))
                 || (is_array($this->eventIdentifier))
@@ -99,7 +103,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function getEventManager()
     {
-        if (!$this->events instanceof EventManagerInterface) {
+        if (! $this->events instanceof EventManagerInterface) {
             $this->setEventManager(new EventManager());
         }
         return $this->events;
@@ -133,7 +137,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * @var array
      */
-    protected $eventIdentifier = array('ZF\Apigility\Doctrine\DoctrineResource');
+    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
 
     /**
      * @var array|QueryProviderInterface
@@ -148,12 +152,12 @@ class DoctrineResource extends AbstractResourceListener implements
     public function setQueryProviders($queryProviders)
     {
         // @codeCoverageIgnoreStart
-        if (!is_array($queryProviders) && !$queryProviders instanceof Traversable) {
+        if (! is_array($queryProviders) && ! $queryProviders instanceof Traversable) {
             throw new InvalidArgumentException('queryProviders must be array or Traversable object');
         }
 
         foreach ($queryProviders as $qp) {
-            if (!$qp instanceof QueryProviderInterface) {
+            if (! $qp instanceof QueryProviderInterface) {
                 throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
             }
         }
@@ -290,7 +294,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function getHydrator()
     {
-        if (!$this->hydrator) {
+        if (! $this->hydrator) {
             // @codeCoverageIgnoreStart
             // FIXME: find a way to test this line from a created API.  Shouldn't all created API's have a hydrator?
             $this->hydrator = new Hydrator\DoctrineObject($this->getObjectManager(), $this->getEntityClass());
@@ -318,7 +322,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
-        } elseif (!$results->isEmpty() && $results->last() !== null) {
+        } elseif (! $results->isEmpty() && $results->last() !== null) {
             // TODO Change to a more logical/secure way to see if data was acted and and we have the expected response
             $preEventData = $results->last();
         } else {
@@ -389,7 +393,7 @@ class DoctrineResource extends AbstractResourceListener implements
             return $results->last();
         }
 
-        if (!$this->getObjectManager() instanceof EntityManagerInterface) {
+        if (! $this->getObjectManager() instanceof EntityManagerInterface) {
             throw new InvalidArgumentException('Invalid Object Manager, must implement EntityManagerInterface');
         }
 
@@ -496,7 +500,7 @@ class DoctrineResource extends AbstractResourceListener implements
      * @param  array $data
      * @return ApiProblem|mixed
      */
-    public function fetchAll($data = array())
+    public function fetchAll($data = [])
     {
         // Build query
         $queryProvider = $this->getQueryProvider('fetch_all');
@@ -545,9 +549,9 @@ class DoctrineResource extends AbstractResourceListener implements
                 $collection->setCurrentPageNumber($halCollection->getPage());
 
                 $halCollection->setCollectionRouteOptions(
-                    array(
+                    [
                         'query' => $e->getTarget()->getRequest()->getQuery()->toArray()
-                    )
+                    ]
                 );
             }
         );
@@ -622,7 +626,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
-        } elseif (!$results->isEmpty() && $results->last() !== null) {
+        } elseif (! $results->isEmpty() && $results->last() !== null) {
             // TODO Change to a more logical/secure way to see if data was acted on and we have the expected response
             $preEventData = $results->last();
         } else {
@@ -679,7 +683,7 @@ class DoctrineResource extends AbstractResourceListener implements
         // Match identiy identifier name(s) with id(s)
         $ids = explode($this->getMultiKeyDelimiter(), $id);
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
-        $criteria = array();
+        $criteria = [];
 
         // @codeCoverageIgnoreStart
         if (count($ids) !== count($keys)) {
@@ -748,7 +752,7 @@ class DoctrineResource extends AbstractResourceListener implements
             $entity = null;
         }
 
-        if (!$entity) {
+        if (! $entity) {
             $entity = new ApiProblem(404, 'Entity was not found');
         }
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -177,7 +177,7 @@ class DoctrineMetadataServiceEntity implements ArraySerializableInterface
 
     public function getArrayCopy()
     {
-        return array(
+        return [
             'name' => $this->name,
             'namespace' => $this->namespace,
             'rootEntityName' => $this->rootEntityName,
@@ -215,6 +215,6 @@ class DoctrineMetadataServiceEntity implements ArraySerializableInterface
             '*namingStrategy' => $this->namingStrategy,
             'reflFields' => $this->reflFields,
             'Doctrine\ORM\Mapping\ClassMetadataInfo_prototype' => $this->ClassMetadataInfo_prototype,
-        );
+        ];
     }
 }

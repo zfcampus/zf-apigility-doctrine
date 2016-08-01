@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -84,7 +84,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
 
         // @codeCoverageIgnoreStart
         $moduleName = $this->getEvent()->getRouteParam('name', false);
-        if (!$moduleName) {
+        if (! $moduleName) {
             throw new RuntimeException(
                 sprintf(
                     '%s cannot operate correctly without a "name" segment in the route matches',
@@ -126,13 +126,13 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             $data = (array) $data;
         }
         // @codeCoverageIgnoreEnd
-        $creationData = array(
-            'http_methods' => array('GET'),
+        $creationData = [
+            'http_methods' => ['GET'],
             'selector'     => null,
-        );
+        ];
 
-        if (!isset($data['service_name'])
-            || !is_string($data['service_name'])
+        if (! isset($data['service_name'])
+            || ! is_string($data['service_name'])
             || empty($data['service_name'])
         ) {
             // @codeCoverageIgnoreStart
@@ -148,8 +148,8 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         }
         // @codeCoverageIgnoreEnd
 
-        if (!isset($data['route'])
-            || !is_string($data['route'])
+        if (! isset($data['route'])
+            || ! is_string($data['route'])
             || empty($data['route'])
         ) {
             // @codeCoverageIgnoreStart
@@ -160,14 +160,14 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
 
         if (isset($data['http_methods'])
             && (is_string($data['http_methods']) || is_array($data['http_methods']))
-            && !empty($data['http_methods'])
+            && ! empty($data['http_methods'])
         ) {
             $creationData['http_methods'] = $data['http_methods'];
         }
 
         if (isset($data['selector'])
             && is_string($data['selector'])
-            && !empty($data['selector'])
+            && ! empty($data['selector'])
         ) {
             $creationData['selector'] = $data['selector'];
         }
@@ -200,7 +200,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     {
         $service = $this->getModel()->fetch($id);
 
-        if (!$service instanceof DoctrineRpcServiceEntity) {
+        if (! $service instanceof DoctrineRpcServiceEntity) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(404, 'RPC service not found');
             // @codeCoverageIgnoreEnd
@@ -218,7 +218,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
      * @param  array $params
      * @return DoctrineRpcServiceEntity[]
      */
-    public function fetchAll($params = array())
+    public function fetchAll($params = [])
     {
         $version  = $this->getEvent()->getQueryParam('version', null);
         $services = $this->getModel()->fetchAll($version);
@@ -246,7 +246,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
             $data = (array) $data;
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return new ApiProblem(400, 'Invalid data provided for update');
         }
 
@@ -314,31 +314,31 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     protected function injectInputFilters(DoctrineRpcServiceEntity $service)
     {
         $inputFilters = $this->inputFilterModel->fetch($this->moduleName, $service->controllerServiceName);
-        if (!$inputFilters instanceof InputFilterCollection
-            || !count($inputFilters)
+        if (! $inputFilters instanceof InputFilterCollection
+            || ! count($inputFilters)
         ) {
             return;
         }
 
         // @codeCoverageIgnoreStart
-        $collection = array();
+        $collection = [];
 
         foreach ($inputFilters as $inputFilter) {
             $resource = new HalResource($inputFilter, $inputFilter['input_filter_name']);
             $links    = $resource->getLinks();
             $links->add(
                 Link::factory(
-                    array(
+                    [
                         'rel' => 'self',
-                        'route' => array(
+                        'route' => [
                             'name' => 'zf-apigility-admin/api/module/rpc-service/rpc_input_filter',
-                            'params' => array(
+                            'params' => [
                                 'name' => $this->moduleName,
                                 'controller_service_name' => $service->controllerServiceName,
                                 'input_filter_name' => $inputFilter['input_filter_name'],
-                            ),
-                        ),
-                    )
+                            ],
+                        ],
+                    ]
                 )
             );
             $collection[] = $resource;
@@ -348,16 +348,16 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
         $collection->setCollectionName('input_filter');
         $collection->setCollectionRoute('zf-apigility-admin/module/rpc-service/inputfilter');
         $collection->setCollectionRouteParams(
-            array(
+            [
             'name' => $this->moduleName,
             'controller_service_name' => $service->controllerServiceName,
-            )
+            ]
         );
 
         $service->exchangeArray(
-            array(
+            [
             'input_filters' => $collection,
-            )
+            ]
         );
     }
         // @codeCoverageIgnoreEnd
@@ -370,7 +370,7 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
     protected function injectControllerClass(DoctrineRpcServiceEntity $service)
     {
         $controllerServiceName = $service->controllerServiceName;
-        if (!$this->controllerManager->has($controllerServiceName)) {
+        if (! $this->controllerManager->has($controllerServiceName)) {
             // @codeCoverageIgnoreStart
             return;
             // @codeCoverageIgnoreEnd
@@ -378,9 +378,9 @@ class DoctrineRpcServiceResource extends AbstractResourceListener
 
         $controller = $this->controllerManager->get($controllerServiceName);
         $service->exchangeArray(
-            array(
+            [
             'controller_class' => get_class($controller),
-            )
+            ]
         );
     }
 }

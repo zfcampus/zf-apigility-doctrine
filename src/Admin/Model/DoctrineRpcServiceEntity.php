@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -17,17 +17,17 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
     /**
      * @var array
      */
-    protected $acceptWhitelist = array(
+    protected $acceptWhitelist = [
         'application/json',
         'application/*+json',
-    );
+    ];
 
     /**
      * @var array
      */
-    protected $contentTypeWhitelist = array(
+    protected $contentTypeWhitelist = [
         'application/json',
-    );
+    ];
 
     /**
      * @var string
@@ -42,7 +42,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
     /**
      * @var array
      */
-    protected $httpMethods = array('GET');
+    protected $httpMethods = ['GET'];
 
     /**
      * @var array
@@ -66,7 +66,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
 
     public function __get($name)
     {
-        if (!isset($this->{$name})) {
+        if (! isset($this->{$name})) {
             throw new \OutOfRangeException(
                 sprintf(
                     '%s does not contain a property by the name of "%s"',
@@ -93,7 +93,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
 
             switch ($key) {
                 case 'acceptwhitelist':
-                    if (!is_array($value)) {
+                    if (! is_array($value)) {
                         throw new InvalidArgumentException(
                             sprintf(
                                 '%s expects an array value for "%s"; received "%s"',
@@ -105,7 +105,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
                     $this->acceptWhitelist = $value;
                     break;
                 case 'contenttypewhitelist':
-                    if (!is_array($value)) {
+                    if (! is_array($value)) {
                         throw new InvalidArgumentException(
                             sprintf(
                                 '%s expects an array value for "%s"; received "%s"',
@@ -123,7 +123,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
                     $this->controllerServiceName = $value;
                     break;
                 case 'httpmethods':
-                    if (!is_array($value)) {
+                    if (! is_array($value)) {
                         throw new InvalidArgumentException(
                             sprintf(
                                 '%s expects an array value for "%s"; received "%s"',
@@ -156,7 +156,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
         }
 
         if (null === $this->controllerServiceName
-            || !is_string($this->controllerServiceName)
+            || ! is_string($this->controllerServiceName)
             || empty($this->controllerServiceName)
         ) {
             throw new RuntimeException(
@@ -173,7 +173,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
      */
     public function getArrayCopy()
     {
-        $array = array(
+        $array = [
             'accept_whitelist'        => $this->acceptWhitelist,
             'content_type_whitelist'  => $this->contentTypeWhitelist,
             'controller_service_name' => $this->controllerServiceName,
@@ -181,7 +181,7 @@ class DoctrineRpcServiceEntity extends RpcServiceEntity implements ArraySerializ
             'route_match'             => $this->routeMatch,
             'route_name'              => $this->routeName,
             'selector'                => $this->selector,
-        );
+        ];
         if (null !== $this->inputFilters) {
             $array['input_filters'] = $this->inputFilters;
         }

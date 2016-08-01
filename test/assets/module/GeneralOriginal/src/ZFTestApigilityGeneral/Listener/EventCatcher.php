@@ -19,19 +19,19 @@ class EventCatcher implements SharedListenerAggregateInterface
     /**
      * @var array
      */
-    protected $listeners = array();
+    protected $listeners = [];
 
     /**
      * @var array
      */
-    protected $caughtEvents = array();
+    protected $caughtEvents = [];
 
     /**
      * {@inheritDoc}
      */
     public function attachShared(SharedEventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(self::EVENT_IDENTIFIER, '*', array($this, 'listen'));
+        $this->listeners[] = $events->attach(self::EVENT_IDENTIFIER, '*', [$this, 'listen']);
     }
 
     /**

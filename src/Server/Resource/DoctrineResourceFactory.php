@@ -1,15 +1,17 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use DoctrineModule\Stdlib\Hydrator;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Hydrator\HydratorInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
 use RuntimeException;
 
 /**
@@ -23,7 +25,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      * Cache of canCreateServiceWithName lookups
      * @var array
      */
-    protected $lookupCache = array();
+    protected $lookupCache = [];
 
     /**
      * Determine if we can create a service with name
@@ -41,7 +43,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             return $this->lookupCache[$requestedName];
         }
 
-        if (!$serviceLocator->has('Config')) {
+        if (! $serviceLocator->has('Config')) {
             // @codeCoverageIgnoreStart
 
             return false;
@@ -51,9 +53,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // Validate object is set
         $config = $serviceLocator->get('Config');
 
-        if (!isset($config['zf-apigility']['doctrine-connected'])
-            || !is_array($config['zf-apigility']['doctrine-connected'])
-            || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])
+        if (! isset($config['zf-apigility']['doctrine-connected'])
+            || ! is_array($config['zf-apigility']['doctrine-connected'])
+            || ! isset($config['zf-apigility']['doctrine-connected'][$requestedName])
         ) {
             $this->lookupCache[$requestedName] = false;
 
@@ -64,7 +66,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $className = isset($config['class']) ? $config['class'] : $requestedName;
         $className = $this->normalizeClassname($className);
         $reflection = new \ReflectionClass($className);
-        if (!$reflection->isSubclassOf('\ZF\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
+        if (! $reflection->isSubclassOf('\ZF\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
             // @codeCoverageIgnoreStart
             throw new ServiceNotFoundException(
                 sprintf(
@@ -78,7 +80,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         // Validate object manager
         $config = $config['zf-apigility']['doctrine-connected'];
-        if (!isset($config[$requestedName]) || !isset($config[$requestedName]['object_manager'])) {
+        if (! isset($config[$requestedName]) || ! isset($config[$requestedName]['object_manager'])) {
             // @codeCoverageIgnoreStart
             throw new ServiceNotFoundException(
                 sprintf(
@@ -203,16 +205,16 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     ) {
 
         // @codeCoverageIgnoreStart
-        if (!isset($doctrineConnectedConfig['hydrator'])) {
+        if (! isset($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
 
-        if (!$serviceLocator->has('HydratorManager')) {
+        if (! $serviceLocator->has('HydratorManager')) {
             return null;
         }
 
         $hydratorManager = $serviceLocator->get('HydratorManager');
-        if (!$hydratorManager->has($doctrineConnectedConfig['hydrator'])) {
+        if (! $hydratorManager->has($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
 
@@ -242,7 +244,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     protected function loadQueryCreateFilter(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
         $createFilterManager = $serviceLocator->get('ZfApigilityDoctrineQueryCreateFilterManager');
-        $filterManagerAlias = (isset($config['query_create_filter'])) ? $config['query_create_filter']: 'default';
+        $filterManagerAlias = (isset($config['query_create_filter'])) ? $config['query_create_filter'] : 'default';
 
         $queryCreateFilter = $createFilterManager->get($filterManagerAlias);
 
@@ -263,7 +265,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     protected function loadQueryProviders(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
     {
-        $queryProviders = array();
+        $queryProviders = [];
         $queryManager = $serviceLocator->get('ZfApigilityDoctrineQueryProviderManager');
 
         // Load default query provider
@@ -304,11 +306,11 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      */
     protected function loadConfiguredListeners(ServiceLocatorInterface $serviceLocator, $config)
     {
-        if (!isset($config['listeners'])) {
-            return array();
+        if (! isset($config['listeners'])) {
+            return [];
         }
 
-        $listeners = array();
+        $listeners = [];
         foreach ($config['listeners'] as $listener) {
             $listeners[] = $serviceLocator->get($listener);
         }

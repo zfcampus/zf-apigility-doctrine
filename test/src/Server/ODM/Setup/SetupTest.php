@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
+
 // Because of the code-generating of Apigility this script
 // is used to setup the tests.  Use ~/test/bin/reset-tests
 // to reset the output of this test if the unit tests
@@ -28,14 +33,14 @@ class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTest
         // Create DB
         $resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
 
-        $metaResourceDefinition = array(
-            "objectManager"=> "doctrine.documentmanager.odm_default",
+        $metaResourceDefinition = [
+            "objectManager" => "doctrine.documentmanager.odm_default",
             "serviceName" => "Meta",
             "entityClass" => "ZFTestApigilityDbMongo\\Document\\Meta",
             "routeIdentifierName" => "meta_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/meta",
-        );
+        ];
 
         $resource->setModuleName('ZFTestApigilityDbMongoApi');
         $metaEntity = $resource->create($metaResourceDefinition);

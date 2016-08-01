@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -45,7 +45,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
     {
         $objectManagerAlias = $this->getEvent()->getRouteParam('object_manager_alias');
 
-        if (!$objectManagerAlias) {
+        if (! $objectManagerAlias) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No objectManager manager specificed in request.');
             // @codeCoverageIgnoreEnd
@@ -69,13 +69,13 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
      * @param  array $params
      * @return RestServiceEntity[]
      */
-    public function fetchAll($params = array())
+    public function fetchAll($params = [])
     {
         if ($this->getEvent()->getRouteParam('object_manager_alias')) {
             $objectManagerClass = $this->getEvent()->getRouteParam('object_manager_alias');
         }
 
-        if (!$objectManagerClass) {
+        if (! $objectManagerClass) {
             // @codeCoverageIgnoreStart
             return new ApiProblem(500, 'No objectManager manager specificed in request.');
             // @codeCoverageIgnoreEnd
@@ -84,7 +84,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        $return = array();
+        $return = [];
         foreach ($metadataFactory->getAllMetadata() as $metadata) {
             $entityClass = $this->getEntityClass();
             $metadataEntity = new $entityClass;

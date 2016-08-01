@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
+
 // Because of the code-generating of Apigility this script
 // is used to setup the tests.  Use ~/test/bin/reset-tests
 // to reset the output of this test if the unit tests
@@ -25,53 +30,53 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
 
         $tool = new SchemaTool($em);
-        $res = $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
+        $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         // Create DB
         $resource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource');
 
-        $artistResourceDefinition = array(
-            "objectManager"=> "doctrine.entitymanager.orm_default",
+        $artistResourceDefinition = [
+            "objectManager" => "doctrine.entitymanager.orm_default",
             "serviceName" => "Artist",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/rest/artist",
-            "collectionHttpMethods" => array(
+            "collectionHttpMethods" => [
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PATCH',
                 3 => 'DELETE',
-            ),
-        );
+            ],
+        ];
 
-        $artistResourceDefinitionWithNonKeyIdentifer = array(
-            "objectManager"=> "doctrine.entitymanager.orm_default",
+        $artistResourceDefinitionWithNonKeyIdentifer = [
+            "objectManager" => "doctrine.entitymanager.orm_default",
             "serviceName" => "ArtistByName",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Artist",
             "routeIdentifierName" => "artist_name",
             "entityIdentifierName" => "name",
             "routeMatch" => "/test/rest/artist-by-name",
-            "collectionHttpMethods" => array(
+            "collectionHttpMethods" => [
                 0 => 'GET',
-            ),
-        );
+            ],
+        ];
 
         // This route is what should be an rpc service, but an user could do
-        $albumResourceDefinition = array(
-            "objectManager"=> "doctrine.entitymanager.orm_default",
+        $albumResourceDefinition = [
+            "objectManager" => "doctrine.entitymanager.orm_default",
             "serviceName" => "Album",
             "entityClass" => "ZFTestApigilityDb\\Entity\\Album",
             "routeIdentifierName" => "album_id",
             "entityIdentifierName" => "id",
             "routeMatch" => "/test/rest[/artist/:artist_id]/album[/:album_id]",
-            "collectionHttpMethods" => array(
+            "collectionHttpMethods" => [
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PATCH',
                 3 => 'DELETE',
-            ),
-        );
+            ],
+        ];
 
         $resource->setModuleName('ZFTestApigilityDbApi');
         $artistEntity = $resource->create($artistResourceDefinition);
@@ -96,21 +101,21 @@ class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpController
         foreach ($entityMetadata->associationMappings as $mapping) {
             switch ($mapping['type']) {
                 case 4:
-                    $rpcServiceResource->create(
-                        array(
+                    $rpcServiceResource->create([
                         'service_name' => 'Artist' . $mapping['fieldName'],
                         'route' => '/test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
-                        'http_methods' => array(
-                            'GET', 'PUT', 'POST'
-                            ),
-                            'options' => array(
+                        'http_methods' => [
+                            'GET',
+                            'PUT',
+                            'POST',
+                        ],
+                        'options' => [
                             'target_entity' => $mapping['targetEntity'],
                             'source_entity' => $mapping['sourceEntity'],
-                            'field_name' => $mapping['fieldName'],
-                            ),
-                            'selector' => 'custom selector',
-                            )
-                    );
+                            'field_name'    => $mapping['fieldName'],
+                        ],
+                        'selector' => 'custom selector',
+                    ]);
                     break;
                 default:
                     break;

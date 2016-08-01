@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Validator;
 
@@ -13,7 +17,7 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     /**
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Create service
@@ -27,12 +31,12 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
             return new ObjectExists(
                 ArrayUtils::merge(
                     $this->options,
-                    array(
+                    [
                     'object_repository' => $validators
                         ->getServiceLocator()
                         ->get('Doctrine\ORM\EntityManager')
                         ->getRepository($this->options['entity_class'])
-                    )
+                    ]
                 )
             );
         }

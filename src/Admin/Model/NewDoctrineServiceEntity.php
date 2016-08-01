@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -30,7 +30,7 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySe
     /**
      * @var array
      */
-    protected $hydratorStrategies = array();
+    protected $hydratorStrategies = [];
 
     /**
      * @var boolean

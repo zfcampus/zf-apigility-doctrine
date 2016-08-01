@@ -39,15 +39,15 @@ class Meta
 
     public function getArrayCopy()
     {
-        return array(
+        return [
             'name' => $this->getName(),
             'createdAt' => $this->getCreatedAt(),
-        );
+        ];
     }
 
     public function exchangeArray($values)
     {
-        $this->setName((isset($values['name'])) ? $values['name']: null);
-        $this->setCreatedAt((isset($values['createdAt'])) ? $values['createdAt']: null);
+        $this->setName((isset($values['name'])) ? $values['name'] : null);
+        $this->setCreatedAt((isset($values['createdAt'])) ? $values['createdAt'] : null);
     }
 }

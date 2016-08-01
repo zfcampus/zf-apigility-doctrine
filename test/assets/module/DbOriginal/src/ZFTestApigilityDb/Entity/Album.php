@@ -73,7 +73,7 @@ class Album
      */
     public function setAlbum($album)
     {
-        if (null !== $album && !$album instanceof Album) {
+        if (null !== $album && ! $album instanceof Album) {
             throw new \InvalidArgumentException('Invalid album argument');
         }
         $this->album = $album;

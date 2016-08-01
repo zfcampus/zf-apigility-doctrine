@@ -1,7 +1,11 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
-return array(
-    'modules' => array(
+return [
+    'modules' => [
         'DoctrineModule',
         'DoctrineORMModule',
         'Phpro\DoctrineHydrationModule',
@@ -19,15 +23,15 @@ return array(
         'ZFTestApigilityGeneral',
         'ZFTestApigilityDb',
         'ZFTestApigilityDbApi',
-    ),
-    'module_listener_options' => array(
-        'config_glob_paths' => array(
+    ],
+    'module_listener_options' => [
+        'config_glob_paths' => [
             __DIR__ . '/testing.config.php',
-        ),
-        'module_paths' => array(
+        ],
+        'module_paths' => [
             'ZFTestApigilityGeneral' => __DIR__ . '/../../assets/module/General',
             'ZFTestApigilityDb' => __DIR__ . '/../assets/module/Db',
             'ZFTestApigilityDbApi' => __DIR__ . '/../assets/module/DbApi',
-        ),
-    ),
-);
+        ],
+    ],
+];

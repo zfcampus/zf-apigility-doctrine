@@ -95,6 +95,5 @@ class Artist
                 $this->album->removeElement($a);
             }
         }
-
     }
 }
