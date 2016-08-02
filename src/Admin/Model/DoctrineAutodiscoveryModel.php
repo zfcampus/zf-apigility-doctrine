@@ -13,19 +13,19 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
     /**
      * Fetch fields for an adapter
      *
-     * @param  string $module
-     * @param  int    $version
-     * @param  string $adapter_name
+     * @param string $module
+     * @param int $version
+     * @param string $adapterName
      * @return array
      */
-    public function fetchFields($module, $version, $adapter_name)
+    public function fetchFields($module, $version, $adapterName)
     {
         $entities = [];
 
         /**
          * @var \Doctrine\ORM\EntityManager $em
          */
-        $em = $this->getServiceLocator()->get($adapter_name);
+        $em = $this->getServiceLocator()->get($adapterName);
 
         /**
          * @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf

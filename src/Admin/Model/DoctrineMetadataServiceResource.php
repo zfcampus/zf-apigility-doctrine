@@ -6,39 +6,47 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
+use Interop\Container\ContainerInterface;
+use ZF\Apigility\Admin\Model\RestServiceEntity;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use Zend\ServiceManager\ServiceManager;
-use Exception;
 
 class DoctrineMetadataServiceResource extends AbstractResourceListener
 {
+    /**
+     * @var ContainerInterface
+     */
     protected $serviceManager;
 
-    public function setServiceManager(ServiceManager $serviceManager)
+    /**
+     * @param ContainerInterface $serviceManager
+     * @return $this
+     */
+    public function setServiceManager(ContainerInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
 
         return $this;
     }
 
+    /**
+     * @return ContainerInterface
+     */
     public function getServiceManager()
     {
         return $this->serviceManager;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function create($data)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 
     /**
      * Fetch REST metadata
      *
-     * @param  string $id
+     * @param string $entityClassName
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($entityClassName)
@@ -46,12 +54,11 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
         $objectManagerAlias = $this->getEvent()->getRouteParam('object_manager_alias');
 
         if (! $objectManagerAlias) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No objectManager manager specificed in request.');
-            // @codeCoverageIgnoreEnd
+            return new ApiProblem(500, 'No objectManager manager specified in request.');
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerAlias);
+        /** @var AbstractClassMetadataFactory $metadataFactory */
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $metadata = $metadataFactory->getMetadataFor($entityClassName);
@@ -66,8 +73,8 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array $params
-     * @return RestServiceEntity[]
+     * @param array $params
+     * @return RestServiceEntity[]|ApiProblem
      */
     public function fetchAll($params = [])
     {
@@ -75,13 +82,12 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
             $objectManagerClass = $this->getEvent()->getRouteParam('object_manager_alias');
         }
 
-        if (! $objectManagerClass) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No objectManager manager specificed in request.');
-            // @codeCoverageIgnoreEnd
+        if (empty($objectManagerClass)) {
+            return new ApiProblem(500, 'No objectManager manager specified in request.');
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
+        /** @var AbstractClassMetadataFactory $metadataFactory */
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $return = [];
@@ -96,19 +102,13 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
         return $return;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function patch($id, $data)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function delete($id)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 }

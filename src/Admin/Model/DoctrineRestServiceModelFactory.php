@@ -6,24 +6,24 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Interop\Container\ContainerInterface;
 use Zend\EventManager\EventManager;
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
-use Zend\ServiceManager\ServiceManager;
 
 class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
 {
-    const TYPE_DEFAULT = 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel';
+    const TYPE_DEFAULT = DoctrineRestServiceModel::class;
 
     /**
-     * @var ServiceManager
+     * @var ContainerInterface
      */
     protected $serviceManager;
 
     /**
      * Get service manager
      *
-     * @return ServiceManager
+     * @return ContainerInterface
      */
     public function getServiceManager()
     {
@@ -33,10 +33,10 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
     /**
      * Set service manager
      *
-     * @param ServiceManager $serviceManager
+     * @param ContainerInterface $serviceManager
      * @return DoctrineRestServiceModelFactory
      */
-    public function setServiceManager(ServiceManager $serviceManager)
+    public function setServiceManager(ContainerInterface $serviceManager)
     {
         $this->serviceManager = $serviceManager;
         return $this;

@@ -7,8 +7,8 @@
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 use Zend\Stdlib\ArraySerializableInterface;
+use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 
 class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySerializableInterface
 {

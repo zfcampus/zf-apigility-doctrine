@@ -11,11 +11,11 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
-use ZF\Configuration\ConfigResource;
-use ZF\Apigility\Admin\Model\ModulePathSpec;
-use ZF\Rest\Exception\PatchException;
-use ZF\Rest\Exception\CreationException;
 use ZF\Apigility\Admin\Model\ModuleEntity;
+use ZF\Apigility\Admin\Model\ModulePathSpec;
+use ZF\Configuration\ConfigResource;
+use ZF\Rest\Exception\CreationException;
+use ZF\Rest\Exception\PatchException;
 
 class DoctrineRpcServiceModel
 {
@@ -60,8 +60,8 @@ class DoctrineRpcServiceModel
     /**
      * Fetch a single RPC service
      *
-     * @todo   get route details?
-     * @param  string $controllerServiceName
+     * @todo get route details?
+     * @param string $controllerServiceName
      * @return DoctrineRpcServiceEntity|false
      */
     public function fetch($controllerServiceName)
@@ -135,10 +135,7 @@ class DoctrineRpcServiceModel
         if (null !== $version) {
             if (! in_array($version, $this->moduleEntity->getVersions())) {
                 throw new Exception\RuntimeException(
-                    sprintf(
-                        'Invalid version "%s" provided',
-                        $version
-                    ),
+                    sprintf('Invalid version "%s" provided', $version),
                     400
                 );
             }
@@ -171,11 +168,11 @@ class DoctrineRpcServiceModel
      *
      * Creates the controller and all configuration, returning the full configuration as a tree.
      *
-     * @todo   Return the controller service name
-     * @param  string      $serviceName
-     * @param  string      $route
-     * @param  array       $httpMethods
-     * @param  null|string $selector
+     * @todo Return the controller service name
+     * @param string $serviceName
+     * @param string $route
+     * @param array $httpMethods
+     * @param null|string $selector
      * @return DoctrineRpcServiceEntity
      */
     public function createService($serviceName, $route, $httpMethods, $selector, $options)
@@ -200,7 +197,7 @@ class DoctrineRpcServiceModel
     /**
      * Delete a service
      *
-     * @param  DoctrineRpcServiceEntity $entity
+     * @param DoctrineRpcServiceEntity $entity
      * @return true
      */
     public function deleteService(DoctrineRpcServiceEntity $entity, $deleteFiles = true)
@@ -234,7 +231,7 @@ class DoctrineRpcServiceModel
     /**
      * Create a controller in the current module named for the given service
      *
-     * @param  string $serviceName
+     * @param string $serviceName
      * @return mixed
      */
     public function createController($serviceName)
@@ -315,7 +312,7 @@ class DoctrineRpcServiceModel
 //            $serviceName
 //        );
 //
-//        if (!file_exists($srcPath)) {
+//        if (! file_exists($srcPath)) {
 //            mkdir($srcPath, 0777, true);
 //        }
 //
@@ -345,7 +342,7 @@ class DoctrineRpcServiceModel
 //        $renderer = new PhpRenderer();
 //        $renderer->setResolver($resolver);
 //
-//        if (!file_put_contents(
+//        if (! file_put_contents(
 //            $classPath,
 //            "<?php\n" . $renderer->render($view)
 //        )) {
@@ -353,12 +350,13 @@ class DoctrineRpcServiceModel
 //        }
 //
 //        $fullClassName = sprintf('%s\\V%s\\Rpc\\%s\\%s', $module, $version, $serviceName, $className);
-//        $this->configResource->patch([
-//            'controllers' => [
-//                'invokables' => [
-//                    $controllerService => $fullClassName,
+//        $this->configResource->patch(
+//            [
+//                'controllers' => [
+//                    'invokables' => [
+//                        $controllerService => $fullClassName,
+//                    ],
 //                ],
-//            ],
 //            ],
 //            true
 //        );
@@ -373,9 +371,9 @@ class DoctrineRpcServiceModel
     /**
      * Create the route configuration
      *
-     * @param  string $route
-     * @param  string $serviceName
-     * @param  string $controllerService
+     * @param string $route
+     * @param string $serviceName
+     * @param string $controllerService
      * @return string The newly created route name
      */
     public function createRoute($route, $serviceName, $controllerService = null)
@@ -433,10 +431,10 @@ class DoctrineRpcServiceModel
     /**
      * Create the zf-rpc configuration for the controller service
      *
-     * @param  string               $controllerService
-     * @param  string               $routeName
-     * @param  array                $httpMethods
-     * @param  null|string|callable $callable
+     * @param string $controllerService
+     * @param string $routeName
+     * @param array $httpMethods
+     * @param null|string|callable $callable
      * @return array
      */
     public function createRpcConfig($controllerService, $routeName, array $httpMethods = ['GET'], $callable = null)
@@ -460,8 +458,8 @@ class DoctrineRpcServiceModel
     /**
      * Create the selector configuration
      *
-     * @param  string $controllerService
-     * @param  string $selector
+     * @param string $controllerService
+     * @param string $selector
      * @return array
      */
     public function createContentNegotiationConfig($controllerService, $selector = null)
@@ -495,8 +493,8 @@ class DoctrineRpcServiceModel
     /**
      * Update the route associated with a controller service
      *
-     * @param  string $controllerService
-     * @param  string $routeMatch
+     * @param string $controllerService
+     * @param string $routeMatch
      * @return true
      */
     public function updateRoute($controllerService, $routeMatch)
@@ -520,8 +518,8 @@ class DoctrineRpcServiceModel
     /**
      * Update the allowed HTTP methods for a given service
      *
-     * @param  string $controllerService
-     * @param  array  $httpMethods
+     * @param string $controllerService
+     * @param array $httpMethods
      * @return true
      */
     public function updateHttpMethods($controllerService, array $httpMethods)
@@ -536,8 +534,8 @@ class DoctrineRpcServiceModel
     /**
      * Update the content-negotiation selector for the given service
      *
-     * @param  string $controllerService
-     * @param  string $selector
+     * @param string $controllerService
+     * @param string $selector
      * @return true
      */
     public function updateSelector($controllerService, $selector)
@@ -552,9 +550,9 @@ class DoctrineRpcServiceModel
     /**
      * Update configuration for a content negotiation whitelist for a named controller service
      *
-     * @param  string $controllerService
-     * @param  string $headerType
-     * @param  array  $whitelist
+     * @param string $controllerService
+     * @param string $headerType
+     * @param array $whitelist
      * @return true
      */
     public function updateContentNegotiationWhitelist($controllerService, $headerType, array $whitelist)
@@ -632,7 +630,7 @@ class DoctrineRpcServiceModel
     /**
      * Normalize a service or module name to lowercase, dash-separated
      *
-     * @param  string $string
+     * @param string $string
      * @return string
      */
     protected function normalize($string)
@@ -663,8 +661,8 @@ class DoctrineRpcServiceModel
     /**
      * Retrieve the URL match for the given route name
      *
-     * @param  string $routeName
-     * @param  array  $config
+     * @param string $routeName
+     * @param array $config
      * @return false|string
      */
     protected function getRouteMatchStringFromModuleConfig($routeName, array $config)

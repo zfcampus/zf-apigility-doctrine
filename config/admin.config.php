@@ -54,6 +54,17 @@ return [
         ],
     ],
 
+    'service_manager' => [
+        'factories' => [
+            Model\DoctrineAutodiscoveryModel::class      => Model\DoctrineAutodiscoveryModelFactory::class,
+            Model\DoctrineMetadataServiceResource::class => Model\DoctrineMetadataServiceResourceFactory::class,
+            Model\DoctrineRestServiceModelFactory::class => Model\DoctrineRestServiceModelFactoryFactory::class,
+            Model\DoctrineRestServiceResource::class     => Model\DoctrineRestServiceResourceFactory::class,
+            Model\DoctrineRpcServiceModelFactory::class  => Model\DoctrineRpcServiceModelFactoryFactory::class,
+            Model\DoctrineRpcServiceResource::class      => Model\DoctrineRpcServiceResourceFactory::class,
+        ],
+    ],
+
     'controllers' => [
         'factories' => [
             Controller\DoctrineAutodiscovery::class => Controller\DoctrineAutodiscoveryControllerFactory::class,

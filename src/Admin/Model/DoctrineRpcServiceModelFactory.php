@@ -7,9 +7,9 @@
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Zend\EventManager\SharedEventManagerInterface;
-use ZF\Configuration\ResourceFactory as ConfigResourceFactory;
-use ZF\Apigility\Admin\Model\ModulePathSpec;
 use ZF\Apigility\Admin\Model\ModuleModel;
+use ZF\Apigility\Admin\Model\ModulePathSpec;
+use ZF\Configuration\ResourceFactory as ConfigResourceFactory;
 
 class DoctrineRpcServiceModelFactory
 {
@@ -41,10 +41,10 @@ class DoctrineRpcServiceModelFactory
     protected $sharedEventManager;
 
     /**
-     * @param ModulePathSpec              $modules
-     * @param ConfigResourceFactory       $configFactory
+     * @param ModulePathSpec $modules
+     * @param ConfigResourceFactory $configFactory
      * @param SharedEventManagerInterface $sharedEvents
-     * @param ModuleModel                 $moduleModel
+     * @param ModuleModel $moduleModel
      */
     public function __construct(
         ModulePathSpec $modules,
@@ -59,7 +59,7 @@ class DoctrineRpcServiceModelFactory
     }
 
     /**
-     * @param  string $module
+     * @param string $module
      * @return DoctrineRpcServiceModel
      */
     public function factory($module)
@@ -78,7 +78,7 @@ class DoctrineRpcServiceModelFactory
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      * @return string
      */
     protected function normalizeModuleName($name)
