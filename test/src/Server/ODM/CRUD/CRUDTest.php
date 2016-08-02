@@ -13,12 +13,12 @@ namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use MongoClient;
 use ZF\ApiProblem\ApiProblem;
-use ZFTestApigilityGeneral\Listener\EventCatcher;
 use Zend\Http\Request;
+use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
-class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class CRUDTest extends TestCase
 {
     public function setUp()
     {

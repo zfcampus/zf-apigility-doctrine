@@ -13,8 +13,9 @@ namespace ZFTest\Apigility\Doctrine\Server\ORM\Setup;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
+use ZFTest\Apigility\Doctrine\TestCase;
 
-class ApigilityTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class ApigilityTest extends TestCase
 {
     public function setUp()
     {

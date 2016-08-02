@@ -7,8 +7,9 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use Zend\Http\Request;
+use ZFTest\Apigility\Doctrine\TestCase;
 
-class DoctrineMetadata2Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class DoctrineMetadata2Test extends TestCase
 {
     public function setUp()
     {

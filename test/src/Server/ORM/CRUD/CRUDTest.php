@@ -15,11 +15,12 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
+use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album as AlbumEntity;
 use ZFTestApigilityDb\Entity\Artist as ArtistEntity;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
-class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class CRUDTest extends TestCase
 {
     public function setUp()
     {

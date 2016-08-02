@@ -9,8 +9,9 @@ namespace ZFTest\Apigility\Doctrine\Admin\Model;
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
 use Zend\Http\Request;
+use ZFTest\Apigility\Doctrine\TestCase;
 
-class DoctrineMetadata1Test extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+class DoctrineMetadata1Test extends TestCase
 {
     public function setUp()
     {

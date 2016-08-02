@@ -11,7 +11,9 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\Model\Server\ODM\Setup;
 
-class SetupTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase
+use ZFTest\Apigility\Doctrine\TestCase;
+
+class SetupTest extends TestCase
 {
     public function setUp()
     {

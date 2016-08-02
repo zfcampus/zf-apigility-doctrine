@@ -7,10 +7,10 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\ORM\Tools\SchemaTool;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTest\Util\ServiceManagerFactory;
 
-class DoctrineRestServiceResourceTest extends AbstractHttpControllerTestCase
+class DoctrineRestServiceResourceTest extends TestCase
 {
     public function setUp()
     {
