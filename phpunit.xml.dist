@@ -19,13 +19,8 @@
     </testsuites>
 
     <filter>
-        <whitelist>
-            <directory>.</directory>
-            <exclude>
-                <directory>./vendor</directory>
-                <directory>./test</directory>
-                <file>./config/module.config.php</file>
-            </exclude>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory>./src</directory>
         </whitelist>
     </filter>
 </phpunit>
