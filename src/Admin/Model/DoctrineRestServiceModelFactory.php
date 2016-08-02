@@ -1,11 +1,12 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Zend\EventManager\EventManager;
 use ZF\Apigility\Admin\Exception;
 use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
 use Zend\ServiceManager\ServiceManager;
@@ -41,7 +42,6 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
         return $this;
     }
 
-
     /**
      * @param string $module
      * @param string $type
@@ -52,33 +52,46 @@ class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
         if (isset($this->models[$type])
             && isset($this->models[$type][$module])
         ) {
-            // @codeCoverageIgnoreStart
             return $this->models[$type][$module];
         }
-            // @codeCoverageIgnoreEnd
 
-        $moduleName   = $this->normalizeModuleName($module);
+        $moduleName   = $this->modules->normalizeModuleName($module);
         $config       = $this->configFactory->factory($module);
         $moduleEntity = $this->moduleModel->getModule($moduleName);
 
         $restModel = new DoctrineRestServiceModel($moduleEntity, $this->modules, $config);
-        $restModel->getEventManager()->setSharedManager($this->sharedEventManager);
+        $restModel->setEventManager($this->createEventManager());
         $restModel->setServiceManager($this->getServiceManager());
 
         switch ($type) {
             case self::TYPE_DEFAULT:
                 $this->models[$type][$module] = $restModel;
-
                 return $restModel;
-            // @codeCoverageIgnoreStart
             default:
-                throw new Exception\InvalidArgumentException(
-                    sprintf(
-                        'Model of type "%s" does not exist or cannot be handled by this factory',
-                        $type
-                    )
-                );
+                throw new Exception\InvalidArgumentException(sprintf(
+                    'Model of type "%s" does not exist or cannot be handled by this factory',
+                    $type
+                ));
         }
-            // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Create and return an EventManager composing the shared event manager instance.
+     *
+     * @return EventManager
+     */
+    private function createEventManager()
+    {
+        $r = new \ReflectionClass(EventManager::class);
+
+        if ($r->hasMethod('setSharedManager')) {
+            // zend-eventmanager v2 initialization
+            $eventManager = new EventManager();
+            $eventManager->setSharedManager($this->sharedEventManager);
+            return $eventManager;
+        }
+
+        // zend-eventmanager v3 initialization
+        return new EventManager($this->sharedEventManager);
     }
 }

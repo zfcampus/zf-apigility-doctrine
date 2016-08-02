@@ -12,6 +12,8 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Filter\FilterChain;
+use Zend\Filter\StringToLower;
+use Zend\Filter\Word\CamelCaseToDash;
 use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
@@ -53,7 +55,7 @@ class DoctrineRestServiceModel implements
     protected $modulePath;
 
     /**
-     * @var ModuleUtils
+     * @var ModulePathSpec
      */
     protected $modules;
 
@@ -107,7 +109,7 @@ class DoctrineRestServiceModel implements
 
     /**
      * @param ModuleEntity   $moduleEntity
-     * @param ModulePathSpec    $modules
+     * @param ModulePathSpec $modules
      * @param ConfigResource $config
      */
     public function __construct(ModuleEntity $moduleEntity, ModulePathSpec $modules, ConfigResource $config)
@@ -393,35 +395,24 @@ class DoctrineRestServiceModel implements
 
         $mediaType = $this->createMediaType();
 
-        $resourceClass = ($details->resourceClass)
-            ? $details->resourceClass
-            : $this->createResourceClass($resourceName, $details);
+        $resourceClass = $details->resourceClass ?: $this->createResourceClass($resourceName, $details);
+        $collectionClass = $details->collectionClass ?: $this->createCollectionClass($resourceName);
+        $serviceName = $details->serviceName ?: $resourceName;
 
-        $collectionClass = ($details->collectionClass)
-            ? $details->collectionClass
-            : $this->createCollectionClass($resourceName);
-
-        $serviceName = ($details->serviceName)
-            ? $details->serviceName
-            : $resourceName;
-
-        if (! $entityClass = $details->entityClass or ! class_exists($details->entityClass)) {
+        $entityClass = $details->entityClass;
+        if (! $entityClass || ! class_exists($entityClass)) {
             throw new CreationException('entityClass is required and must exist');
         }
         $module = $details->module ?: $this->module;
 
-        $controllerService = ($details->controllerServiceName)
-            ? $details->controllerServiceName
-            : $this->createControllerServiceName($resourceName);
+        $controllerService = $details->controllerServiceName ?: $this->createControllerServiceName($resourceName);
 
-        $routeName = ($details->routeName)
-            ? $details->routeName
-            : $this->createRoute(
-                $resourceName,
-                $details->routeMatch,
-                $details->routeIdentifierName,
-                $controllerService
-            );
+        $routeName = $details->routeName ?: $this->createRoute(
+            $resourceName,
+            $details->routeMatch,
+            $details->routeIdentifierName,
+            $controllerService
+        );
         $hydratorName  = $details->hydratorName ?: $this->createHydratorName($resourceName);
         $objectManager = $details->objectManager ?: 'doctrine.entitymanager.orm_default';
 
@@ -528,7 +519,6 @@ class DoctrineRestServiceModel implements
     /**
      * Generate the controller service name from the module and resource name
      *
-     * @param  string $module
      * @param  string $resourceName
      * @return string
      */
@@ -1164,8 +1154,8 @@ class DoctrineRestServiceModel implements
 
         $this->routeNameFilter = new FilterChain();
         $this->routeNameFilter
-            ->attachByName('Word\CamelCaseToDash')
-            ->attachByName('StringToLower');
+            ->attachByName(CamelCaseToDash::class)
+            ->attachByName(StringToLower::class);
 
         return $this->routeNameFilter;
     }
@@ -1202,11 +1192,9 @@ class DoctrineRestServiceModel implements
         DoctrineRestServiceEntity $metadata,
         array $config
     ) {
-        // @codeCoverageIgnoreStart
         if (! isset($config['zf-content-negotiation'])) {
             return;
         }
-        // @codeCoverageIgnoreEnd
 
         $config = $config['zf-content-negotiation'];
 

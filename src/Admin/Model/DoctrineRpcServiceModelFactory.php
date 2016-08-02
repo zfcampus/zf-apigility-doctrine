@@ -60,15 +60,13 @@ class DoctrineRpcServiceModelFactory
 
     /**
      * @param  string $module
-     * @return RpcServiceModel
+     * @return DoctrineRpcServiceModel
      */
     public function factory($module)
     {
         if (isset($this->models[$module])) {
-            // @codeCoverageIgnoreStart
             return $this->models[$module];
         }
-        // @codeCoverageIgnoreEnd
 
         $moduleName   = $this->normalizeModuleName($module);
         $moduleEntity = $this->moduleModel->getModule($moduleName);
