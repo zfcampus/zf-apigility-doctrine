@@ -1,3 +1,5 @@
 rm -rf ./test/assets/module/Db
 rm -rf ./test/assets/module/DbApi
+rm -rf ./test/assets/module/DbMongo
+rm -rf ./test/assets/module/DbMongoApi
 rm -rf ./test/assets/module/General
