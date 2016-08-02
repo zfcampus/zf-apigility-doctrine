@@ -367,7 +367,7 @@ class CollectionListener implements ListenerAggregateInterface
     protected function getEntityHydratorMap()
     {
         if ($this->entityHydratorMap === null) {
-            $config = $this->getServiceManager()->get('Config');
+            $config = $this->getServiceManager()->get('config');
             $config = $config[DoctrineHydratorFactory::FACTORY_NAMESPACE];
 
             if (! empty($config)) {

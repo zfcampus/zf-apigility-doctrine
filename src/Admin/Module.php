@@ -43,13 +43,13 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface, Depen
                     return $instance;
                 },
                 'ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel' => function ($services) {
-                    if (! $services->has('Config')) {
+                    if (! $services->has('config')) {
                         throw new ServiceNotCreatedException(
                             'Cannot create ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel'
                             . ' service because Config service is not present'
                         );
                     }
-                    $config = $services->get('Config');
+                    $config = $services->get('config');
                     $model = new Model\DoctrineAutodiscoveryModel($config);
                     $model->setServiceLocator($services);
                     return $model;

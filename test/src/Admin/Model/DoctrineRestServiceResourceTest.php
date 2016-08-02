@@ -65,7 +65,7 @@ class DoctrineRestServiceResourceTest extends TestCase
         $this->assertContains('DbApi\V1\Rest\Artist\Controller', $controllerServiceName);
 
         //        $serviceManager = ServiceManagerFactory::getServiceManager();
-        //        $config = $serviceManager->get('Config');
+        //        $config = $serviceManager->get('config');
 
         //        $routerConfig = isset($config['router']) ? $config['router'] : [];
         //        $router = HttpRouter::factory($routerConfig);
