@@ -23,7 +23,6 @@ use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
-use Zend\Stdlib\ArrayUtils;
 use Zend\Hydrator\HydratorAwareInterface;
 use Zend\Hydrator\HydratorInterface;
 use Zend\EventManager\SharedEventManager;
@@ -151,7 +150,6 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function setQueryProviders($queryProviders)
     {
-        // @codeCoverageIgnoreStart
         if (! is_array($queryProviders) && ! $queryProviders instanceof Traversable) {
             throw new InvalidArgumentException('queryProviders must be array or Traversable object');
         }
@@ -161,7 +159,6 @@ class DoctrineResource extends AbstractResourceListener implements
                 throw new InvalidArgumentException('queryProviders must implement QueryProviderInterface');
             }
         }
-        // @codeCoverageIgnoreEnd
 
         $this->queryProviders = (array) $queryProviders;
     }
@@ -295,11 +292,10 @@ class DoctrineResource extends AbstractResourceListener implements
     public function getHydrator()
     {
         if (! $this->hydrator) {
-            // @codeCoverageIgnoreStart
             // FIXME: find a way to test this line from a created API.  Shouldn't all created API's have a hydrator?
             $this->hydrator = new Hydrator\DoctrineObject($this->getObjectManager(), $this->getEntityClass());
         }
-            // @codeCoverageIgnoreEnd
+
         return $this->hydrator;
     }
 
@@ -355,10 +351,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $entity = $this->findEntity($id, 'delete');
 
         if ($entity instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $entity;
         }
-            // @codeCoverageIgnoreEnd
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_PRE, $entity);
         if ($results->last() instanceof ApiProblem) {
@@ -428,31 +422,25 @@ class DoctrineResource extends AbstractResourceListener implements
     {
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE, $data, $data);
         if ($results->last() instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $results->last();
         }
-            // @codeCoverageIgnoreEnd
 
         $this->getObjectManager()->getConnection()->beginTransaction();
         foreach ($data as $row) {
             $result = $this->delete($row[$this->getEntityIdentifierName()]);
 
             if ($result instanceof ApiProblem) {
-                // @codeCoverageIgnoreStart
                 $this->getObjectManager()->getConnection()->rollback();
 
                 return $result;
-                // @codeCoverageIgnoreEnd
             }
         }
         $this->getObjectManager()->getConnection()->commit();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_LIST_POST, true, $data);
         if ($results->last() instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $results->last();
         }
-            // @codeCoverageIgnoreEnd
 
         return true;
     }
@@ -472,7 +460,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $event->setEntityClassName($this->getEntityClass());
         $event->setEntityId($id);
         $eventManager = $this->getEventManager();
-        $response = $eventManager->trigger($event);
+        $response = $eventManager->triggerEvent($event);
         if ($response->last() instanceof ApiProblem) {
             return $response->last();
         }
@@ -480,10 +468,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $entity = $this->findEntity($id, 'fetch');
 
         if ($entity instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $entity;
         }
-            // @codeCoverageIgnoreEnd
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_FETCH_POST, $entity);
         if ($results->last() instanceof ApiProblem) {
@@ -507,10 +493,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $queryBuilder;
         }
-            // @codeCoverageIgnoreEnd
 
         $response = $this->triggerDoctrineEvent(
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
@@ -548,11 +532,9 @@ class DoctrineResource extends AbstractResourceListener implements
                 $collection->setItemCountPerPage($halCollection->getPageSize());
                 $collection->setCurrentPageNumber($halCollection->getPage());
 
-                $halCollection->setCollectionRouteOptions(
-                    [
-                        'query' => $e->getTarget()->getRequest()->getQuery()->toArray()
-                    ]
-                );
+                $halCollection->setCollectionRouteOptions([
+                    'query' => $e->getTarget()->getRequest()->getQuery()->toArray(),
+                ]);
             }
         );
 
@@ -571,10 +553,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $entity = $this->findEntity($id, 'patch', $data);
 
         if ($entity instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $entity;
         }
-            // @codeCoverageIgnoreEnd
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
@@ -597,9 +577,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Replace a collection or members of a collection
      *
-     * @param              mixed $data
-     * @return             ApiProblem|mixed
-     *                               @codeCoverageIgnore
+     * @param  mixed $data
+     * @return ApiProblem|mixed
      */
     public function replaceList($data)
     {
@@ -618,10 +597,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $entity = $this->findEntity($id, 'update', $data);
 
         if ($entity instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $entity;
         }
-            // @codeCoverageIgnoreEnd
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
@@ -665,7 +642,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $event->setResourceEvent($this->getEvent());
 
         $eventManager = $this->getEventManager();
-        $response = $eventManager->trigger($event);
+        $response = $eventManager->triggerEvent($event);
         return $response;
     }
 
@@ -673,9 +650,7 @@ class DoctrineResource extends AbstractResourceListener implements
      * Gets an entity by route params and/or the specified id
      *
      * @param $id
-     *
      * @param $method
-     *
      * @return object
      */
     protected function findEntity($id, $method, $data = null)
@@ -685,7 +660,6 @@ class DoctrineResource extends AbstractResourceListener implements
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = [];
 
-        // @codeCoverageIgnoreStart
         if (count($ids) !== count($keys)) {
             return new ApiProblem(
                 500,
@@ -695,7 +669,6 @@ class DoctrineResource extends AbstractResourceListener implements
                 . count($keys)
             );
         }
-        // @codeCoverageIgnoreEnd
 
         foreach ($keys as $index => $identifier) {
             $criteria[$identifier] = $ids[$index];
@@ -730,10 +703,8 @@ class DoctrineResource extends AbstractResourceListener implements
         $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
-            // @codeCoverageIgnoreStart
             return $queryBuilder;
         }
-            // @codeCoverageIgnoreEnd
 
         // Add criteria
         foreach ($criteria as $key => $value) {
