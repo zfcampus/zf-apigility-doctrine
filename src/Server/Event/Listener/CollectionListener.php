@@ -85,12 +85,12 @@ class CollectionListener implements ListenerAggregateInterface
     {
         $this->listeners[] = $events->attach(
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
-            [ $this, 'handleCollections' ]
+            [$this, 'handleCollections']
         );
 
         $this->listeners[] = $events->attach(
             DoctrineResourceEvent::EVENT_CREATE_PRE,
-            [ $this, 'handleCollections' ]
+            [$this, 'handleCollections']
         );
     }
 
@@ -183,7 +183,7 @@ class CollectionListener implements ListenerAggregateInterface
             return null; // Not really sure what would cause this or how to handle, skipping for now
         }
 
-        $identifierValues = [ ];
+        $identifierValues = [];
         foreach ($identifierNames as $identifierName) {
             if (! isset($data[$identifierName]) || empty($data[$identifierName])) {
                 continue; // Should mean we are working with a new entity to be created
@@ -245,7 +245,7 @@ class CollectionListener implements ListenerAggregateInterface
             $entity = get_class($entity);
         }
         if (! array_key_exists($entity, $this->entityCollectionValuedAssociations)) {
-            $collectionValuedAssociations = [ ];
+            $collectionValuedAssociations = [];
             $metadata                     = $this->getClassMetadata($entity);
             $associations                 = $metadata->getAssociationNames();
 
@@ -371,7 +371,7 @@ class CollectionListener implements ListenerAggregateInterface
             $config = $config[DoctrineHydratorFactory::FACTORY_NAMESPACE];
 
             if (! empty($config)) {
-                $this->entityHydratorMap = [ ];
+                $this->entityHydratorMap = [];
                 foreach ($config as $hydratorKey => $configParams) {
                     $this->entityHydratorMap[$configParams['entity_class']] = $hydratorKey;
                 }

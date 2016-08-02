@@ -13,7 +13,6 @@ use Zend\EventManager\SharedListenerAggregateInterface;
  */
 class EventCatcher implements SharedListenerAggregateInterface
 {
-
     const EVENT_IDENTIFIER = 'ZF\Apigility\Doctrine\DoctrineResource';
 
     /**
