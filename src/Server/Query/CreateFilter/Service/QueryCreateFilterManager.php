@@ -12,28 +12,46 @@ use Zend\ServiceManager\Exception;
 
 class QueryCreateFilterManager extends AbstractPluginManager
 {
-    protected $invokableClasses = [];
+    /**
+     * @var string
+     */
+    protected $instanceOf = QueryCreateFilterInterface::class;
 
     /**
-     * @param mixed $plugin
+     * Validate the plugin is of the expected type (v3).
      *
+     * Validates against `$instanceOf`.
+     *
+     * @param mixed $instance
+     * @throws Exception\InvalidServiceException
+     */
+    public function validate($instance)
+    {
+        if (! $instance instanceof $this->instanceOf) {
+            throw new Exception\InvalidServiceException(sprintf(
+                '%s can only create instances of %s; %s is invalid',
+                get_class($this),
+                $this->instanceOf,
+                is_object($instance) ? get_class($instance) : gettype($instance)
+            ));
+        }
+    }
+
+    /**
+     * Validate the plugin is of the expected type (v2).
+     *
+     * Proxies to `validate()`.
+     *
+     * @param mixed $plugin
      * @return void
      * @throws Exception\RuntimeException
      */
     public function validatePlugin($plugin)
     {
-        if ($plugin instanceof QueryCreateFilterInterface) {
-            // we're okay
-            return;
+        try {
+            $this->validate($plugin);
+        } catch (Exception\InvalidServiceException $e) {
+            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
-
-        // @codeCoverageIgnoreStart
-        throw new Exception\RuntimeException(
-            sprintf(
-                'Plugin of type %s is invalid; must implement QueryCreateFilterInterface',
-                (is_object($plugin) ? get_class($plugin) : gettype($plugin))
-            )
-        );
-        // @codeCoverageIgnoreEnd
     }
 }
