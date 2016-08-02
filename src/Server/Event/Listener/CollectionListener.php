@@ -80,8 +80,9 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param EventManagerInterface $events
+     * @param int $priority
      */
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $this->listeners[] = $events->attach(
             DoctrineResourceEvent::EVENT_UPDATE_PRE,

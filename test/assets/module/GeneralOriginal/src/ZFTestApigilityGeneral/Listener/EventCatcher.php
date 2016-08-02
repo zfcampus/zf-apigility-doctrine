@@ -4,14 +4,8 @@ namespace ZFTestApigilityGeneral\Listener;
 
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
-use Zend\EventManager\SharedListenerAggregateInterface;
 
-/**
- * Class EventCatcher
- *
- * @package DbMongo\Listener
- */
-class EventCatcher implements SharedListenerAggregateInterface
+class EventCatcher
 {
     const EVENT_IDENTIFIER = 'ZF\Apigility\Doctrine\DoctrineResource';
 
@@ -26,22 +20,40 @@ class EventCatcher implements SharedListenerAggregateInterface
     protected $caughtEvents = [];
 
     /**
-     * {@inheritDoc}
+     * @param SharedEventManagerInterface $events
      */
     public function attachShared(SharedEventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(self::EVENT_IDENTIFIER, '*', [$this, 'listen']);
+        $listener = $events->attach(self::EVENT_IDENTIFIER, '*', [$this, 'listen']);
+
+        if (! $listener) {
+            $listener = [$this, 'listen'];
+        }
+
+        $this->listeners[] = $listener;
     }
 
     /**
-     * {@inheritDoc}
+     * @param SharedEventManagerInterface $events
      */
     public function detachShared(SharedEventManagerInterface $events)
     {
-        foreach ($this->listeners as $listener) {
-            $events->detach(self::EVENT_IDENTIFIER, $listener);
+        $eventManagerVersion = method_exists($events, 'getEvents') ? 2 : 3;
+
+        foreach ($this->listeners as $index => $listener) {
+            switch ($eventManagerVersion) {
+                case 2:
+                    if ($events->detach(self::EVENT_IDENTIFIER, $listener)) {
+                        unset($this->listeners[$index]);
+                    }
+                    break;
+                case 3:
+                    if ($events->detach($listener, self::EVENT_IDENTIFIER, '*')) {
+                        unset($this->listeners[$index]);
+                    }
+                    break;
+            }
         }
-        unset($this->listeners);
     }
 
     /**

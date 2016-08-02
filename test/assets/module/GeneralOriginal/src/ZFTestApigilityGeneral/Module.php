@@ -4,6 +4,7 @@ namespace ZFTestApigilityGeneral;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use ZF\Apigility\Provider\ApigilityProviderInterface;
+use ZFTestApigilityGeneral\Listener\EventCatcher;
 
 class Module implements ApigilityProviderInterface, BootstrapListenerInterface
 {
@@ -35,9 +36,10 @@ class Module implements ApigilityProviderInterface, BootstrapListenerInterface
         $application = $e->getApplication();
         $serviceManager = $application->getServiceManager();
         $eventManager = $application->getEventManager();
-        $sharedEventManager = $eventManager->getSharedManager();
+        $sharedEvents = $eventManager->getSharedManager();
 
-        $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
-        $sharedEventManager->attachAggregate($eventCatcher);
+        /** @var EventCatcher $eventCatcher */
+        $eventCatcher = $serviceManager->get(EventCatcher::class);
+        $eventCatcher->attachShared($sharedEvents);
     }
 }
