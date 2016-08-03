@@ -655,7 +655,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
                             ],
                         ],
                     ],
-                ]
+                ],
             ],
             'zf-versioning' => [
                 'uri' => [

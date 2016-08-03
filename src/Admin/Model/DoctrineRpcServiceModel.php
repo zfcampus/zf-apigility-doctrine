@@ -265,7 +265,7 @@ class DoctrineRpcServiceModel
         ]);
 
         $resolver = new Resolver\TemplateMapResolver([
-            'code-connected/rpc-controller' => __DIR__ . '/../../../view/doctrine/rpc-controller.phtml'
+            'code-connected/rpc-controller' => __DIR__ . '/../../../view/doctrine/rpc-controller.phtml',
         ]);
 
         $view->setTemplate('code-connected/rpc-controller');
@@ -422,7 +422,7 @@ class DoctrineRpcServiceModel
     public function createDoctrineRpcConfig($controllerService, $options)
     {
         $config = ['zf-rpc-doctrine-controller' => [
-            $controllerService => $options
+            $controllerService => $options,
         ]];
 
         return $this->configResource->patch($config, true);

@@ -29,17 +29,15 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     {
         if (isset($this->options['entity_class'])) {
             return new ObjectExists(
-                ArrayUtils::merge(
-                    $this->options,
-                    [
+                ArrayUtils::merge($this->options, [
                     'object_repository' => $validators
                         ->getServiceLocator()
                         ->get('Doctrine\ORM\EntityManager')
-                        ->getRepository($this->options['entity_class'])
-                    ]
-                )
+                        ->getRepository($this->options['entity_class']),
+                ])
             );
         }
+
         return new ObjectExists($this->options);
     }
 

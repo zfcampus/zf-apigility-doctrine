@@ -138,7 +138,7 @@ class CRUDTest extends TestCase
         $this->assertEquals('ArtistTwo', $body['name']);
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_FETCH_PRE,
-            DoctrineResourceEvent::EVENT_FETCH_POST
+            DoctrineResourceEvent::EVENT_FETCH_POST,
         ]);
 
         // Test fetch() of resource with non-primary key identifier

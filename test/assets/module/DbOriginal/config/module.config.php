@@ -13,12 +13,12 @@ return [
         'invokables' => [
             'Artist_default' => 'ZFTestApigilityDb\Query\Provider\Artist\DefaultQueryProvider',
             'Artist_update' => 'ZFTestApigilityDb\Query\Provider\Artist\UpdateQueryProvider',
-        ]
+        ],
     ],
     'zf-apigility-doctrine-query-create-filter' => [
         'invokables' => [
             'Artist' => 'ZFTestApigilityDb\Query\CreateFilter\ArtistCreateFilter',
-        ]
+        ],
     ],
     'zf-apigility' => [
         'doctrine-connected' => [
@@ -54,7 +54,7 @@ return [
         'json_exceptions'          => [
             'display'    => true,
             'ajax_only'  => true,
-            'show_trace' => true
+            'show_trace' => true,
         ],
 
         'doctype'            => 'HTML5',

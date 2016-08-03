@@ -697,7 +697,7 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $reservedRouteParams = ['controller','action',
-            \Zend\Mvc\ModuleRouteListener::MODULE_NAMESPACE,\Zend\Mvc\ModuleRouteListener::ORIGINAL_CONTROLLER
+            \Zend\Mvc\ModuleRouteListener::MODULE_NAMESPACE,\Zend\Mvc\ModuleRouteListener::ORIGINAL_CONTROLLER,
         ];
         $allowedRouteParams = array_diff_key($routeParams, array_flip($reservedRouteParams));
 

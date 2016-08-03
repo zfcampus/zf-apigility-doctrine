@@ -23,13 +23,13 @@ return [
         'invokables' => [
             'default_orm' => Query\Provider\DefaultOrm::class,
             'default_odm' => Query\Provider\DefaultOdm::class,
-        ]
+        ],
     ],
 
     'zf-apigility-doctrine-query-create-filter' => [
         'invokables' => [
             'default' => Query\CreateFilter\DefaultCreateFilter::class,
-        ]
+        ],
     ],
 
     'view_manager' => [
