@@ -61,7 +61,6 @@ class CRUDTest extends \Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestC
         $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
         $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
-
         $this->assertEquals('ArtistOne', $body['name']);
         $this->assertEquals(201, $this->getResponseStatusCode());
         $this->validateTriggeredEvents(array(

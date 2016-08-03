@@ -1,7 +1,7 @@
 {
     "name": "zfcampus/zf-apigility-doctrine",
     "type": "library",
-    "description": "Doctrine for Apigility",
+    "description": "Doctrine in Apigility",
     "keywords": [
         "apigility",
         "doctrine",
@@ -12,32 +12,33 @@
     "authors": [
         {
             "name": "Tom Anderson",
-            "email": "tanderson@soliantconsulting.com"
+            "email": "tom.h.anderson@gmail.com"
         }
     ],
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.1-dev",
-            "dev-develop": "1.2-dev"
-        }
-    },
     "require-dev": {
-        "doctrine/doctrine-mongo-odm-module": "^0.8.0",
-        "doctrine/doctrine-orm-module": "^0.8.0",
-        "doctrine/mongodb-odm": "~1.0.0@beta",
-        "phpunit/phpunit": "~4.7",
+        "doctrine/doctrine-mongo-odm-module": "~0.10 || ^1.0",
+        "doctrine/doctrine-orm-module": "^0.10",
+        "doctrine/mongodb-odm": "^1",
+        "phpunit/phpunit": "^4.7",
         "squizlabs/php_codesniffer": "^2.3.0",
-        "zendframework/zend-form": "~2.4.0",
-        "zendframework/zend-log": "~2.4.0",
-        "zendframework/zend-serializer": "~2.4.0",
-        "zendframework/zend-test": "~2.4.0",
-        "zfcampus/zf-apigility-admin": "~1.1",
-        "zendframework/zend-i18n": "~2.4.0"
+        "zendframework/zend-form": "~2.4",
+        "zendframework/zend-log": "~2.4",
+        "zendframework/zend-serializer": "~2.4",
+        "zendframework/zend-test": "~2.4",
+        "zendframework/zend-stdlib": "~2.4",
+        "zfcampus/zf-apigility-admin": "~1.4",
+        "zendframework/zend-i18n": "~2.4"
     },
     "require": {
-        "php": ">=5.4",
-        "phpro/zf-doctrine-hydration-module": "^0.1.5",
-        "zfcampus/zf-apigility": "~1.0"
+        "php": ">=5.4 || ^7.0",
+        "phpro/zf-doctrine-hydration-module": "^2.0",
+        "zfcampus/zf-apigility": "^1.1"
+    },
+    "suggest": {
+        "doctrine/doctrine-orm-module": "For ORM mapping",
+        "doctrine/doctrine-mongo-odm-module": "For Mongo ODM mapping",
+        "api-skeletons/zf-doctrine-hydrator": "Hydrator strategies for Doctrine in Apipgility",
+        "api-skeletons/zf-oauth2-doctrine": "OAuth2 Doctrine Adapter for Apigility"
     },
     "prefer-stable": true,
     "autoload": {

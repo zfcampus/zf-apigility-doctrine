@@ -8,7 +8,7 @@ use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Collection\Query;
 use RuntimeException;
 
@@ -19,7 +19,6 @@ use RuntimeException;
  */
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
-
     /**
      * Cache of canCreateServiceWithName lookups
      * @var array
@@ -44,6 +43,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         if (!$serviceLocator->has('Config')) {
             // @codeCoverageIgnoreStart
+
             return false;
         }
             // @codeCoverageIgnoreEnd
@@ -108,6 +108,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     {
         $config = $serviceLocator->get('Config');
         $doctrineConnectedConfig = $config['zf-apigility']['doctrine-connected'][$requestedName];
+        $doctrineHydratorConfig = $config['doctrine-hydrator'];
 
         $restConfig = null;
         foreach ($config['zf-rest'] as $restControllerConfig) {
@@ -129,20 +130,26 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $className = $this->normalizeClassname($className);
 
         $objectManager = $this->loadObjectManager($serviceLocator, $doctrineConnectedConfig);
-        $hydrator = $this->loadHydrator($serviceLocator, $doctrineConnectedConfig, $objectManager);
+        $hydrator = $this->loadHydrator(
+            $serviceLocator,
+            $doctrineConnectedConfig,
+            $doctrineHydratorConfig,
+            $objectManager
+        );
         $queryProviders = $this->loadQueryProviders($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
         $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
 
         /** @var DoctrineResource $listener */
         $listener = new $className();
-        $listener->setServiceManager($serviceLocator);
+        $listener->setSharedEventManager($serviceLocator->get('Application')->getEventManager()->getSharedManager());
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
         $listener->setQueryCreateFilter($queryCreateFilter);
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
+
         if (count($configuredListeners)) {
             foreach ($configuredListeners as $configuredListener) {
                 $listener->getEventManager()->attach($configuredListener);
@@ -178,6 +185,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
             throw new ServiceNotCreatedException('The object_manager could not be found.');
         }
         // @codeCoverageIgnoreEnd
+
         return $objectManager;
     }
 
@@ -187,10 +195,15 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
      *
      * @return HydratorInterface
      */
-    protected function loadHydrator(ServiceLocatorInterface $serviceLocator, $config)
-    {
+    protected function loadHydrator(
+        ServiceLocatorInterface $serviceLocator,
+        array $doctrineConnectedConfig,
+        array $doctrineHydratorConfig,
+        $objectManager
+    ) {
+
         // @codeCoverageIgnoreStart
-        if (!isset($config['hydrator'])) {
+        if (!isset($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
 
@@ -199,11 +212,23 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         }
 
         $hydratorManager = $serviceLocator->get('HydratorManager');
-        if (!$hydratorManager->has($config['hydrator'])) {
+        if (!$hydratorManager->has($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
+
+        // Set the hydrator for the entity for this resource to the hydrator
+        // configured for the resource.  This removes per-entity hydrator configuration
+        // allowing multiple hydrators per resource.
+        if (isset($doctrineConnectedConfig['hydrator'])) {
+            $entityClass = $doctrineHydratorConfig[$doctrineConnectedConfig['hydrator']]['entity_class'];
+            $viewHelpers  = $serviceLocator->get('ViewHelperManager');
+            $hal = $viewHelpers->get('Hal');
+            $hal->getEntityHydratorManager()->addHydrator($entityClass, $doctrineConnectedConfig['hydrator']);
+        }
+
         // @codeCoverageIgnoreEnd
-        return $hydratorManager->get($config['hydrator']);
+
+        return $hydratorManager->get($doctrineConnectedConfig['hydrator']);
     }
 
     /**
@@ -287,6 +312,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         foreach ($config['listeners'] as $listener) {
             $listeners[] = $serviceLocator->get($listener);
         }
+
         return $listeners;
     }
 }

@@ -2,8 +2,6 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
-use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,10 +19,10 @@ use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\StaticEventManager;
 use Zend\Stdlib\ArrayUtils;
-use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorAwareInterface;
+use Zend\Hydrator\HydratorInterface;
+use Zend\EventManager\SharedEventManager;
 use Traversable;
 use ReflectionClass;
 
@@ -34,34 +32,25 @@ use ReflectionClass;
  * @package ZF\Apigility\Doctrine\Server\Resource
  */
 class DoctrineResource extends AbstractResourceListener implements
-    ServiceManagerAwareInterface,
     ObjectManagerAwareInterface,
     EventManagerAwareInterface,
     HydratorAwareInterface
 {
     /**
-     * @var ServiceManager
+     * @var SharedEventManager Interface
      */
-    protected $serviceManager;
+    protected $sharedEventManager;
 
-    /**
-     * @param ServiceManager $serviceManager
-     *
-     * @return $this
-     */
-    public function setServiceManager(ServiceManager $serviceManager)
+    public function getSharedEventManager()
     {
-        $this->serviceManager = $serviceManager;
-
-        return $this;
+        return $this->sharedEventManager;
     }
 
-    /**
-     * @return ServiceManager
-     */
-    public function getServiceManager()
+    public function setSharedEventManager(SharedEventManager $sharedEventManager)
     {
-        return $this->serviceManager;
+        $this->sharedEventManager = $sharedEventManager;
+
+        return $this;
     }
 
     /**
@@ -277,34 +266,6 @@ class DoctrineResource extends AbstractResourceListener implements
     public function getMultiKeyDelimiter()
     {
         return $this->multiKeyDelimiter;
-    }
-
-    /**
-     * For /multi/1/keyed/2/routes/3 the route parameter
-     * names may include an id suffix (e.g. id, _id, Id)
-     * and this will be striped to create criteria
-     *
-     * Example
-     * $objectManager->getRepository(...)->findOneBy(
-     *   'multi' => 1,
-     *   'keyed' => 2,
-     *   'routes' => 3
-     * );
-     *
-     * @var string
-     */
-    protected $stripRouteParameterSuffix = '_id';
-
-    public function setStripRouteParameterSuffix($value)
-    {
-        $this->stripRouteParameterSuffix = $value;
-
-        return $this;
-    }
-
-    public function getStripRouteParameterSuffix()
-    {
-        return $this->stripRouteParameterSuffix;
     }
 
     /**
@@ -571,7 +532,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
         // Add event to set extra HAL data
         $entityClass = $this->getEntityClass();
-        StaticEventManager::getInstance()->attach(
+
+        $this->getSharedEventManager()->attach(
             'ZF\Rest\RestController',
             'getList.post',
             function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
@@ -582,17 +544,9 @@ class DoctrineResource extends AbstractResourceListener implements
                 $collection->setItemCountPerPage($halCollection->getPageSize());
                 $collection->setCurrentPageNumber($halCollection->getPage());
 
-                $halCollection->setAttributes(
-                    array(
-                    'count' => $collection->getCurrentItemCount(),
-                    'total' => $collection->getTotalItemCount(),
-                    'collectionTotal' => $queryProvider->getCollectionTotal($entityClass)
-                    )
-                );
-
                 $halCollection->setCollectionRouteOptions(
                     array(
-                    'query' => ArrayUtils::iteratorToArray($data)
+                        'query' => $e->getTarget()->getRequest()->getQuery()->toArray()
                     )
                 );
             }
@@ -610,7 +564,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function patch($id, $data)
     {
-        $entity = $this->findEntity($id, 'patch');
+        $entity = $this->findEntity($id, 'patch', $data);
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -657,7 +611,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     public function update($id, $data)
     {
-        $entity = $this->findEntity($id, 'update');
+        $entity = $this->findEntity($id, 'update', $data);
 
         if ($entity instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
@@ -720,7 +674,7 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @return object
      */
-    protected function findEntity($id, $method)
+    protected function findEntity($id, $method, $data = null)
     {
         // Match identiy identifier name(s) with id(s)
         $ids = explode($this->getMultiKeyDelimiter(), $id);
@@ -753,14 +707,15 @@ class DoctrineResource extends AbstractResourceListener implements
             unset($routeParams[$this->getRouteIdentifierName()]);
         }
 
-        foreach ($routeParams as $routeMatchParam => $value) {
-            if ($this->getStripRouteParameterSuffix() === substr(
-                $routeMatchParam,
-                -1 * strlen($this->getStripRouteParameterSuffix())
-            )) {
-                $routeMatchParam = substr($routeMatchParam, 0, -1 * strlen($this->getStripRouteParameterSuffix()));
-            }
+        $reservedRouteParams = ['controller','action',
+            \Zend\Mvc\ModuleRouteListener::MODULE_NAMESPACE,\Zend\Mvc\ModuleRouteListener::ORIGINAL_CONTROLLER
+        ];
+        $allowedRouteParams = array_diff_key($routeParams, array_flip($reservedRouteParams));
 
+        /**
+         * Append query selection parameters by route match.
+         */
+        foreach ($allowedRouteParams as $routeMatchParam => $value) {
             if (in_array($routeMatchParam, $associationMappings) || in_array($routeMatchParam, $fieldNames)) {
                 $criteria[$routeMatchParam] = $value;
             }
@@ -768,7 +723,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         // Build query
         $queryProvider = $this->getQueryProvider($method);
-        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), null);
+        $queryBuilder = $queryProvider->createQuery($this->getEvent(), $this->getEntityClass(), $data);
 
         if ($queryBuilder instanceof ApiProblem) {
             // @codeCoverageIgnoreStart
