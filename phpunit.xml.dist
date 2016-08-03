@@ -4,6 +4,9 @@
         <testsuite name="admin">
             <directory>./test/Admin</directory>
         </testsuite>
+        <testsuite name="server">
+            <directory>./test/src/Server/Validator</directory>
+        </testsuite>
         <testsuite name="server-orm">
             <directory>./test/src/Server/ORM/Setup</directory>
             <directory>./test/src/Server/ORM/CRUD</directory>
