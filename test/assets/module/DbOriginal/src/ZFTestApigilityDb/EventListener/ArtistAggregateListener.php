@@ -2,9 +2,9 @@
 
 namespace ZFTestApigilityDb\EventListener;
 
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
-use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\ListenerAggregateInterface;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class ArtistAggregateListener implements ListenerAggregateInterface
 {

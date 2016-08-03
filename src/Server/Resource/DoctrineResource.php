@@ -6,34 +6,29 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Stdlib\Hydrator;
+use ReflectionClass;
+use Traversable;
 use Zend\EventManager\EventInterface;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
-use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
-use ZF\ApiProblem\ApiProblem;
-use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
-use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
-use ZF\Rest\AbstractResourceListener;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\SharedEventManager;
 use Zend\Hydrator\HydratorAwareInterface;
 use Zend\Hydrator\HydratorInterface;
-use Zend\EventManager\SharedEventManager;
-use Traversable;
-use ReflectionClass;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use ZF\ApiProblem\ApiProblem;
+use ZF\Rest\AbstractResourceListener;
 
-/**
- * Class DoctrineResource
- *
- * @package ZF\Apigility\Doctrine\Server\Resource
- */
 class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
     EventManagerAwareInterface,
@@ -44,11 +39,63 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected $sharedEventManager;
 
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * @var EventManagerInterface
+     */
+    protected $events;
+
+    /**
+     * @var array
+     */
+    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
+
+    /**
+     * @var array|QueryProviderInterface
+     */
+    protected $queryProviders;
+
+    /**
+     * @var string entityIdentifierName
+     */
+    protected $entityIdentifierName;
+
+    /**
+     * @var string
+     */
+    protected $routeIdentifierName;
+
+    /**
+     * @var QueryCreateFilterInterface
+     */
+    protected $queryCreateFilter;
+
+    /**
+     * @var string
+     */
+    protected $multiKeyDelimiter = '.';
+
+    /**
+     * @var HydratorInterface
+     */
+    protected $hydrator;
+
+    /**
+     * @return SharedEventManager
+     */
     public function getSharedEventManager()
     {
         return $this->sharedEventManager;
     }
 
+    /**
+     * @param SharedEventManager $sharedEventManager
+     * @return $this
+     */
     public function setSharedEventManager(SharedEventManager $sharedEventManager)
     {
         $this->sharedEventManager = $sharedEventManager;
@@ -57,27 +104,22 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var EventManagerInterface
-     */
-    protected $events;
-
-    /**
      * Set the event manager instance used by this context.
      *
      * For convenience, this method will also set the class name / LSB name as
      * identifiers, in addition to any string or array of strings set to the
      * $this->eventIdentifier property.
      *
-     * @param  EventManagerInterface $events
-     * @return mixed
+     * @param EventManagerInterface $events
+     * @return $this
      */
     public function setEventManager(EventManagerInterface $events)
     {
         $identifiers = [__CLASS__, get_class($this)];
         if (isset($this->eventIdentifier)) {
-            if ((is_string($this->eventIdentifier))
-                || (is_array($this->eventIdentifier))
-                || ($this->eventIdentifier instanceof Traversable)
+            if (is_string($this->eventIdentifier)
+                || is_array($this->eventIdentifier)
+                || $this->eventIdentifier instanceof Traversable
             ) {
                 $identifiers = array_unique(array_merge($identifiers, (array) $this->eventIdentifier));
             } elseif (is_object($this->eventIdentifier)) {
@@ -90,6 +132,7 @@ class DoctrineResource extends AbstractResourceListener implements
         if (method_exists($this, 'attachDefaultListeners')) {
             $this->attachDefaultListeners();
         }
+
         return $this;
     }
 
@@ -105,13 +148,9 @@ class DoctrineResource extends AbstractResourceListener implements
         if (! $this->events instanceof EventManagerInterface) {
             $this->setEventManager(new EventManager());
         }
+
         return $this->events;
     }
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
 
     /**
      * Set the object manager
@@ -134,18 +173,7 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var array
-     */
-    protected $eventIdentifier = ['ZF\Apigility\Doctrine\DoctrineResource'];
-
-    /**
-     * @var array|QueryProviderInterface
-     */
-    protected $queryProviders;
-
-    /**
      * @param array|\ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface[]
-     *
      * @throws InvalidArgumentException if parameter is not an array or \Traversable object
      */
     public function setQueryProviders($queryProviders)
@@ -173,7 +201,6 @@ class DoctrineResource extends AbstractResourceListener implements
 
     /**
      * @param $method
-     *
      * @return QueryProviderInterface
      */
     public function getQueryProvider($method)
@@ -186,11 +213,6 @@ class DoctrineResource extends AbstractResourceListener implements
 
         return $queryProviders['default'];
     }
-
-    /**
-     * @var string entityIdentifierName
-     */
-    protected $entityIdentifierName;
 
     /**
      * @return string
@@ -212,11 +234,6 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var string
-     */
-    protected $routeIdentifierName;
-
-    /**
      * @return string
      */
     public function getRouteIdentifierName()
@@ -235,10 +252,9 @@ class DoctrineResource extends AbstractResourceListener implements
     }
 
     /**
-     * @var QueryCreateFilterInterface
+     * @param QueryCreateFilterInterface $value
+     * @return $this
      */
-    protected $queryCreateFilter;
-
     public function setQueryCreateFilter(QueryCreateFilterInterface $value)
     {
         $this->queryCreateFilter = $value;
@@ -246,17 +262,18 @@ class DoctrineResource extends AbstractResourceListener implements
         return $this;
     }
 
+    /**
+     * @return QueryCreateFilterInterface
+     */
     public function getQueryCreateFilter()
     {
         return $this->queryCreateFilter;
     }
 
-
     /**
-     * @var string
+     * @param string $value
+     * @return $this
      */
-    protected $multiKeyDelimiter = '.';
-
     public function setMultiKeyDelimiter($value)
     {
         $this->multiKeyDelimiter = $value;
@@ -264,19 +281,16 @@ class DoctrineResource extends AbstractResourceListener implements
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getMultiKeyDelimiter()
     {
         return $this->multiKeyDelimiter;
     }
 
     /**
-     * @var HydratorInterface
-     */
-    protected $hydrator;
-
-    /**
      * @param HydratorInterface $hydrator
-     *
      * @return $this
      */
     public function setHydrator(HydratorInterface $hydrator)
@@ -302,7 +316,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Create a resource
      *
-     * @param  mixed $data
+     * @param mixed $data
      * @return ApiProblem|mixed
      */
     public function create($data)
@@ -343,7 +357,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Delete a resource
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return ApiProblem|mixed
      */
     public function delete($id)
@@ -451,7 +465,7 @@ class DoctrineResource extends AbstractResourceListener implements
      * If the extractCollections array contains a collection for this resource
      * expand that collection instead of returning a link to the collection
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return ApiProblem|mixed
      */
     public function fetch($id)
@@ -482,8 +496,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Fetch all or a subset of resources
      *
-     * @see    Apigility/Doctrine/Server/Resource/AbstractResource.php
-     * @param  array $data
+     * @param array $data
      * @return ApiProblem|mixed
      */
     public function fetchAll($data = [])
@@ -544,8 +557,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Patch (partial in-place update) a resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param mixed $id
+     * @param mixed $data
      * @return ApiProblem|mixed
      */
     public function patch($id, $data)
@@ -577,7 +590,7 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Replace a collection or members of a collection
      *
-     * @param  mixed $data
+     * @param mixed $data
      * @return ApiProblem|mixed
      */
     public function replaceList($data)
@@ -588,8 +601,8 @@ class DoctrineResource extends AbstractResourceListener implements
     /**
      * Update a resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param mixed $id
+     * @param mixed $data
      * @return ApiProblem|mixed
      */
     public function update($id, $data)
@@ -630,7 +643,6 @@ class DoctrineResource extends AbstractResourceListener implements
      * @param $name
      * @param $entity
      * @param $data mixed The original data supplied to the resource method, if any
-     *
      * @return \Zend\EventManager\ResponseCollection
      */
     protected function triggerDoctrineEvent($name, $entity, $data = null)

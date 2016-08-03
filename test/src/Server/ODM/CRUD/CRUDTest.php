@@ -12,11 +12,11 @@
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use MongoClient;
-use ZF\ApiProblem\ApiProblem;
 use Zend\Http\Request;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\ApiProblem\ApiProblem;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class CRUDTest extends TestCase
 {

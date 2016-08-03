@@ -22,7 +22,7 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     /**
      * Create service
      *
-     * @param  ServiceLocatorInterface $validators
+     * @param ServiceLocatorInterface $validators
      * @return mixed
      */
     public function createService(ServiceLocatorInterface $validators)
@@ -46,7 +46,7 @@ class ObjectExistsFactory implements FactoryInterface, MutableCreationOptionsInt
     /**
      * Set creation options
      *
-     * @param  array $options
+     * @param array $options
      * @return void
      */
     public function setCreationOptions(array $options)

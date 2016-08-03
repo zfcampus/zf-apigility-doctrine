@@ -2,16 +2,15 @@
 
 namespace ZFTestApigilityDb\Query\CreateFilter;
 
-use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\ResourceEvent;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\AbstractCreateFilter;
+use ZF\Rest\ResourceEvent;
 
 class ArtistCreateFilter extends AbstractCreateFilter
 {
     /**
+     * @param ResourceEvent $event
      * @param string $entityClass
-     * @param array  $data
-     *
+     * @param array $data
      * @return array
      */
     public function filter(ResourceEvent $event, $entityClass, $data)

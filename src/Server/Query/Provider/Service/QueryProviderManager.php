@@ -6,9 +6,9 @@
 
 namespace ZF\Apigility\Doctrine\Server\Query\Provider\Service;
 
-use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\Exception;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 
 class QueryProviderManager extends AbstractPluginManager
 {

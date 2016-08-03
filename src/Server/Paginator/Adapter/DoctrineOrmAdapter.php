@@ -9,11 +9,6 @@ namespace ZF\Apigility\Doctrine\Server\Paginator\Adapter;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Zend\Paginator\Adapter\AdapterInterface;
 
-/**
- * Class DoctrineOrmAdapter
- *
- * @package ZF\Apigility\Doctrine\Server\Paginator\Adapter
- */
 class DoctrineOrmAdapter extends Paginator implements AdapterInterface
 {
     /**
@@ -24,7 +19,6 @@ class DoctrineOrmAdapter extends Paginator implements AdapterInterface
     /**
      * @param $offset
      * @param $itemCountPerPage
-     *
      * @return array
      */
     public function getItems($offset, $itemCountPerPage)

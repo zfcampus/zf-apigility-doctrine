@@ -9,11 +9,6 @@ namespace ZF\Apigility\Doctrine\Server\Paginator\Adapter;
 use Doctrine\Odm\MongoDB\Query\Builder;
 use Zend\Paginator\Adapter\AdapterInterface;
 
-/**
- * Class DoctrineOdmAdapter
- *
- * @package ZF\Apigility\Doctrine\Server\Paginator\Adapter
- */
 class DoctrineOdmAdapter implements AdapterInterface
 {
     /**
@@ -48,7 +43,6 @@ class DoctrineOdmAdapter implements AdapterInterface
     /**
      * @param $offset
      * @param $itemCountPerPage
-     *
      * @return array
      */
     public function getItems($offset, $itemCountPerPage)

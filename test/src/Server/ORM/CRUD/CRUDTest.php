@@ -13,12 +13,11 @@ namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Http\Request;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album as AlbumEntity;
 use ZFTestApigilityDb\Entity\Artist as ArtistEntity;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 
 class CRUDTest extends TestCase
 {

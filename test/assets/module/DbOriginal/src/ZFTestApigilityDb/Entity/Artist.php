@@ -2,7 +2,7 @@
 
 namespace ZFTestApigilityDb\Entity;
 
-use \Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Artist
 {
@@ -42,7 +42,7 @@ class Artist
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\Datetime $value)
+    public function setCreatedAt(\DateTime $value)
     {
         $this->createdAt = $value;
 
@@ -59,8 +59,9 @@ class Artist
     /**
      * Add album
      *
-     * @param  \Db\Entity\Album $album
-     * @return Artist
+     * @param Album $album
+     * @return $this
+     * @throws \Exception
      */
     public function addAlbum($album)
     {
@@ -81,7 +82,8 @@ class Artist
     /**
      * Remove album
      *
-     * @param \Db\Entity\Album $album
+     * @param Album $album
+     * @throws \Exception
      */
     public function removeAlbum($album)
     {

@@ -7,7 +7,6 @@
 namespace ZF\Apigility\Doctrine\Server\Query\CreateFilter\Service;
 
 use Zend\Mvc\Service\AbstractPluginManagerFactory;
-use ZF\Apigility\Doctrine\Server\Query\CreateFilter\Service\QueryCreateFilterManager;
 
 class QueryCreateFilterManagerFactory extends AbstractPluginManagerFactory
 {

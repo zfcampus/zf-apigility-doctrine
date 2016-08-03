@@ -16,7 +16,6 @@ interface QueryProviderInterface extends ObjectManagerAwareInterface
      * @param ResourceEvent $event
      * @param string $entityClass
      * @param array $parameters
-     *
      * @return mixed This will return an ORM or ODM Query\Builder
      */
     public function createQuery(ResourceEvent $event, $entityClass, $parameters);
@@ -27,7 +26,6 @@ interface QueryProviderInterface extends ObjectManagerAwareInterface
      * included in this interface.
      *
      * @param $queryBuilder
-     *
      * @return AdapterInterface
      */
     public function getPaginatedQuery($queryBuilder);
@@ -38,7 +36,6 @@ interface QueryProviderInterface extends ObjectManagerAwareInterface
      * included in this interface.
      *
      * @param $entityClass
-     *
      * @return int
      */
     public function getCollectionTotal($entityClass);

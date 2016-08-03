@@ -11,26 +11,22 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Phpro\DoctrineHydrationModule\Service\DoctrineHydratorFactory;
-use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\ListenerAggregateInterface;
+use Zend\Hydrator\HydratorInterface;
 use Zend\InputFilter\CollectionInputFilter;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayObject;
-use Zend\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 
 /**
- * Class CollectionListener
- *
  * The purpose of this listener is to handle toMany relationships that were supplied in the request method. Historically
  * only entity identifiers should have been passed in which was used to establish a relationship with the entity. This
  * listener will create or update the embedded entities and strip out the additional data allowing related entities to
  * also be created or updated with the parent, preventing multiple calls. Downstream, the relationships will continue to
  * be managed by the hydrator and whatever strategies are defined on it
- *
- * @package ZF\Apigility\Doctrine\Server\Event\Listener
  */
 class CollectionListener implements ListenerAggregateInterface
 {
@@ -38,6 +34,7 @@ class CollectionListener implements ListenerAggregateInterface
      * @var array
      */
     protected $listeners = [];
+
     /**
      * @var null
      */
@@ -109,7 +106,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param DoctrineResourceEvent $event
-     *
      * @return array
      */
     public function handleCollections(DoctrineResourceEvent $event)
@@ -132,10 +128,9 @@ class CollectionListener implements ListenerAggregateInterface
     }
 
     /**
-     * @param $entity Object|string
-     * @param $data array
-     * @param $inputFilter InputFilterInterface
-     *
+     * @param object|string $entity
+     * @param array $data
+     * @param InputFilterInterface $inputFilter
      * @return mixed
      */
     protected function iterateEntity($entity, $data, InputFilterInterface $inputFilter)
@@ -173,7 +168,6 @@ class CollectionListener implements ListenerAggregateInterface
     /**
      * @param $targetEntityClassName
      * @param $data
-     *
      * @return object|null
      */
     protected function processEntity($targetEntityClassName, $data)
@@ -210,11 +204,10 @@ class CollectionListener implements ListenerAggregateInterface
     }
 
     /**
-     * @param $entity
-     *
-     * @return ClassMetadata
-     *
      * Retrieve the Doctrine MetaData for whichever entity we are currently processing
+     *
+     * @param $entity
+     * @return ClassMetadata
      */
     protected function getClassMetadata($entity)
     {
@@ -235,9 +228,8 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param $entity
-     * @param $data array
-     * @param $stripEmptyAssociations bool
-     *
+     * @param null|array $data
+     * @param bool $stripEmptyAssociations
      * @return ArrayObject
      */
     protected function getEntityCollectionValuedAssociations($entity, $data = null, $stripEmptyAssociations = false)
@@ -261,27 +253,21 @@ class CollectionListener implements ListenerAggregateInterface
 
         if ($stripEmptyAssociations === true && ! empty($data) && is_array($data)) {
             return $this->stripEmptyAssociations($this->entityCollectionValuedAssociations[$entity], $data);
-        } else {
-            return $this->entityCollectionValuedAssociations[$entity];
         }
+
+        return $this->entityCollectionValuedAssociations[$entity];
     }
 
     /**
-     * @param $associations ArrayObject
-     * @param $data array
-     *
-     * @return mixed array
+     * @param ArrayObject $associations
+     * @param array $data
+     * @return ArrayObject
      */
     protected function stripEmptyAssociations(ArrayObject $associations, $data)
     {
         $associationsArray = $associations->getArrayCopy();
         foreach ($associationsArray as $key => $association) {
-            if (! ( array_key_exists($association, $data)
-                   && ! empty($data[$association])
-                   && ( is_array($data[$association])
-                        || $data[$association] instanceof \Traversable )
-            )
-            ) {
+            if (! $this->validateAssociationData($association, $data)) {
                 unset($associationsArray[$key]);
             }
         }
@@ -292,21 +278,18 @@ class CollectionListener implements ListenerAggregateInterface
     /**
      * @param $association
      * @param $data
-     *
      * @return bool
      */
     protected function validateAssociationData($association, $data)
     {
         return array_key_exists($association, $data)
-               && ! empty($data[$association])
-               && ( is_array($data[$association])
-                    || $data[$association] instanceof \Traversable );
+           && ! empty($data[$association])
+           && (is_array($data[$association]) || $data[$association] instanceof \Traversable);
     }
 
     /**
      * @param $association
      * @param $inputFilter
-     *
      * @return InputFilterInterface
      */
     protected function getAssociatedEntityInputFilter($association, InputFilterInterface $inputFilter)
@@ -324,16 +307,14 @@ class CollectionListener implements ListenerAggregateInterface
         $childInputFilter = $inputFilter->get($association);
         if ($childInputFilter instanceof CollectionInputFilter) {
             return $childInputFilter->getInputFilter();
-        } else {
-            return $childInputFilter;
         }
+
+        return $childInputFilter;
     }
 
     /**
      * @param $entityClass
-     *
      * @param $objectManager
-     *
      * @return AbstractHydrator|DoctrineObject
      */
     protected function getEntityHydrator($entityClass, $objectManager)
@@ -397,7 +378,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param InputFilterInterface $inputFilter
-     *
      * @return $this
      */
     public function setInputFilter(InputFilterInterface $inputFilter)
@@ -417,7 +397,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param array $objectData
-     *
      * @return $this
      */
     public function setObjectData($objectData)
@@ -437,7 +416,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param ObjectManager $objectManager
-     *
      * @return $this
      */
     public function setObjectManager(ObjectManager $objectManager)
@@ -457,7 +435,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param mixed $rootEntity
-     *
      * @return $this
      */
     public function setRootEntity($rootEntity)
@@ -477,7 +454,6 @@ class CollectionListener implements ListenerAggregateInterface
 
     /**
      * @param ServiceLocatorInterface $serviceManager
-     *
      * @return $this
      */
     public function setServiceManager(ServiceLocatorInterface $serviceManager)

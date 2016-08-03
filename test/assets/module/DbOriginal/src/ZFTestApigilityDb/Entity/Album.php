@@ -32,7 +32,7 @@ class Album
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\Datetime $value)
+    public function setCreatedAt(\DateTime $value)
     {
         $this->createdAt = $value;
 

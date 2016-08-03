@@ -10,11 +10,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManager;
 use Interop\Container\ContainerInterface;
+use RuntimeException;
+use Zend\Hydrator\HydratorInterface;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Hydrator\HydratorInterface;
-use RuntimeException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
 use ZF\Hal\Plugin\Hal;
 

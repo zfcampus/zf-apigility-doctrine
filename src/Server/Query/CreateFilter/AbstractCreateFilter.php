@@ -6,22 +6,16 @@
 
 namespace ZF\Apigility\Doctrine\Server\Query\CreateFilter;
 
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\ApiProblem\ApiProblem;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use ZF\Rest\ResourceEvent;
 
-/**
- * Class DefaultCreateFilter
- *
- * @package ZF\Apigility\Doctrine\Server\Query\CreateFilter
- */
 abstract class AbstractCreateFilter implements ObjectManagerAwareInterface, QueryCreateFilterInterface
 {
     /**
+     * @param ResourceEvent $event
      * @param string $entityClass
-     * @param array  $data
-     *
+     * @param array $data
      * @return array
      */
     abstract public function filter(ResourceEvent $event, $entityClass, $data);
