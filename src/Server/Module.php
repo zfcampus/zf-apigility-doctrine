@@ -6,16 +6,14 @@
 
 namespace ZF\Apigility\Doctrine\Server;
 
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManager;
 
-class Module implements ConfigProviderInterface, DependencyIndicatorInterface
+class Module
 {
     /**
      * Returns configuration to merge with application configuration
      *
-     * @return array|\Traversable
+     * @return array
      */
     public function getConfig()
     {
