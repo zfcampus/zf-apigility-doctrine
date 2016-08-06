@@ -29,10 +29,10 @@ class DoctrineRestServiceResourceFactory
             ));
         }
 
-        $factory = $container->get(DoctrineRestServiceModelFactory::class);
-        $inputFilterModel = $container->get(InputFilterModel::class);
-        $documentationModel = $container->get(DocumentationModel::class);
-
-        return new DoctrineRestServiceResource($factory, $inputFilterModel, $documentationModel);
+        return new DoctrineRestServiceResource(
+            $container->get(DoctrineRestServiceModelFactory::class),
+            $container->get(InputFilterModel::class),
+            $container->get(DocumentationModel::class)
+        );
     }
 }

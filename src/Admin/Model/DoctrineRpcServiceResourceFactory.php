@@ -8,6 +8,7 @@ namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use ZF\Apigility\Admin\Model\DocumentationModel;
 use ZF\Apigility\Admin\Model\InputFilterModel;
 
 class DoctrineRpcServiceResourceFactory
@@ -17,6 +18,7 @@ class DoctrineRpcServiceResourceFactory
         if (! $container->has(DoctrineRpcServiceModelFactory::class)
             || ! $container->has(InputFilterModel::class)
             || ! $container->has('ControllerManager')
+            || ! $container->has(DocumentationModel::class)
         ) {
             throw new ServiceNotCreatedException(sprintf(
                 '%s is missing one or more dependencies from ZF\Configuration',
@@ -24,10 +26,11 @@ class DoctrineRpcServiceResourceFactory
             ));
         }
 
-        $factory           = $container->get(DoctrineRpcServiceModelFactory::class);
-        $inputFilterModel  = $container->get(InputFilterModel::class);
-        $controllerManager = $container->get('ControllerManager');
-
-        return new DoctrineRpcServiceResource($factory, $inputFilterModel, $controllerManager);
+        return new DoctrineRpcServiceResource(
+            $container->get(DoctrineRpcServiceModelFactory::class),
+            $container->get(InputFilterModel::class),
+            $container->get('ControllerManager'),
+            $container->get(DocumentationModel::class)
+        );
     }
 }

@@ -29,7 +29,7 @@ return [
             __DIR__ . '/testing.config.php',
         ],
         'module_paths' => [
-            'ZFTestApigilityGeneral' => __DIR__ . '/../../assets/module/General',
+            'ZFTestApigilityGeneral' => __DIR__ . '/../assets/module/General',
             'ZFTestApigilityDb' => __DIR__ . '/../assets/module/Db',
             'ZFTestApigilityDbApi' => __DIR__ . '/../assets/module/DbApi',
         ],

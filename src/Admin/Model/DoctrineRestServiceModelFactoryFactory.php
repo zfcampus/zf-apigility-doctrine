@@ -7,6 +7,7 @@
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Interop\Container\ContainerInterface;
+use Zend\EventManager\SharedEventManagerInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use ZF\Apigility\Admin\Model\ModuleModel;
 use ZF\Apigility\Admin\Model\ModulePathSpec;
@@ -31,21 +32,32 @@ class DoctrineRestServiceModelFactoryFactory
             ));
         }
 
-        $moduleModel    = $container->get(ModuleModel::class);
-        $modulePathSpec = $container->get(ModulePathSpec::class);
-        $configFactory  = $container->get(ConfigResourceFactory::class);
-        $sharedEvents   = $container->get('SharedEventManager');
+        $sharedEvents = $container->get('SharedEventManager');
+        $this->attachSharedListeners($sharedEvents);
 
-        // Wire Doctrine-Connected fetch listener
+        $instance = new DoctrineRestServiceModelFactory(
+            $container->get(ModulePathSpec::class),
+            $container->get(ConfigResourceFactory::class),
+            $sharedEvents,
+            $container->get(ModuleModel::class)
+        );
+        $instance->setServiceManager($container);
+
+        return $instance;
+    }
+
+    /**
+     * Attach shared listeners to the DoctrineRestServiceModel.
+     *
+     * @param SharedEventManagerInterface $sharedEvents
+     * @return void
+     */
+    private function attachSharedListeners(SharedEventManagerInterface $sharedEvents)
+    {
         $sharedEvents->attach(
             DoctrineRestServiceModel::class,
             'fetch',
             [DoctrineRestServiceModel::class, 'onFetch']
         );
-
-        $instance = new DoctrineRestServiceModelFactory($modulePathSpec, $configFactory, $sharedEvents, $moduleModel);
-        $instance->setServiceManager($container);
-
-        return $instance;
     }
 }

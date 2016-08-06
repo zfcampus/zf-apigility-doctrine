@@ -6,28 +6,27 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-use Zend\ServiceManager\ConfigInterface;
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 
 class DoctrineAutodiscoveryModelFactory
 {
     /**
-     * @param ConfigInterface $container
+     * @param ContainerInterface $container
      * @return DoctrineAutodiscoveryModel
      */
-    public function __invoke(ConfigInterface $container)
+    public function __invoke(ContainerInterface $container)
     {
         if (! $container->has('config')) {
             throw new ServiceNotCreatedException(sprintf(
-                'Cannot create %s service because Config service is not present',
+                'Cannot create %s service because config service is not present',
                 DoctrineAutodiscoveryModel::class
             ));
         }
 
-        $config = $container->get('config');
-        $model = new DoctrineAutodiscoveryModel($config);
-        $model->setServiceLocator($container);
+        $instance = new DoctrineAutodiscoveryModel($container->get('config'));
+        $instance->setServiceLocator($container);
 
-        return $model;
+        return $instance;
     }
 }
