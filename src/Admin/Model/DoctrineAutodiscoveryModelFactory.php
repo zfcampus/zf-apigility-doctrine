@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace Zf\Apigility\Doctrine\Admin\Model;
+namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Zend\ServiceManager\ConfigInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;

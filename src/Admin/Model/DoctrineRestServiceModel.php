@@ -19,7 +19,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
-use Zf\Apigility\Admin\Model\ModuleEntity;
+use ZF\Apigility\Admin\Model\ModuleEntity;
 use ZF\Apigility\Admin\Model\ModulePathSpec;
 use ZF\Apigility\Admin\Utility;
 use ZF\ApiProblem\ApiProblem;
