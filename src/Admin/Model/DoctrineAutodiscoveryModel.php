@@ -62,7 +62,7 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                 switch ($mapping['type']) {
                     case 'string':
                         $field['filters'] = $this->filters['text'];
-                        if (!empty($mapping['length'])) {
+                        if (! empty($mapping['length'])) {
                             $validator = $this->validators['text'];
                             $validator['options']['max'] = $mapping['length'];
                             $field['validators'][] = $validator;
