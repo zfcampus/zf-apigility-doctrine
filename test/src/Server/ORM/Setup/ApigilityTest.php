@@ -79,7 +79,7 @@ class ApigilityTest extends TestCase
             ],
         ];
 
-        $resource->setModuleName('ZFTestApigilityDbApi');
+        $this->setModuleName($resource, 'ZFTestApigilityDbApi');
         $artistEntity = $resource->create($artistResourceDefinition);
         $artistEntity = $resource->create($artistResourceDefinitionWithNonKeyIdentifer);
         $albumEntity = $resource->create($albumResourceDefinition);
@@ -97,7 +97,7 @@ class ApigilityTest extends TestCase
         $entityMetadata = $metadataFactory->getMetadataFor("ZFTestApigilityDb\\Entity\\Artist");
 
         $rpcServiceResource = $serviceManager->get('ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource');
-        $rpcServiceResource->setModuleName('ZFTestApigilityDbApi');
+        $this->setModuleName($rpcServiceResource, 'ZFTestApigilityDbApi');
 
         foreach ($entityMetadata->associationMappings as $mapping) {
             switch ($mapping['type']) {

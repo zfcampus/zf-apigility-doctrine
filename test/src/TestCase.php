@@ -22,4 +22,12 @@ class TestCase extends AbstractHttpControllerTestCase
 
         parent::setApplicationConfig($config);
     }
+
+    protected function setModuleName($resource, $moduleName)
+    {
+        $r = new \ReflectionObject($resource);
+        $prop = $r->getProperty('moduleName');
+        $prop->setAccessible(true);
+        $prop->setValue($resource, $moduleName);
+    }
 }

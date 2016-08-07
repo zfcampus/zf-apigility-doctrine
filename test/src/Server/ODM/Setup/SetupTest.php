@@ -44,7 +44,7 @@ class SetupTest extends TestCase
             "routeMatch" => "/test/meta",
         ];
 
-        $resource->setModuleName('ZFTestApigilityDbMongoApi');
+        $this->setModuleName($resource, 'ZFTestApigilityDbMongoApi');
         $metaEntity = $resource->create($metaResourceDefinition);
 
         $this->assertInstanceOf('ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity', $metaEntity);
