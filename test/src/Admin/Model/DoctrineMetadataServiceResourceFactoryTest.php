@@ -6,15 +6,15 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use Interop\Container\ContainerInterface;
 use Prophecy\Prophecy\ProphecyInterface;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResourceFactory;
 
 class DoctrineMetadataServiceResourceFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ProphecyInterface|ContainerInterface
+     * @var ProphecyInterface|ServiceManager
      */
     private $container;
 
@@ -22,7 +22,7 @@ class DoctrineMetadataServiceResourceFactoryTest extends \PHPUnit_Framework_Test
     {
         parent::setUp();
 
-        $this->container = $this->prophesize(ContainerInterface::class);
+        $this->container = $this->prophesize(ServiceManager::class);
     }
 
     public function testFactoryReturnsDoctrineMetadataServiceResource()

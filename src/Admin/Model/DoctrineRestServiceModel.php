@@ -6,7 +6,6 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-use Interop\Container\ContainerInterface;
 use OutOfRangeException;
 use ReflectionClass;
 use Zend\EventManager\EventManager;
@@ -15,6 +14,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\Filter\FilterChain;
 use Zend\Filter\StringToLower;
 use Zend\Filter\Word\CamelCaseToDash;
+use Zend\ServiceManager\ServiceManager;
 use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
@@ -105,7 +105,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
     protected $routeNameFilter;
 
     /**
-     * @var ContainerInterface
+     * @var ServiceManager
      */
     protected $serviceManager;
 
@@ -181,7 +181,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
     /**
      * Get service manager
      *
-     * @return ContainerInterface
+     * @return ServiceManager
      */
     public function getServiceManager()
     {
@@ -191,10 +191,10 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
     /**
      * Set service manager
      *
-     * @param ContainerInterface $serviceManager
+     * @param ServiceManager $serviceManager
      * @return DoctrineRestServiceModel
      */
-    public function setServiceManager(ContainerInterface $serviceManager)
+    public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
         return $this;

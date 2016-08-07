@@ -6,10 +6,10 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
-use Interop\Container\ContainerInterface;
 use Prophecy\Prophecy\ProphecyInterface;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Admin\Model\ModuleModel;
 use ZF\Apigility\Admin\Model\ModulePathSpec;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceModel;
@@ -21,7 +21,7 @@ use ZF\Configuration\ResourceFactory;
 class DoctrineRestServiceModelFactoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ProphecyInterface|ContainerInterface
+     * @var ProphecyInterface|ServiceManager
      */
     private $container;
 
@@ -29,7 +29,7 @@ class DoctrineRestServiceModelFactoryFactoryTest extends \PHPUnit_Framework_Test
     {
         parent::setUp();
 
-        $this->container = $this->prophesize(ContainerInterface::class);
+        $this->container = $this->prophesize(ServiceManager::class);
     }
 
     public function missingDependencies()

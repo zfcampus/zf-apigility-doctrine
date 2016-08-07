@@ -7,7 +7,7 @@
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
-use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Admin\Model\RestServiceEntity;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
@@ -15,15 +15,15 @@ use ZF\Rest\AbstractResourceListener;
 class DoctrineMetadataServiceResource extends AbstractResourceListener
 {
     /**
-     * @var ContainerInterface
+     * @var ServiceManager
      */
     protected $serviceManager;
 
     /**
-     * @param ContainerInterface $serviceManager
+     * @param ServiceManager $serviceManager
      * @return $this
      */
-    public function setServiceManager(ContainerInterface $serviceManager)
+    public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
 
@@ -31,7 +31,7 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
     }
 
     /**
-     * @return ContainerInterface
+     * @return ServiceManager
      */
     public function getServiceManager()
     {
