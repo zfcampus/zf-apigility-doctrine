@@ -6,6 +6,9 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use ZF\Apigility\Admin\Model\AbstractAutodiscoveryModel;
 
 class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
@@ -23,17 +26,17 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
         $entities = [];
 
         /**
-         * @var \Doctrine\ORM\EntityManager $em
+         * @var ObjectManager $em
          */
         $em = $this->getServiceLocator()->get($adapterName);
 
         /**
-         * @var \Doctrine\ORM\Mapping\ClassMetadataFactory $cmf
+         * @var AbstractClassMetadataFactory $cmf
          */
         $cmf = $em->getMetadataFactory();
 
         /**
-         * @var \Doctrine\ORM\Mapping\ClassMetadata $classMetadata
+         * @var ClassMetadata $classMetadata
          */
         foreach ($cmf->getAllMetadata() as $classMetadata) {
             $service = substr($classMetadata->getName(), strrpos($classMetadata->getName(), '\\') + 1);
@@ -43,7 +46,7 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
             $entity = [
                 'entity_class' => $classMetadata->getName(),
                 'service_name' => $service,
-                'fields' => [],
+                'fields'       => [],
             ];
 
             foreach ($classMetadata->fieldMappings as $mapping) {
@@ -51,15 +54,15 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                     continue;
                 }
                 $field = [
-                    'name' => $mapping['fieldName'],
-                    'required' => (! isset($mapping['nullable']) || $mapping['nullable'] !== true),
-                    'filters' => [],
+                    'name'       => $mapping['fieldName'],
+                    'required'   => ! isset($mapping['nullable']) || $mapping['nullable'] !== true,
+                    'filters'    => [],
                     'validators' => [],
                 ];
                 switch ($mapping['type']) {
                     case 'string':
                         $field['filters'] = $this->filters['text'];
-                        if (isset($mapping['length']) && $mapping['length']) {
+                        if (!empty($mapping['length'])) {
                             $validator = $this->validators['text'];
                             $validator['options']['max'] = $mapping['length'];
                             $field['validators'][] = $validator;
