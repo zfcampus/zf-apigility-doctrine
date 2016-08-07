@@ -6,42 +6,30 @@
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
-use RuntimeException;
+use ZF\Apigility\Admin\Model\DocumentationModel;
+use ZF\Apigility\Admin\Model\InputFilterModel;
+use ZF\Apigility\Admin\Model\RestServiceResource;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
-use ZF\Rest\Exception\CreationException;
-use ZF\Rest\Exception\PatchException;
 
-class DoctrineRestServiceResource extends AbstractResourceListener
+class DoctrineRestServiceResource extends RestServiceResource
 {
     /**
-     * @var DoctrineRestServiceModel
-     */
-    protected $model;
-
-    /**
-     * @var string
-     */
-    protected $moduleName;
-
-    /**
-     * @var DoctrineRestServiceModelFactory
-     */
-    protected $restFactory;
-
-    /**
-     * Constructor
-     *
      * @param DoctrineRestServiceModelFactory $restFactory
+     * @param InputFilterModel $inputFilterModel
+     * @param DocumentationModel $documentationModel
      */
-    public function __construct(DoctrineRestServiceModelFactory $restFactory)
-    {
-        $this->restFactory = $restFactory;
+    public function __construct(
+        DoctrineRestServiceModelFactory $restFactory,
+        InputFilterModel $inputFilterModel,
+        DocumentationModel $documentationModel
+    ) {
+        parent::__construct($restFactory, $inputFilterModel, $documentationModel);
     }
 
     /**
      * Set module name
      *
+     * @deprecated since 2.1.0, and no longer used internally.
      * @param string $moduleName
      * @return DoctrineRestServiceResource
      */
@@ -49,30 +37,6 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     {
         $this->moduleName = $moduleName;
         return $this;
-    }
-
-    /**
-     * Get module name
-     *
-     * @return string
-     * @throws RuntimeException if module name is not present in route matches
-     */
-    public function getModuleName()
-    {
-        if (null !== $this->moduleName) {
-            return $this->moduleName;
-        }
-
-        $moduleName = $this->getEvent()->getRouteParam('name', false);
-        if (! $moduleName) {
-            throw new RuntimeException(sprintf(
-                '%s cannot operate correctly without a "name" segment in the route matches',
-                __CLASS__
-            ));
-        }
-        $this->moduleName = $moduleName;
-
-        return $moduleName;
     }
 
     /**
@@ -84,18 +48,18 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         if ($this->model instanceof DoctrineRestServiceModel) {
             return $this->model;
         }
-        $moduleName = $this->getModuleName();
+
+        $moduleName  = $this->getModuleName();
         $this->model = $this->restFactory->factory($moduleName, $type);
 
         return $this->model;
     }
 
     /**
-     * Create a new REST service
+     * Create a new Doctrine REST service
      *
      * @param array|object $data
-     * @return DoctrineRestServiceEntity
-     * @throws CreationException
+     * @return DoctrineRestServiceEntity|ApiProblem
      */
     public function create($data)
     {
@@ -107,20 +71,22 @@ class DoctrineRestServiceResource extends AbstractResourceListener
         $creationData = new NewDoctrineServiceEntity();
 
         $creationData->exchangeArray($data);
-
         $model = $this->getModel($type);
 
         try {
             $service = $model->createService($creationData);
         } catch (\Exception $e) {
-            throw new CreationException('Unable to create REST service', $e->getCode(), $e);
+            return new ApiProblem(
+                409,
+                sprintf('Unable to create Doctrine REST service: %s', $e->getMessage())
+            );
         }
 
         return $service;
     }
 
     /**
-     * Fetch REST metadata
+     * Fetch Doctrine REST metadata
      *
      * @param string $id
      * @return DoctrineRestServiceEntity|ApiProblem
@@ -129,84 +95,9 @@ class DoctrineRestServiceResource extends AbstractResourceListener
     {
         $service = $this->getModel()->fetch($id);
         if (! $service instanceof DoctrineRestServiceEntity) {
-            return new ApiProblem(404, 'REST service not found');
+            return new ApiProblem(404, 'Doctrine REST service not found');
         }
 
-        return $service;
-    }
-
-    /**
-     * Fetch metadata for all REST services
-     *
-     * @param array $params
-     * @return DoctrineRestServiceEntity[]
-     */
-    public function fetchAll($params = [])
-    {
-        $version = $this->getEvent()->getQueryParam('version', null);
-
-        return $this->getModel()->fetchAll($version);
-    }
-
-    /**
-     * Update an existing REST service
-     *
-     * @param string $id
-     * @param object|array $data
-     * @return ApiProblem|DoctrineRestServiceEntity
-     * @throws PatchException if unable to update configuration
-     */
-    public function patch($id, $data)
-    {
-        if (is_object($data)) {
-            $data = (array) $data;
-        }
-
-        if (! is_array($data)) {
-            return new ApiProblem(400, 'Invalid data provided for update');
-        }
-
-        if (empty($data)) {
-            return new ApiProblem(400, 'No data provided for update');
-        }
-
-        // Make sure we have an entity first
-        $model  = $this->getModel();
-        $entity = $model->fetch($id);
-
-        $entity->exchangeArray($data);
-
-        $updated = $model->updateService($entity);
-
-        return $updated;
-    }
-
-    /**
-     * Delete a service
-     *
-     * @param mixed $id
-     * @return bool
-     * @throws \Exception
-     */
-    public function delete($id)
-    {
-        // Make sure we have an entity first
-        $model  = $this->getModel();
-        $entity = $model->fetch($id);
-
-        $request   = $this->getEvent()->getRequest();
-        $recursive = $request->getQuery('recursive', false);
-
-        try {
-            switch (true) {
-                case ($entity instanceof DoctrineRestServiceEntity):
-                default:
-                    $model->deleteService($entity->controllerServiceName, $recursive);
-            }
-        } catch (\Exception $e) {
-            throw new \Exception('Error deleting REST service', 500, $e);
-        }
-
-        return true;
+        return parent::fetch($id);
     }
 }
