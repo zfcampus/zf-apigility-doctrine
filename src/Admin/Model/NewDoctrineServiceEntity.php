@@ -13,17 +13,17 @@ use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySerializableInterface
 {
     /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
      * @var string
      */
     protected $hydratorName;
 
     /**
-     * @var boolean
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * @var bool
      */
     protected $byValue = true;
 
@@ -33,33 +33,32 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySe
     protected $hydratorStrategies = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
     {
         parent::exchangeArray($data);
+
         foreach ($data as $key => $value) {
             $key = strtolower($key);
             $key = str_replace('_', '', $key);
             switch ($key) {
-                case 'objectmanager':
-                    $this->objectManager = $value;
-                    break;
                 case 'hydrator':
                     $this->hydratorName = $value;
+                    break;
+                case 'objectmanager':
+                    $this->objectManager = $value;
                     break;
                 case 'byvalue':
                     $this->byValue = $value;
                     break;
-                case 'hydratorstrategies':
+                case 'strategies':
                     $this->hydratorStrategies = $value;
                     break;
                 case 'usegeneratedhydrator':
                     $this->useGeneratedHydrator = $value;
-                    break;
-                default:
                     break;
             }
         }
@@ -68,10 +67,9 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySe
     public function getArrayCopy()
     {
         $data = parent::getArrayCopy();
-        $data['object_manager']         = $this->objectManager;
         $data['hydrator_name']          = $this->hydratorName;
+        $data['object_manager']         = $this->objectManager;
         $data['by_value']               = $this->byValue;
-        $data['entity_identifier_name'] = $this->entityIdentifierName;
         $data['strategies']             = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 

@@ -23,7 +23,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     protected $objectManager;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $byValue = true;
 
@@ -33,7 +33,7 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     protected $hydratorStrategies = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $useGeneratedHydrator = true;
 
@@ -60,9 +60,6 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
                 case 'usegeneratedhydrator':
                     $this->useGeneratedHydrator = $value;
                     break;
-                case 'servicename':
-                    $this->serviceName = $value;
-                    break;
             }
         }
     }
@@ -70,12 +67,11 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     public function getArrayCopy()
     {
         $data = parent::getArrayCopy();
-        $data['hydrator_name'] = $this->hydratorName;
-        $data['object_manager'] = $this->objectManager;
-        $data['by_value'] = $this->byValue;
-        $data['strategies'] = $this->hydratorStrategies;
+        $data['hydrator_name']          = $this->hydratorName;
+        $data['object_manager']         = $this->objectManager;
+        $data['by_value']               = $this->byValue;
+        $data['strategies']             = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
-        $data['service_name'] = $this->serviceName;
 
         return $data;
     }
