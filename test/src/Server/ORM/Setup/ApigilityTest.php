@@ -104,7 +104,7 @@ class ApigilityTest extends TestCase
                 case 4:
                     $rpcServiceResource->create([
                         'service_name' => 'Artist' . $mapping['fieldName'],
-                        'route' => '/test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
+                        'route_match' => '/test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
                         'http_methods' => [
                             'GET',
                             'PUT',
