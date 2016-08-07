@@ -9,9 +9,9 @@ namespace ZF\Apigility\Doctrine\Admin\Model;
 use Interop\Container\ContainerInterface;
 use Zend\EventManager\EventManager;
 use ZF\Apigility\Admin\Exception;
-use ZF\Apigility\Admin\Model\RpcServiceModelFactory;
+use ZF\Apigility\Admin\Model\RestServiceModelFactory;
 
-class DoctrineRestServiceModelFactory extends RpcServiceModelFactory
+class DoctrineRestServiceModelFactory extends RestServiceModelFactory
 {
     const TYPE_DEFAULT = DoctrineRestServiceModel::class;
 
