@@ -4,15 +4,12 @@
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-// Because of the code-generating of Apigility this script
-// is used to setup the tests.  Use ~/test/bin/reset-tests
-// to reset the output of this test if the unit tests
-// fail the application.
-
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use MongoClient;
 use Zend\Http\Request;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZFTest\Apigility\Doctrine\TestCase;
@@ -20,16 +17,39 @@ use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
 
 class CRUDTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
-        if (! extension_loaded('mongo')) {
-            $this->markTestSkipped(sprintf('Tests for %s can only be run with the Mongo extension', __CLASS__));
-        }
+        parent::setUp();
 
         $this->setApplicationConfig(
             include __DIR__ . '/../../../../config/ODM/application.config.php'
         );
-        parent::setUp();
+
+        $this->buildODMApi();
+    }
+
+    protected function buildODMApi()
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+
+        /** @var DoctrineRestServiceResource $resource */
+        $resource = $serviceManager->get(DoctrineRestServiceResource::class);
+
+        $metaResourceDefinition = [
+            'objectManager'        => 'doctrine.documentmanager.odm_default',
+            'serviceName'          => 'Meta',
+            'entityClass'          => MetaEntity::class,
+            'routeIdentifierName'  => 'meta_id',
+            'entityIdentifierName' => 'id',
+            'routeMatch'           => '/test/meta',
+        ];
+
+        $this->setModuleName($resource, 'ZFTestApigilityDbMongoApi');
+        $metaEntity = $resource->create($metaResourceDefinition);
+
+        $this->assertInstanceOf(DoctrineRestServiceEntity::class, $metaEntity);
+
+        $this->reset();
     }
 
     protected function clearData()

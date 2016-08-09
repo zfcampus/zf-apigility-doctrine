@@ -4,29 +4,138 @@
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-// Because of the code-generating of Apigility this script
-// is used to setup the tests.  Use ~/test/bin/reset-tests
-// to reset the output of this test if the unit tests
-// fail the application.
-
 namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
+use Zend\Filter\FilterChain;
 use Zend\Http\Request;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity;
+use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource;
+use ZF\Apigility\Doctrine\DoctrineResource;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album as AlbumEntity;
+use ZFTestApigilityDb\Entity\Album;
 use ZFTestApigilityDb\Entity\Artist as ArtistEntity;
+use ZFTestApigilityDb\Entity\Artist;
 
 class CRUDTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
+        parent::setUp();
+
         $this->setApplicationConfig(
             include __DIR__ . '/../../../../config/ORM/application.config.php'
         );
-        parent::setUp();
+
+        $this->buildORMApi();
+    }
+
+    protected function buildORMApi()
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        /** @var EntityManager $em */
+        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
+
+        /** @var DoctrineRestServiceResource $restServiceResource */
+        $restServiceResource = $serviceManager->get(DoctrineRestServiceResource::class);
+
+        $artistResourceDefinition = [
+            'objectManager'         => 'doctrine.entitymanager.orm_default',
+            'serviceName'           => 'Artist',
+            'entityClass'           => Artist::class,
+            'routeIdentifierName'   => 'artist_id',
+            'entityIdentifierName'  => 'id',
+            'routeMatch'            => '/test/rest/artist',
+            'collectionHttpMethods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+                3 => 'DELETE',
+            ],
+        ];
+
+        $artistResourceDefinitionWithNonKeyIdentifier = [
+            'objectManager'         => 'doctrine.entitymanager.orm_default',
+            'serviceName'           => 'ArtistByName',
+            'entityClass'           => Artist::class,
+            'routeIdentifierName'   => 'artist_name',
+            'entityIdentifierName'  => 'name',
+            'routeMatch'            => '/test/rest/artist-by-name',
+            'collectionHttpMethods' => [
+                0 => 'GET',
+            ],
+        ];
+
+        // This route is what should be an rpc service, but an user could do
+        $albumResourceDefinition = [
+            'objectManager'         => 'doctrine.entitymanager.orm_default',
+            'serviceName'           => 'Album',
+            'entityClass'           => Album::class,
+            'routeIdentifierName'   => 'album_id',
+            'entityIdentifierName'  => 'id',
+            'routeMatch'            => '/test/rest[/artist/:artist_id]/album[/:album_id]',
+            'collectionHttpMethods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+                3 => 'DELETE',
+            ],
+        ];
+
+        $this->setModuleName($restServiceResource, 'ZFTestApigilityDbApi');
+        $artistEntity       = $restServiceResource->create($artistResourceDefinition);
+        $artistByNameEntity = $restServiceResource->create($artistResourceDefinitionWithNonKeyIdentifier);
+        $albumEntity        = $restServiceResource->create($albumResourceDefinition);
+
+        $this->assertInstanceOf(DoctrineRestServiceEntity::class, $artistEntity);
+        $this->assertInstanceOf(DoctrineRestServiceEntity::class, $artistByNameEntity);
+        $this->assertInstanceOf(DoctrineRestServiceEntity::class, $albumEntity);
+
+        // Build relation
+        $filter = new FilterChain();
+        $filter->attachByName('WordCamelCaseToUnderscore')
+            ->attachByName('StringToLower');
+
+        $metadataFactory = $em->getMetadataFactory();
+        $entityMetadata = $metadataFactory->getMetadataFor(Artist::class);
+
+        /** @var DoctrineRpcServiceResource $rpcServiceResource */
+        $rpcServiceResource = $serviceManager->get(DoctrineRpcServiceResource::class);
+        $this->setModuleName($rpcServiceResource, 'ZFTestApigilityDbApi');
+
+        foreach ($entityMetadata->associationMappings as $mapping) {
+            switch ($mapping['type']) {
+                case ClassMetadataInfo::ONE_TO_MANY:
+                    $entity = $rpcServiceResource->create([
+                        'service_name' => 'Artist' . $mapping['fieldName'],
+                        'route_match' => '/test/artist[/:parent_id]/' . $filter($mapping['fieldName']) . '[/:child_id]',
+                        'http_methods' => [
+                            'GET',
+                            'PUT',
+                            'POST',
+                        ],
+                        'options' => [
+                            'target_entity' => $mapping['targetEntity'],
+                            'source_entity' => $mapping['sourceEntity'],
+                            'field_name'    => $mapping['fieldName'],
+                        ],
+                        'selector' => 'custom selector',
+                    ]);
+
+                    $this->assertInstanceOf(DoctrineRpcServiceEntity::class, $entity);
+                    break;
+            }
+        }
+
+        $this->reset();
 
         $serviceManager = $this->getApplication()->getServiceManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');

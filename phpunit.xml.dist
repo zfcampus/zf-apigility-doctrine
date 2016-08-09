@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./test/Bootstrap.php" colors="true">
+<phpunit bootstrap="./vendor/autoload.php" colors="true">
     <testsuites>
-        <testsuite name="admin">
-            <directory>./test/src/Admin</directory>
-        </testsuite>
-        <testsuite name="server">
-            <directory>./test/src/Server/Validator</directory>
-        </testsuite>
-        <testsuite name="server-orm">
-            <directory>./test/src/Server/ORM/Setup</directory>
-            <directory>./test/src/Server/ORM/CRUD</directory>
-            <directory>./test/src/Server/ORM/Event</directory>
-            <directory>./test/src/Server/ORM/Collection</directory>
-        </testsuite>
-        <testsuite name="server-odm">
-            <directory>./test/src/Server/ODM/Setup</directory>
-            <directory>./test/src/Server/ODM/CRUD</directory>
-            <directory>./test/src/Server/ODM/Event</directory>
-            <directory>./test/src/Server/ODM/Collection</directory>
+        <testsuite name="ZFApigility\Doctrine Module Tests">
+            <directory>./test/src/</directory>
         </testsuite>
     </testsuites>
-
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory>./src</directory>

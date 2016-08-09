@@ -15,5 +15,10 @@ return [
                 'dbname' => 'zf_apigility_doctrine_server_test',
             ],
         ],
+        'configuration' => [
+            'odm_default' => [
+                'hydrator_dir' => __DIR__ . '/../../data/DoctrineMongoODMModule/Hydrator',
+            ],
+        ],
     ],
 ];

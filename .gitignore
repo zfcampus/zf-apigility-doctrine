@@ -1,7 +1,6 @@
 .idea/
 vendor/
 test/data/
-test/assets/module/*
-!test/assets/module/*Original
+test/assets/module/*/config/module.config.php
 clover.xml
 coveralls-upload.json

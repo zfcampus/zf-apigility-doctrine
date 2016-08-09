@@ -29,9 +29,9 @@ return [
             __DIR__ . '/local.php',
         ],
         'module_paths' => [
-            'ZFTestApigilityGeneral' => __DIR__ . '/../../assets/module/General',
-            'ZFTestApigilityDbMongo' => __DIR__ . '/../../assets/module/DbMongo',
-            'ZFTestApigilityDbMongoApi' => __DIR__ . '/../../assets/module/DbMongoApi',
+            'ZFTestApigilityGeneral' => __DIR__ . '/../../assets/module/ZFTestApigilityGeneral',
+            'ZFTestApigilityDbMongo' => __DIR__ . '/../../assets/module/ZFTestApigilityDbMongo',
+            'ZFTestApigilityDbMongoApi' => __DIR__ . '/../../assets/module/ZFTestApigilityDbMongoApi',
         ],
     ],
 ];

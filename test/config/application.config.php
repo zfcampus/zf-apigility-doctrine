@@ -29,9 +29,9 @@ return [
             __DIR__ . '/testing.config.php',
         ],
         'module_paths' => [
-            'ZFTestApigilityGeneral' => __DIR__ . '/../assets/module/General',
-            'ZFTestApigilityDb' => __DIR__ . '/../assets/module/Db',
-            'ZFTestApigilityDbApi' => __DIR__ . '/../assets/module/DbApi',
+            'ZFTestApigilityGeneral' => __DIR__ . '/../assets/module/ZFTestApigilityGeneral',
+            'ZFTestApigilityDb' => __DIR__ . '/../assets/module/ZFTestApigilityDb',
+            'ZFTestApigilityDbApi' => __DIR__ . '/../assets/module/ZFTestApigilityDbApi',
         ],
     ],
 ];
