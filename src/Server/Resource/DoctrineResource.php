@@ -12,6 +12,7 @@ use DoctrineModule\Stdlib\Hydrator;
 use Zend\EventManager\EventInterface;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
+use ZF\Apigility\Doctrine\Server\Resource\EntityFactory\EntityFactoryInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
@@ -303,9 +304,10 @@ class DoctrineResource extends AbstractResourceListener implements
      * Create a resource
      *
      * @param  mixed $data
-     * @return ApiProblem|mixed
+     * @param EntityFactoryInterface $entityFactory A factory to delegate instantiation of the entity
+     * @return mixed|ApiProblem
      */
-    public function create($data)
+    public function create($data, EntityFactoryInterface $entityFactory = null)
     {
         $entityClass = $this->getEntityClass();
 
@@ -314,7 +316,7 @@ class DoctrineResource extends AbstractResourceListener implements
             return $data;
         }
 
-        $entity = new $entityClass;
+        $entity = $entityFactory ? $entityFactory->createEntity($data) : new $entityClass;
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
