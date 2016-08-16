@@ -10,7 +10,7 @@ final class DisabledConstructorEntityFactory implements EntityFactoryInterface
     /**
      * Creates a Doctrine entity
      *
-     * @param string $entityClass
+     * @param string|object $entityClass
      * @param array $data Request data before DoctrineResourceEvent is triggered.
      * @return object
      */
