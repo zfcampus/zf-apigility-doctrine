@@ -6,17 +6,26 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoClient;
 use Zend\Http\Request;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
+use ZF\Apigility\Doctrine\DoctrineResource;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 use ZFTest\Apigility\Doctrine\TestCase;
-use ZFTestApigilityDbMongo\Document\Meta as MetaEntity;
+use ZFTestApigilityDbMongo\Document\Meta;
+use ZFTestApigilityGeneral\Listener\EventCatcher;
 
 class CRUDTest extends TestCase
 {
+    /**
+     * @var DocumentManager
+     */
+    protected $dm;
+
     protected function setUp()
     {
         parent::setUp();
@@ -26,6 +35,13 @@ class CRUDTest extends TestCase
         );
 
         $this->buildODMApi();
+    }
+
+    protected function tearDown()
+    {
+        $this->clearData();
+
+        parent::tearDown();
     }
 
     protected function buildODMApi()
@@ -38,7 +54,7 @@ class CRUDTest extends TestCase
         $metaResourceDefinition = [
             'objectManager'        => 'doctrine.documentmanager.odm_default',
             'serviceName'          => 'Meta',
-            'entityClass'          => MetaEntity::class,
+            'entityClass'          => Meta::class,
             'routeIdentifierName'  => 'meta_id',
             'entityIdentifierName' => 'id',
             'routeMatch'           => '/test/meta',
@@ -50,6 +66,9 @@ class CRUDTest extends TestCase
         $this->assertInstanceOf(DoctrineRestServiceEntity::class, $metaEntity);
 
         $this->reset();
+
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $this->dm = $serviceManager->get('doctrine.documentmanager.odm_default');
     }
 
     protected function clearData()
@@ -63,95 +82,76 @@ class CRUDTest extends TestCase
         $collection->remove();
     }
 
-    /**
-     * @param $expectedEvents
-     */
-    protected function validateTriggeredEvents($expectedEvents)
-    {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $eventCatcher = $serviceManager->get('ZFTestApigilityGeneral\Listener\EventCatcher');
-
-        $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
-    }
-
     public function testCreate()
     {
-        $this->getRequest()->getHeaders()->addHeaders([
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
-        ]);
-        $this->getRequest()->setMethod(Request::METHOD_POST);
-        $this->getRequest()->setContent('{"name": "ArtistOne","createdAt": "2011-12-18 13:17:17"}');
-        $this->dispatch('/test/meta');
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+
+        $this->dispatch(
+            '/test/meta',
+            Request::METHOD_POST,
+            [
+                'name' => 'MetaOne',
+                'createdAt' => '2016-08-21 23:04:19',
+            ]
+        );
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('ArtistOne', $body['name']);
-        $this->assertEquals(201, $this->getResponseStatusCode());
+
+        $this->assertResponseStatusCode(201);
+        $this->assertEquals('MetaOne', $body['name']);
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
         ]);
+    }
 
-        // Test create() with listener that returns ApiProblem
-        $this->reset();
-        $this->setUp();
-
+    public function testCreateWithListenerThatReturnsApiProblem()
+    {
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
         $sharedEvents->attach(
-            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResource::class,
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestCreateFailure');
             }
         );
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
 
-        $this->getRequest()->getHeaders()->addHeaders([
-            'Accept' => 'application/json',
-            'Content-type' => 'application/json',
-        ]);
-        $this->getRequest()->setMethod(Request::METHOD_POST);
-        $this->getRequest()->setContent('{"name": "ArtistEleven","createdAt": "2011-12-18 13:17:17"}');
-        $this->dispatch('/test/meta');
+        $this->dispatch(
+            '/test/meta',
+            Request::METHOD_POST,
+            ['name' => 'Meta ODM', 'createdAt' => '2016-08-21 23:09:58']
+        );
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
-        $this->assertEquals(400, $this->getResponseStatusCode());
     }
 
     public function testFetch()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $dm = $serviceManager->get('doctrine.documentmanager.odm_default');
-        $this->clearData();
-
-        $meta = new MetaEntity();
-        $meta->setName('ArtistTwo');
-        $meta->setCreatedAt(new \Datetime());
-        $dm->persist($meta);
-        $dm->flush();
-
-        $this->getRequest()->getHeaders()->addHeaders([
-            'Accept' => 'application/json',
-        ]);
+        $meta = $this->createMeta('Meta Fetch');
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
         $this->getRequest()->setMethod(Request::METHOD_GET);
-        $this->getRequest()->setContent(null);
+
         $this->dispatch('/test/meta/' . $meta->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(200, $this->getResponseStatusCode());
-        $this->assertEquals('ArtistTwo', $body['name']);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals('Meta Fetch', $body['name']);
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_FETCH_PRE,
             DoctrineResourceEvent::EVENT_FETCH_POST,
         ]);
+    }
 
-        // Test fetch() with listener that returns ApiProblem
-        // Listener will not run because ApiProblem of 404 returns first
-        $this->reset();
-        $this->setUp();
-
+    public function testFetchWithListenerThatReturnsApiProblem()
+    {
+        $meta = $this->createMeta('Meta Fetch ApiProblem');
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
         $sharedEvents->attach(
-            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResource::class,
             DoctrineResourceEvent::EVENT_FETCH_PRE,
             function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
@@ -160,163 +160,278 @@ class CRUDTest extends TestCase
         );
 
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
-        $this->dispatch('/test/meta/' . 111);
+
+        $this->dispatch('/test/meta/' . $meta->getId());
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
-        $this->assertEquals(400, $this->getResponseStatusCode());
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
+        $this->assertEquals('ZFTestFetchFailure', $body['detail']);
     }
 
     public function testFetchAll()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $dm = $serviceManager->get('doctrine.documentmanager.odm_default');
-        $this->clearData();
-
-        $meta = new MetaEntity();
-        $meta->setName('ArtistThree');
-        $meta->setCreatedAt(new \Datetime());
-        $dm->persist($meta);
-        $meta = new MetaEntity();
-        $meta->setName('ArtistFour');
-        $meta->setCreatedAt(new \Datetime());
-        $dm->persist($meta);
-        $dm->flush();
-
-        $this->getRequest()->getHeaders()->addHeaders([
-            'Accept' => 'application/json',
-        ]);
+        $meta1 = $this->createMeta('Meta 1');
+        $meta2 = $this->createMeta('Meta 2');
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
         $this->getRequest()->setMethod(Request::METHOD_GET);
-        $this->getRequest()->setContent(null);
+
         $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals(200, $this->getResponseStatusCode());
-        $this->assertEquals(2, count($body['_embedded']['meta']));
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals(2, $body['total_items']);
+        $this->assertCount(2, $body['_embedded']['meta']);
+        $this->assertEquals($meta1->getId(), $body['_embedded']['meta'][0]['id']);
+        $this->assertEquals($meta2->getId(), $body['_embedded']['meta'][1]['id']);
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
         ]);
+    }
 
-        // Test fetchAll() with listener that returns ApiProblem
-        $this->reset();
-        $this->setUp();
+    public function testFetchAllEmptyCollection()
+    {
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_GET);
 
+        $this->dispatch('/test/meta');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals(0, $body['total_items']);
+        $this->assertCount(0, $body['_embedded']['meta']);
+        $this->validateTriggeredEvents([
+            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
+            DoctrineResourceEvent::EVENT_FETCH_ALL_POST,
+        ]);
+    }
+
+    public function testFetchAllWithListenerThatReturnsApiProblem()
+    {
+        $this->createMeta('Meta FetchAll ApiProblem');
         $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
         $sharedEvents->attach(
-            'ZF\Apigility\Doctrine\DoctrineResource',
+            DoctrineResource::class,
             DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
             function (DoctrineResourceEvent $e) {
                 $e->stopPropagation();
                 return new ApiProblem(400, 'ZFTestFetchAllFailure');
             }
         );
-
-        $this->getRequest()->setContent(null);
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
-        $this->dispatch('/test/meta?orderBy%5Bname%5D=ASC');
+
+        $this->dispatch('/test/meta');
         $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertInstanceOf('ZF\ApiProblem\ApiProblemResponse', $this->getResponse());
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestFetchAllFailure', $body['detail']);
-        $this->assertEquals(400, $this->getResponseStatusCode());
     }
-    /*
+
     public function testPatch()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
-
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistSix');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
-
+        $meta = $this->createMeta('Meta Patch');
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
         ]);
         $this->getRequest()->setMethod(Request::METHOD_PATCH);
-        $this->getRequest()->setContent('{"name":"ArtistOnePatchEdit"}');
-        $this->dispatch('/test/artist/' . $artist->getId());
-        $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('ArtistOnePatchEdit', $body['name']);
+        $this->getRequest()->setContent(json_encode(['name' => 'Meta Patch Edit']));
 
-        $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
-        $this->assertEquals('ArtistOnePatchEdit', $foundEntity->getName());
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals('Meta Patch Edit', $body['name']);
+        $this->assertEquals($meta->getId(), $body['id']);
+        $foundEntity = $this->dm->getRepository(Meta::class)->find($meta->getId());
+        $this->assertEquals('Meta Patch Edit', $foundEntity->getName());
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_PATCH_PRE,
             DoctrineResourceEvent::EVENT_PATCH_POST,
         ]);
     }
 
+    public function testPatchWithListenerThatReturnsApiProblem()
+    {
+        $meta = $this->createMeta('Meta Patch ApiProblem');
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            DoctrineResource::class,
+            DoctrineResourceEvent::EVENT_PATCH_PRE,
+            function (DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestPatchFailure');
+            }
+        );
+        $this->getRequest()->getHeaders()->addHeaders([
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+        ]);
+        $this->getRequest()->setMethod(Request::METHOD_PATCH);
+        $this->getRequest()->setContent(json_encode(['name' => 'MetaTenPatchEdit']));
+
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
+        $this->assertEquals('ZFTestPatchFailure', $body['detail']);
+    }
+
     public function testPut()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
-
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistSeven');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
-
+        $meta = $this->createMeta('Meta Put');
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
         ]);
         $this->getRequest()->setMethod(Request::METHOD_PUT);
-        $this->getRequest()->setContent('{"name": "ArtistSevenPutEdit","createdAt": "2012-12-18 13:17:17"}');
-        $this->dispatch('/test/artist/' . $artist->getId());
-        $body = json_decode($this->getResponse()->getBody(), true);
-        $this->assertEquals('ArtistSevenPutEdit', $body['name']);
+        $this->getRequest()->setContent(json_encode([
+            'name' => 'Meta Put Edit',
+            'createdAt' => '2016-08-22 00:08:19',
+        ]));
 
-        $foundEntity = $em->getRepository('Db\Entity\Artist')->find($artist->getId());
-        $this->assertEquals('ArtistSevenPutEdit', $foundEntity->getName());
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals('Meta Put Edit', $body['name']);
+        $foundEntity = $this->dm->getRepository(Meta::class)->find($meta->getId());
+        $this->assertEquals('Meta Put Edit', $foundEntity->getName());
+        $this->assertEquals('2016-08-22 00:08:19', $foundEntity->getCreatedAt()->format('Y-m-d H:i:s'));
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
             DoctrineResourceEvent::EVENT_UPDATE_POST,
         ]);
     }
 
-    public function testDelete()
+    public function testPutWithListenerThatReturnsApiProblem()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
-
-        $artist = new ArtistEntity();
-        $artist->setName('ArtistFive');
-        $artist->setCreatedAt(new \Datetime());
-        $em->persist($artist);
-        $em->flush();
-
-        $id = $artist->getId();
-
+        $meta = $this->createMeta('Meta Put ApiProblem');
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            DoctrineResource::class,
+            DoctrineResourceEvent::EVENT_UPDATE_PRE,
+            function (DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestPutFailure');
+            }
+        );
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
+            'Content-type' => 'application/json',
         ]);
-        $this->getRequest()->setMethod(Request::METHOD_DELETE);
-        $this->dispatch('/test/artist/' . $artist->getId());
-        $this->assertEquals(204, $this->getResponseStatusCode());
+        $this->getRequest()->setMethod(Request::METHOD_PUT);
+        $this->getRequest()->setContent(json_encode([
+            'name' => 'Meta Put Edit',
+            'createdAt' => '2016-08-21 22:10:19',
+        ]));
 
-        $this->assertEmpty($em->getRepository('Db\Entity\Artist')->find($id));
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
+        $this->assertEquals('ZFTestPutFailure', $body['detail']);
+    }
+
+    public function testDelete()
+    {
+        $meta = $this->createMeta('Meta Delete');
+        $id = $meta->getId();
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+
+        $this->dispatch('/test/meta/' . $id);
+
+        $this->assertResponseStatusCode(204);
+        $this->assertNull($this->dm->getRepository(Meta::class)->find($id));
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_DELETE_PRE,
             DoctrineResourceEvent::EVENT_DELETE_POST,
         ]);
-
-        // Test DELETE: entity not found
-
-        $this->reset();
-        $this->setUp();
-
-        $id = -1;
-
-        $this->getRequest()->getHeaders()->addHeaders([
-            'Accept' => 'application/json',
-        ]);
-        $this->getRequest()->setMethod(Request::METHOD_DELETE);
-        $this->dispatch('/test/artist/' . $artist->getId());
-        $this->assertEquals(404, $this->getResponseStatusCode());
     }
 
-    */
+    public function testDeleteWithListenerThatReturnsApiProblem()
+    {
+        $meta = $this->createMeta('Meta Delete ApiProblem');
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            DoctrineResource::class,
+            DoctrineResourceEvent::EVENT_DELETE_PRE,
+            function (DoctrineResourceEvent $e) {
+                $e->stopPropagation();
+                return new ApiProblem(400, 'ZFTestDeleteFailure');
+            }
+        );
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+
+        $this->dispatch('/test/meta/' . $meta->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
+        $this->assertEquals('ZFTestDeleteFailure', $body['detail']);
+        $foundEntity = $this->dm->getRepository(Meta::class)->find($meta->getId());
+        $this->assertEquals($meta->getId(), $foundEntity->getId());
+    }
+
+    public function testDeleteEntityNotFound()
+    {
+        $meta = $this->createMeta();
+        $id = $meta->getId() + 1;
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+
+        $this->dispatch('/test/meta/' . $id);
+
+        $this->assertResponseStatusCode(404);
+        $this->validateTriggeredEvents([]);
+        $this->assertNull($this->dm->getRepository(Meta::class)->find($id));
+    }
+
+    public function testDeleteEntityDeleted()
+    {
+        $meta = $this->createMeta();
+        $id = $meta->getId();
+        $this->dm->remove($meta);
+        $this->dm->flush();
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+
+        $this->dispatch('/test/meta/' . $id);
+
+        $this->assertResponseStatusCode(404);
+        $this->validateTriggeredEvents([]);
+        $this->assertNull($this->dm->getRepository(Meta::class)->find($id));
+    }
+
+    /**
+     * @param array $expectedEvents
+     */
+    protected function validateTriggeredEvents(array $expectedEvents)
+    {
+        $serviceManager = $this->getApplication()->getServiceManager();
+        $eventCatcher = $serviceManager->get(EventCatcher::class);
+
+        $this->assertEquals($expectedEvents, $eventCatcher->getCaughtEvents());
+    }
+
+    /**
+     * @param null|string $name
+     * @return Meta
+     */
+    protected function createMeta($name = null)
+    {
+        $meta = new Meta();
+        $meta->setName($name ?: 'Meta Name');
+        $meta->setCreatedAt(new \DateTime());
+        $this->dm->persist($meta);
+        $this->dm->flush();
+
+        return $meta;
+    }
 }
