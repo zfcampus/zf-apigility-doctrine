@@ -44,14 +44,14 @@ class QueryProviderManager extends AbstractPluginManager
      *
      * @param mixed $plugin
      * @return void
-     * @throws Exception\RuntimeException
+     * @throws Exception\InvalidArgumentException
      */
     public function validatePlugin($plugin)
     {
         try {
             $this->validate($plugin);
         } catch (Exception\InvalidServiceException $e) {
-            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
+            throw new Exception\InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }
