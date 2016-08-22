@@ -4,10 +4,11 @@ namespace ZFTestApigilityGeneral\Listener;
 
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
+use ZF\Apigility\Doctrine\DoctrineResource;
 
 class EventCatcher
 {
-    const EVENT_IDENTIFIER = 'ZF\Apigility\Doctrine\DoctrineResource';
+    const EVENT_IDENTIFIER = DoctrineResource::class;
 
     /**
      * @var array

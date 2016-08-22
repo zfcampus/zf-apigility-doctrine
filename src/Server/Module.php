@@ -7,6 +7,8 @@
 namespace ZF\Apigility\Doctrine\Server;
 
 use Zend\ModuleManager\ModuleManager;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 
 class Module
 {
@@ -33,14 +35,14 @@ class Module
         $serviceListener->addServiceManager(
             'ZfApigilityDoctrineQueryProviderManager',
             'zf-apigility-doctrine-query-provider',
-            'ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface',
+            QueryProviderInterface::class,
             'getZfApigilityDoctrineQueryProviderConfig'
         );
 
         $serviceListener->addServiceManager(
             'ZfApigilityDoctrineQueryCreateFilterManager',
             'zf-apigility-doctrine-query-create-filter',
-            'ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface',
+            QueryCreateFilterInterface::class,
             'getZfApigilityDoctrineQueryCreateFilterConfig'
         );
     }

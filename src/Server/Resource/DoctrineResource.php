@@ -22,12 +22,14 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\SharedEventManager;
 use Zend\Hydrator\HydratorAwareInterface;
 use Zend\Hydrator\HydratorInterface;
+use Zend\Mvc\ModuleRouteListener;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\Apigility\Doctrine\Server\Exception\InvalidArgumentException;
 use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
 use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
+use ZF\Rest\RestController;
 
 class DoctrineResource extends AbstractResourceListener implements
     ObjectManagerAwareInterface,
@@ -535,7 +537,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $entityClass = $this->getEntityClass();
 
         $this->getSharedEventManager()->attach(
-            'ZF\Rest\RestController',
+            RestController::class,
             'getList.post',
             function (EventInterface $e) use ($queryProvider, $entityClass, $data) {
                 /** @var \ZF\Hal\Collection $halCollection */
@@ -697,8 +699,11 @@ class DoctrineResource extends AbstractResourceListener implements
             unset($routeParams[$this->getRouteIdentifierName()]);
         }
 
-        $reservedRouteParams = ['controller','action',
-            \Zend\Mvc\ModuleRouteListener::MODULE_NAMESPACE,\Zend\Mvc\ModuleRouteListener::ORIGINAL_CONTROLLER,
+        $reservedRouteParams = [
+            'controller',
+            'action',
+            ModuleRouteListener::MODULE_NAMESPACE,
+            ModuleRouteListener::ORIGINAL_CONTROLLER,
         ];
         $allowedRouteParams = array_diff_key($routeParams, array_flip($reservedRouteParams));
 

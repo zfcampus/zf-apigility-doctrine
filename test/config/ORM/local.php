@@ -10,7 +10,7 @@ return [
             'orm_default' => [
                 'configuration' => 'orm_default',
                 'eventmanager'  => 'orm_default',
-                'driverClass'   => 'Doctrine\DBAL\Driver\PDOSqlite\Driver',
+                'driverClass'   => \Doctrine\DBAL\Driver\PDOSqlite\Driver::class,
                 'params' => [
                     'memory' => true,
                 ],
@@ -19,7 +19,7 @@ return [
     ],
     'zf-orm-collection-filter' => [
         'invokables' => [
-            'innerjoin' => 'ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\InnerJoin',
+            'innerjoin' => \ZF\Apigility\Doctrine\Server\Collection\Filter\ORM\InnerJoin::class,
         ],
     ],
 ];
