@@ -334,7 +334,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         }
 
         foreach (array_keys($config['zf-rest']) as $controllerService) {
-            // Because a verion is always supplied this check may not be necessary
+            // Because a version is always supplied this check may not be necessary
             if (! $pattern) {
                 $services[] = $this->fetch($controllerService);
                 continue;

@@ -128,7 +128,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     /**
      * Retrieve the resource class based on the provided configuration.
      *
-     * Defaults to ZF\Apigility\DbConnectedResource.
+     * Defaults to ZF\Apigility\Doctrine\Server\Resource\DoctrineResource.
      *
      * @param array $config
      * @param string $requestedName

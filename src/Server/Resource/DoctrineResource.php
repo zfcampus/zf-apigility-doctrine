@@ -663,11 +663,12 @@ class DoctrineResource extends AbstractResourceListener implements
      *
      * @param $id
      * @param $method
+     * @param null|array $data parameters
      * @return object
      */
     protected function findEntity($id, $method, $data = null)
     {
-        // Match identiy identifier name(s) with id(s)
+        // Match identity identifier name(s) with id(s)
         $ids = explode($this->getMultiKeyDelimiter(), $id);
         $keys = explode($this->getMultiKeyDelimiter(), $this->getEntityIdentifierName());
         $criteria = [];
