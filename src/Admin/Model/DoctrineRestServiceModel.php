@@ -240,9 +240,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
     {
         $config = $this->configResource->fetch(true);
 
-        if (! isset($config['zf-rest'])
-            || ! isset($config['zf-rest'][$controllerService])
-        ) {
+        if (! isset($config['zf-rest'][$controllerService])) {
             throw new Exception\RuntimeException(sprintf(
                 'Could not find REST resource by name of %s',
                 $controllerService
@@ -790,7 +788,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
 
         // Verify the object manager exists
         $objectManager      = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = (isset($entityValue['strategies'])) ? $entityValue['strategies'] : [];
+        $hydratorStrategies = isset($entityValue['strategies']) ? $entityValue['strategies'] : [];
 
         foreach ($hydratorStrategies as $strategy) {
             if (! $this->getServiceManager()->has($strategy)) {
@@ -950,17 +948,13 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         }
 
         $acceptWhitelist = $update->acceptWhitelist;
-        if (is_array($acceptWhitelist)
-            && ! empty($acceptWhitelist)
-        ) {
+        if (is_array($acceptWhitelist) && $acceptWhitelist) {
             $key = $baseKey . 'accept-whitelist.' . $service;
             $this->configResource->patchKey($key, $acceptWhitelist);
         }
 
         $contentTypeWhitelist = $update->contentTypeWhitelist;
-        if (is_array($contentTypeWhitelist)
-            && ! empty($contentTypeWhitelist)
-        ) {
+        if (is_array($contentTypeWhitelist) && $contentTypeWhitelist) {
             $key = $baseKey . 'content-type-whitelist.' . $service;
             $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
@@ -1210,25 +1204,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
 
         $config = $config['zf-content-negotiation'];
 
-        if (isset($config['controllers'])
-            && isset($config['controllers'][$controllerServiceName])
-        ) {
+        if (isset($config['controllers'][$controllerServiceName])) {
             $metadata->exchangeArray([
                 'selector' => $config['controllers'][$controllerServiceName],
             ]);
         }
 
-        if (isset($config['accept-whitelist'])
-            && isset($config['accept-whitelist'][$controllerServiceName])
-        ) {
+        if (isset($config['accept-whitelist'][$controllerServiceName])) {
             $metadata->exchangeArray([
                 'accept_whitelist' => $config['accept-whitelist'][$controllerServiceName],
             ]);
         }
 
-        if (isset($config['content-type-whitelist'])
-            && isset($config['content-type-whitelist'][$controllerServiceName])
-        ) {
+        if (isset($config['content-type-whitelist'][$controllerServiceName])) {
             $metadata->exchangeArray([
                 'content-type-whitelist' => $config['content-type-whitelist'][$controllerServiceName],
             ]);
@@ -1244,9 +1232,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     protected function mergeHalConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
-        if (! isset($config['zf-hal'])
-            || ! isset($config['zf-hal']['metadata_map'])
-        ) {
+        if (! isset($config['zf-hal']['metadata_map'])) {
             return;
         }
 
@@ -1281,7 +1267,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             return $config['zf-rest'][$controllerServiceName]['entity_class'];
         }
 
-        $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
+        $module = $metadata->module == $this->module ? $this->module : $metadata->module;
         $q = preg_quote('\\');
         if (! preg_match(
             sprintf(
@@ -1315,7 +1301,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             return $config['zf-rest'][$controllerServiceName]['collection_class'];
         }
 
-        $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
+        $module = $metadata->module == $this->module ? $this->module : $metadata->module;
         if (! preg_match(
             '#'
             . preg_quote($module . '\\Rest\\')

@@ -282,8 +282,7 @@ class CollectionListener implements ListenerAggregateInterface
      */
     protected function validateAssociationData($association, $data)
     {
-        return array_key_exists($association, $data)
-           && ! empty($data[$association])
+        return ! empty($data[$association])
            && (is_array($data[$association]) || $data[$association] instanceof \Traversable);
     }
 

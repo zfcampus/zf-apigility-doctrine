@@ -68,9 +68,7 @@ class DoctrineRpcServiceModel
     {
         $data   = ['controller_service_name' => $controllerServiceName];
         $config = $this->configResource->fetch(true);
-        if (isset($config['zf-rpc'])
-            && isset($config['zf-rpc'][$controllerServiceName])
-        ) {
+        if (isset($config['zf-rpc'][$controllerServiceName])) {
             $rpcConfig = $config['zf-rpc'][$controllerServiceName];
             if (isset($rpcConfig['route_name'])) {
                 $data['route_name']  = $rpcConfig['route_name'];
@@ -85,22 +83,16 @@ class DoctrineRpcServiceModel
 
         if (isset($config['zf-content-negotiation'])) {
             $contentNegotiationConfig = $config['zf-content-negotiation'];
-            if (isset($contentNegotiationConfig['controllers'])
-                && isset($contentNegotiationConfig['controllers'][$controllerServiceName])
-            ) {
+            if (isset($contentNegotiationConfig['controllers'][$controllerServiceName])) {
                 $data['selector'] = $contentNegotiationConfig['controllers'][$controllerServiceName];
             }
 
-            if (isset($contentNegotiationConfig['accept_whitelist'])
-                && isset($contentNegotiationConfig['accept_whitelist'][$controllerServiceName])
-            ) {
+            if (isset($contentNegotiationConfig['accept_whitelist'][$controllerServiceName])) {
                 // Is this handled differently in recent versions of Apigility // FIXME: verify this\
                 $data['accept_whitelist'] = $contentNegotiationConfig['accept_whitelist'][$controllerServiceName];
             }
 
-            if (isset($contentNegotiationConfig['content_type_whitelist'])
-                && isset($contentNegotiationConfig['content_type_whitelist'][$controllerServiceName])
-            ) {
+            if (isset($contentNegotiationConfig['content_type_whitelist'][$controllerServiceName])) {
                 // Is this handled differently in recent versions of Apigility // FIXME: verify this\
                 $data['content_type_whitelist'] =
                     $contentNegotiationConfig['content_type_whitelist'][$controllerServiceName];
@@ -667,9 +659,7 @@ class DoctrineRpcServiceModel
      */
     protected function getRouteMatchStringFromModuleConfig($routeName, array $config)
     {
-        if (! isset($config['router'])
-            || ! isset($config['router']['routes'])
-        ) {
+        if (! isset($config['router']['routes'])) {
             return false;
         }
 
@@ -682,9 +672,7 @@ class DoctrineRpcServiceModel
 
         $config = $config[$routeName];
 
-        if (! isset($config['options'])
-            || ! isset($config['options']['route'])
-        ) {
+        if (! isset($config['options']['route'])) {
             return false;
         }
 
