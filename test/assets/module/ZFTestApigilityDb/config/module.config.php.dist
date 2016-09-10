@@ -2,22 +2,33 @@
 
 namespace ZFTestApigilityDb;
 
+use Zend\ServiceManager\Factory\InvokableFactory;
+
 return [
     'service_manager' => [
-        'invokables' => [
-            'Artist_aggregate_listener' =>
-                'ZFTestApigilityDb\EventListener\ArtistAggregateListener',
+        'aliases' => [
+            'Artist_aggregate_listener' => EventListener\ArtistAggregateListener::class,
+        ],
+        'factories' => [
+            EventListener\ArtistAggregateListener::class => InvokableFactory::class,
         ],
     ],
     'zf-apigility-doctrine-query-provider' => [
-        'invokables' => [
-            'Artist_default' => 'ZFTestApigilityDb\Query\Provider\Artist\DefaultQueryProvider',
-            'Artist_update' => 'ZFTestApigilityDb\Query\Provider\Artist\UpdateQueryProvider',
+        'aliases' => [
+            'Artist_default' => Query\Provider\Artist\DefaultQueryProvider::class,
+            'Artist_update' => Query\Provider\Artist\UpdateQueryProvider::class,
+        ],
+        'factories' => [
+            Query\Provider\Artist\DefaultQueryProvider::class => InvokableFactory::class,
+            Query\Provider\Artist\UpdateQueryProvider::class => InvokableFactory::class,
         ],
     ],
     'zf-apigility-doctrine-query-create-filter' => [
-        'invokables' => [
-            'Artist' => 'ZFTestApigilityDb\Query\CreateFilter\ArtistCreateFilter',
+        'aliases' => [
+            'Artist' => Query\CreateFilter\ArtistCreateFilter::class,
+        ],
+        'factories' => [
+            Query\CreateFilter\ArtistCreateFilter::class => InvokableFactory::class,
         ],
     ],
     'zf-apigility' => [

@@ -6,6 +6,8 @@
 
 namespace ZF\Apigility\Doctrine\Server;
 
+use Zend\ServiceManager\Factory\InvokableFactory;
+
 return [
     'service_manager' => [
         'abstract_factories' => [
@@ -20,15 +22,22 @@ return [
     ],
 
     'zf-apigility-doctrine-query-provider' => [
-        'invokables' => [
-            'default_orm' => Query\Provider\DefaultOrm::class,
+        'aliases' => [
             'default_odm' => Query\Provider\DefaultOdm::class,
+            'default_orm' => Query\Provider\DefaultOrm::class,
+        ],
+        'factories' => [
+            Query\Provider\DefaultOdm::class => InvokableFactory::class,
+            Query\Provider\DefaultOrm::class => InvokableFactory::class,
         ],
     ],
 
     'zf-apigility-doctrine-query-create-filter' => [
-        'invokables' => [
+        'aliases' => [
             'default' => Query\CreateFilter\DefaultCreateFilter::class,
+        ],
+        'factories' => [
+            Query\CreateFilter\DefaultCreateFilter::class => InvokableFactory::class,
         ],
     ],
 
@@ -41,7 +50,7 @@ return [
     'validators' => [
         'factories' => [
             Validator\NoObjectExists::class => Validator\NoObjectExistsFactory::class,
-            Validator\ObjectExists::class => Validator\ObjectExistsFactory::class,
+            Validator\ObjectExists::class   => Validator\ObjectExistsFactory::class,
         ],
     ],
 ];

@@ -275,8 +275,11 @@ class DoctrineRpcServiceModel
         $this->configResource->patch(
             [
                 'controllers' => [
-                    'invokables' => [
+                    'aliases' => [
                         $controllerService => $fullClassName,
+                    ],
+                    'factories' => [
+                        $fullClassName => InvokableFactory::class,
                     ],
                 ],
             ],
@@ -520,6 +523,17 @@ class DoctrineRpcServiceModel
 
         $key = ['zf-rpc-doctrine-controller', $serviceName];
         $this->configResource->deleteKey($key);
+
+        $config = $this->configResource->fetch();
+        if (isset($config['controllers.aliases.' . $serviceName])) {
+            $fullClassName = $config['controllers.aliases.' . $serviceName];
+
+            $key = ['controllers', 'aliases', $serviceName];
+            $this->configResource->deleteKey($key);
+
+            $key = ['controllers', 'factories', $fullClassName];
+            $this->configResource->deleteKey($key);
+        }
 
         $key = ['controllers', 'invokables', $serviceName];
         $this->configResource->deleteKey($key);

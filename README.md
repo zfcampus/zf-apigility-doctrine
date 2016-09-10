@@ -155,8 +155,11 @@ A custom plugin manager is available to register your own query providers.  This
 
 ```php
 'zf-apigility-doctrine-query-provider' => [
-    'invokables' => [
-        'entity_name_fetch_all' => 'Application\Query\Provider\EntityName\FetchAll',
+    'aliases' => [
+        'entity_name_fetch_all' => \Application\Query\Provider\EntityName\FetchAll::class,
+    ],
+    'factories' => [
+        \Application\Query\Provider\EntityName\FetchAll::class => \Zend\ServiceManager\Factory\InvokableFactory::class,
     ],
 ],
 ```
@@ -195,8 +198,11 @@ A custom plugin manager is available to register your own create filters.  This 
 
 ```php
 'zf-apigility-doctrine-query-create-filter' => [
-    'invokables' => [
-        'entity_name' => 'Application\Query\CreateFilter\EntityName',
+    'aliases' => [
+        'entity_name' => \Application\Query\CreateFilter\EntityName::class,
+    ],
+    'factories' => [
+        \Application\Query\CreateFilter\EntityName::class => \Zend\ServiceManager\Factory\InvokableFactory::class,
     ],
 ],
 ```
