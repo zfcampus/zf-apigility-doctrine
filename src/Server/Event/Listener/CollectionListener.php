@@ -260,8 +260,6 @@ class CollectionListener implements ListenerAggregateInterface
         } else {
             return $this->entityCollectionValuedAssociations[$entity];
         }
-
-
     }
 
     /**
@@ -299,7 +297,6 @@ class CollectionListener implements ListenerAggregateInterface
                && !empty($data[$association])
                && ( is_array($data[$association])
                     || $data[$association] instanceof \Traversable );
-
     }
 
     /**
@@ -326,7 +323,6 @@ class CollectionListener implements ListenerAggregateInterface
         } else {
             return $childInputFilter;
         }
-
     }
 
     /**
@@ -385,7 +381,6 @@ class CollectionListener implements ListenerAggregateInterface
         }
 
         return $this->entityHydratorMap;
-
     }
 
     /**
@@ -394,7 +389,6 @@ class CollectionListener implements ListenerAggregateInterface
     public function getInputFilter()
     {
         return $this->inputFilter;
-
     }
 
     /**
@@ -407,7 +401,6 @@ class CollectionListener implements ListenerAggregateInterface
         $this->inputFilter = $inputFilter;
 
         return $this;
-
     }
 
     /**
@@ -428,7 +421,6 @@ class CollectionListener implements ListenerAggregateInterface
         $this->objectData = $objectData;
 
         return $this;
-
     }
 
     /**
@@ -449,7 +441,6 @@ class CollectionListener implements ListenerAggregateInterface
         $this->objectManager = $objectManager;
 
         return $this;
-
     }
 
     /**
@@ -458,7 +449,6 @@ class CollectionListener implements ListenerAggregateInterface
     public function getRootEntity()
     {
         return $this->rootEntity;
-
     }
 
     /**
@@ -471,7 +461,6 @@ class CollectionListener implements ListenerAggregateInterface
         $this->rootEntity = $rootEntity;
 
         return $this;
-
     }
 
     /**
@@ -480,7 +469,6 @@ class CollectionListener implements ListenerAggregateInterface
     public function getServiceManager()
     {
         return $this->serviceManager;
-
     }
 
     /**
@@ -493,6 +481,5 @@ class CollectionListener implements ListenerAggregateInterface
         $this->serviceManager = $serviceManager;
 
         return $this;
-
     }
 }
