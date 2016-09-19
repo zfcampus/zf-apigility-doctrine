@@ -32,7 +32,8 @@
     "require": {
         "php": ">=5.4 || ^7.0",
         "phpro/zf-doctrine-hydration-module": "^2.0",
-        "zfcampus/zf-apigility": "^1.1"
+        "zfcampus/zf-apigility": "^1.1",
+        "zendframework/zend-eventmanager": "~2.6"
     },
     "suggest": {
         "doctrine/doctrine-orm-module": "For ORM mapping",
