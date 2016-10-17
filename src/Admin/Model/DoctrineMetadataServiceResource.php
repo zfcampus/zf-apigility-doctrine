@@ -1,20 +1,28 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
+use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
+use Zend\ServiceManager\ServiceManager;
+use ZF\Apigility\Admin\Model\RestServiceEntity;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
-use Zend\ServiceManager\ServiceManager;
-use Exception;
 
 class DoctrineMetadataServiceResource extends AbstractResourceListener
 {
+    /**
+     * @var ServiceManager
+     */
     protected $serviceManager;
 
+    /**
+     * @param ServiceManager $serviceManager
+     * @return $this
+     */
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
@@ -22,36 +30,35 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
         return $this;
     }
 
+    /**
+     * @return ServiceManager
+     */
     public function getServiceManager()
     {
         return $this->serviceManager;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function create($data)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 
     /**
      * Fetch REST metadata
      *
-     * @param  string $id
+     * @param string $entityClassName
      * @return RestServiceEntity|ApiProblem
      */
     public function fetch($entityClassName)
     {
         $objectManagerAlias = $this->getEvent()->getRouteParam('object_manager_alias');
 
-        if (!$objectManagerAlias) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No objectManager manager specificed in request.');
-            // @codeCoverageIgnoreEnd
+        if (! $objectManagerAlias) {
+            return new ApiProblem(500, 'No objectManager manager specified in request.');
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerAlias);
+        /** @var AbstractClassMetadataFactory $metadataFactory */
         $metadataFactory = $objectManager->getMetadataFactory();
 
         $metadata = $metadataFactory->getMetadataFor($entityClassName);
@@ -66,25 +73,24 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
     /**
      * Fetch metadata for all REST services
      *
-     * @param  array $params
-     * @return RestServiceEntity[]
+     * @param array $params
+     * @return RestServiceEntity[]|ApiProblem
      */
-    public function fetchAll($params = array())
+    public function fetchAll($params = [])
     {
         if ($this->getEvent()->getRouteParam('object_manager_alias')) {
             $objectManagerClass = $this->getEvent()->getRouteParam('object_manager_alias');
         }
 
-        if (!$objectManagerClass) {
-            // @codeCoverageIgnoreStart
-            return new ApiProblem(500, 'No objectManager manager specificed in request.');
-            // @codeCoverageIgnoreEnd
+        if (empty($objectManagerClass)) {
+            return new ApiProblem(500, 'No objectManager manager specified in request.');
         }
 
         $objectManager = $this->getServiceManager()->get($objectManagerClass);
+        /** @var AbstractClassMetadataFactory $metadataFactory */
         $metadataFactory = $objectManager->getMetadataFactory();
 
-        $return = array();
+        $return = [];
         foreach ($metadataFactory->getAllMetadata() as $metadata) {
             $entityClass = $this->getEntityClass();
             $metadataEntity = new $entityClass;
@@ -96,19 +102,13 @@ class DoctrineMetadataServiceResource extends AbstractResourceListener
         return $return;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function patch($id, $data)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function delete($id)
     {
-        throw new Exception('Not Implemented');
+        throw new \Exception('Not Implemented');
     }
 }

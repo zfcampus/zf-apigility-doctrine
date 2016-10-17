@@ -1,0 +1,79 @@
+<?php
+
+namespace ZFTestApigilityDb;
+
+use Zend\ServiceManager\Factory\InvokableFactory;
+
+return [
+    'service_manager' => [
+        'aliases' => [
+            'Artist_aggregate_listener' => EventListener\ArtistAggregateListener::class,
+        ],
+        'factories' => [
+            EventListener\ArtistAggregateListener::class => InvokableFactory::class,
+        ],
+    ],
+    'zf-apigility-doctrine-query-provider' => [
+        'aliases' => [
+            'Artist_default' => Query\Provider\Artist\DefaultQueryProvider::class,
+            'Artist_update' => Query\Provider\Artist\UpdateQueryProvider::class,
+        ],
+        'factories' => [
+            Query\Provider\Artist\DefaultQueryProvider::class => InvokableFactory::class,
+            Query\Provider\Artist\UpdateQueryProvider::class => InvokableFactory::class,
+        ],
+    ],
+    'zf-apigility-doctrine-query-create-filter' => [
+        'aliases' => [
+            'Artist' => Query\CreateFilter\ArtistCreateFilter::class,
+        ],
+        'factories' => [
+            Query\CreateFilter\ArtistCreateFilter::class => InvokableFactory::class,
+        ],
+    ],
+    'zf-apigility' => [
+        'doctrine-connected' => [
+            'ZFTestApigilityDbApi\\V1\\Rest\\Artist\\ArtistResource' => [
+                'query_create_filter' => 'Artist',
+                'query_providers' => [
+                    'default' => 'Artist_default',
+                    'update' => 'Artist_update',
+                ],
+                'listeners' => [
+                    'Artist_aggregate_listener',
+                ],
+            ],
+        ],
+    ],
+
+    'doctrine' => [
+        'driver' => [
+           'db_driver' => [
+                'class' => 'Doctrine\ORM\Mapping\Driver\XmlDriver',
+                'paths' => [__DIR__ . '/xml'],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => 'db_driver',
+                ],
+            ],
+        ],
+    ],
+    'view_manager' => [
+        'display_not_found_reason' => true,
+        'display_exceptions'       => true,
+        'json_exceptions'          => [
+            'display'    => true,
+            'ajax_only'  => true,
+            'show_trace' => true,
+        ],
+
+        'doctype'            => 'HTML5',
+        'not_found_template' => 'error/404',
+        'exception_template' => 'error/index',
+        'template_map'       => [],
+        'strategies'         => [
+            'ViewJsonStrategy',
+        ],
+    ],
+];

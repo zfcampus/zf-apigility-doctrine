@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Event;
 
@@ -6,11 +10,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Zend\EventManager\Event;
 use ZF\Rest\ResourceEvent;
 
-/**
- * Class DoctrineResourceEvent
- *
- * @package ZF\Apigility\Doctrine\Server\Event
- */
 class DoctrineResourceEvent extends Event
 {
     const EVENT_FETCH_PRE        = 'fetch.pre';
@@ -61,7 +60,7 @@ class DoctrineResourceEvent extends Event
     protected $entityId;
 
     /**
-     * @param objectManager
+     * @param ObjectManager
      */
     protected $objectManager;
 
@@ -75,7 +74,6 @@ class DoctrineResourceEvent extends Event
 
     /**
      * @param ObjectManager $objectManager
-     *
      * @return $this
      */
     public function setObjectManager(ObjectManager $objectManager)
@@ -86,8 +84,9 @@ class DoctrineResourceEvent extends Event
     }
 
     /**
-     * @return mixed
      * @deprecated Should almost certainly be null at all times as of commit b1cf74e
+     *
+     * @return mixed
      */
     public function getCollection()
     {
@@ -95,9 +94,9 @@ class DoctrineResourceEvent extends Event
     }
 
     /**
-     * @param mixed $collection
-     *
      * @deprecated Callers have been removed in Commit b1cf74e
+     *
+     * @param mixed $collection
      * @return $this
      */
     public function setCollection($collection)
@@ -117,7 +116,6 @@ class DoctrineResourceEvent extends Event
 
     /**
      * @param mixed $entity
-     *
      * @return $this
      */
     public function setEntity($entity)
@@ -137,7 +135,6 @@ class DoctrineResourceEvent extends Event
 
     /**
      * @param mixed $data The Original Data supplied to the Resource Method
-     *
      * @return $this
      */
     public function setData($data)
@@ -157,7 +154,6 @@ class DoctrineResourceEvent extends Event
 
     /**
      * @param \ZF\Rest\ResourceEvent $resourceEvent
-     *
      * @return $this
      */
     public function setResourceEvent($resourceEvent)
@@ -167,7 +163,7 @@ class DoctrineResourceEvent extends Event
         return $this;
     }
 
-    /*
+    /**
      * @return string
      */
     public function getEntityClassName()

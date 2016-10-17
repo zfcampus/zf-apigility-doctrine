@@ -1,175 +1,190 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-return array(
-    'router' => array(
-        'routes' => array(
-            'zf-apigility-doctrine-rpc-service' => array(
+namespace ZF\Apigility\Doctrine\Admin;
+
+use ZF\Apigility\Doctrine\Server;
+
+return [
+    'router' => [
+        'routes' => [
+            'zf-apigility-doctrine-rpc-service' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/apigility/api/module[/:name]/doctrine-rpc[/:controller_service_name]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService',
-                    ),
-                ),
+                    'defaults' => [
+                        'controller' => Controller\DoctrineRpcService::class,
+                    ],
+                ],
                 'may_terminate' => true,
-            ),
-            'zf-apigility-doctrine-service' => array(
+            ],
+            'zf-apigility-doctrine-service' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/apigility/api/module[/:name]/doctrine[/:controller_service_name]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService',
-                    ),
-                ),
+                    'defaults' => [
+                        'controller' => Controller\DoctrineRestService::class,
+                    ],
+                ],
                 'may_terminate' => true,
-            ),
-            'zf-apigility-doctrine-metadata-service' => array(
+            ],
+            'zf-apigility-doctrine-metadata-service' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService',
-                    ),
-                ),
+                    'defaults' => [
+                        'controller' => Controller\DoctrineMetadataService::class,
+                    ],
+                ],
                 'may_terminate' => true,
-            ),
-            'zf-apigility-doctrine-autodiscovery' => array(
+            ],
+            'zf-apigility-doctrine-autodiscovery' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/apigility/api/module/:name/:version/autodiscovery/doctrine/:object_manager_alias',
-                    'defaults' => array(
-                        'controller' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery',
+                    'defaults' => [
+                        'controller' => Controller\DoctrineAutodiscovery::class,
                         'action' => 'discover',
-                    ),
-                ),
-            ),
-        ),
-    ),
+                    ],
+                ],
+            ],
+        ],
+    ],
 
-    'controllers' => array(
-        'factories' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => 'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscoveryControllerFactory'
-        ),
-    ),
+    'service_manager' => [
+        'factories' => [
+            Model\DoctrineAutodiscoveryModel::class      => Model\DoctrineAutodiscoveryModelFactory::class,
+            Model\DoctrineMetadataServiceResource::class => Model\DoctrineMetadataServiceResourceFactory::class,
+            Model\DoctrineRestServiceModelFactory::class => Model\DoctrineRestServiceModelFactoryFactory::class,
+            Model\DoctrineRestServiceResource::class     => Model\DoctrineRestServiceResourceFactory::class,
+            Model\DoctrineRpcServiceModelFactory::class  => Model\DoctrineRpcServiceModelFactoryFactory::class,
+            Model\DoctrineRpcServiceResource::class      => Model\DoctrineRpcServiceResourceFactory::class,
+        ],
+    ],
 
-    'zf-content-negotiation' => array(
-        'controllers' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery'   => 'Json',
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService'     => 'HalJson',
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService'      => 'HalJson',
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => 'HalJson',
-        ),
-        'accept-whitelist' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-        ),
-        'content-type-whitelist' => array(
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
-                'application/json',
-                'application/*+json',
-            ),
-        ),
-    ),
+    'controllers' => [
+        'factories' => [
+            Controller\DoctrineAutodiscovery::class => Controller\DoctrineAutodiscoveryControllerFactory::class,
+        ],
+    ],
 
-    'zf-hal' => array(
-        'metadata_map' => array(
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity' => array(
+    'zf-content-negotiation' => [
+        'controllers' => [
+            Controller\DoctrineAutodiscovery::class   => 'Json',
+            Controller\DoctrineRestService::class     => 'HalJson',
+            Controller\DoctrineRpcService::class      => 'HalJson',
+            Controller\DoctrineMetadataService::class => 'HalJson',
+        ],
+        'accept-whitelist' => [
+            Controller\DoctrineAutodiscovery::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineRpcService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineRestService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineMetadataService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+        ],
+        'content-type-whitelist' => [
+            Controller\DoctrineAutodiscovery::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineRpcService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineRestService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+            Controller\DoctrineMetadataService::class => [
+                'application/json',
+                'application/*+json',
+            ],
+        ],
+    ],
+
+    'zf-hal' => [
+        'metadata_map' => [
+            Model\DoctrineRpcServiceEntity::class => [
                 'hydrator'               => 'ArraySerializable',
                 'route_identifier_name'  => 'controller_service_name',
                 'entity_identifier_name' => 'controller_service_name',
                 'route_name'             => 'zf-apigility-doctrine-rpc-service',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity' => array(
+            ],
+            Model\DoctrineRestServiceEntity::class => [
                 'hydrator'               => 'ArraySerializable',
                 'route_identifier_name'  => 'controller_service_name',
                 'entity_identifier_name' => 'controller_service_name',
                 'route_name'             => 'zf-apigility-doctrine-service',
-            ),
-            'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity' => array(
+            ],
+            Model\DoctrineMetadataServiceEntity::class => [
                 'hydrator'               => 'ArraySerializable',
                 'entity_identifier_name' => 'name',
                 'route_identifier_name'  => 'name',
                 'route_name'             => 'zf-apigility-doctrine-metadata-service',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
-    'zf-rest' => array(
-        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRpcService' => array(
-            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource',
+    'zf-rest' => [
+        Controller\DoctrineRpcService::class => [
+            'listener'                   => Model\DoctrineRpcServiceResource::class,
             'route_name'                 => 'zf-apigility-doctrine-rpc-service',
-            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity',
+            'entity_class'               => Model\DoctrineRpcServiceEntity::class,
             'route_identifier_name'      => 'controller_service_name',
-            'entity_http_methods'        => array('GET', 'POST', 'PATCH', 'DELETE'),
-            'collection_http_methods'    => array('GET', 'POST'),
+            'entity_http_methods'        => ['GET', 'POST', 'PATCH', 'DELETE'],
+            'collection_http_methods'    => ['GET', 'POST'],
             'collection_name'            => 'doctrine-rpc',
-            'collection_query_whitelist' => array('version'),
-        ),
-        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineRestService' => array(
-            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource',
+            'collection_query_whitelist' => ['version'],
+        ],
+        Controller\DoctrineRestService::class => [
+            'listener'                   => Model\DoctrineRestServiceResource::class,
             'route_name'                 => 'zf-apigility-doctrine-service',
-            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity',
+            'entity_class'               => Model\DoctrineRestServiceEntity::class,
             'route_identifier_name'      => 'controller_service_name',
-            'entity_http_methods'        => array('GET', 'POST', 'PATCH', 'DELETE'),
-            'collection_http_methods'    => array('GET', 'POST'),
+            'entity_http_methods'        => ['GET', 'POST', 'PATCH', 'DELETE'],
+            'collection_http_methods'    => ['GET', 'POST'],
             'collection_name'            => 'doctrine',
-            'collection_query_whitelist' => array('version'),
-        ),
-        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineMetadataService' => array(
-            'listener'                   => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource',
+            'collection_query_whitelist' => ['version'],
+        ],
+        Controller\DoctrineMetadataService::class => [
+            'listener'                   => Model\DoctrineMetadataServiceResource::class,
             'route_name'                 => 'zf-apigility-doctrine-metadata-service',
-            'entity_class'               => 'ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceEntity',
+            'entity_class'               => Model\DoctrineMetadataServiceEntity::class,
             'route_identifier_name'      => 'name',
-            'entity_http_methods'        => array('GET'),
-            'collection_http_methods'    => array('GET'),
+            'entity_http_methods'        => ['GET'],
+            'collection_http_methods'    => ['GET'],
             'collection_name'            => 'doctrine-metadata',
-            'collection_query_whitelist' => array('version'),
-        ),
-    ),
-    'zf-rpc' => array(
-        'ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscovery' => array(
-            'http_methods' => array('GET'),
+            'collection_query_whitelist' => ['version'],
+        ],
+    ],
+    'zf-rpc' => [
+        Controller\DoctrineAutodiscovery::class => [
+            'http_methods' => ['GET'],
             'route_name'   => 'zf-apigility-doctrine-autodiscovery',
-        ),
-    ),
-    'validator_metadata' => array(
-        'ZF\Apigility\Doctrine\Server\Validator\ObjectExists' => array(
+        ],
+    ],
+    'validator_metadata' => [
+        Server\Validator\ObjectExists::class => [
             'entity_class' => 'string',
             'fields'       => 'string',
-        ),
-        'ZF\Apigility\Doctrine\Server\Validator\NoObjectExists' => array(
+        ],
+        Server\Validator\NoObjectExists::class => [
             'entity_class' => 'string',
             'fields'       => 'string',
-        ),
-    ),
-);
+        ],
+    ],
+];
