@@ -1,14 +1,14 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\Apigility\Admin\Model\RestServiceEntity;
 use Zend\Stdlib\ArraySerializableInterface;
+use ZF\Apigility\Admin\Model\RestServiceEntity;
 
 class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerializableInterface
 {
@@ -23,17 +23,17 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     protected $objectManager;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $byValue = true;
 
     /**
      * @var array
      */
-    protected $hydratorStrategies = array();
+    protected $hydratorStrategies = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $useGeneratedHydrator = true;
 
@@ -60,9 +60,6 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
                 case 'usegeneratedhydrator':
                     $this->useGeneratedHydrator = $value;
                     break;
-                case 'servicename':
-                    $this->serviceName = $value;
-                    break;
             }
         }
     }
@@ -70,12 +67,11 @@ class DoctrineRestServiceEntity extends RestServiceEntity implements ArraySerial
     public function getArrayCopy()
     {
         $data = parent::getArrayCopy();
-        $data['hydrator_name'] = $this->hydratorName;
-        $data['object_manager'] = $this->objectManager;
-        $data['by_value'] = $this->byValue;
-        $data['strategies'] = $this->hydratorStrategies;
+        $data['hydrator_name']          = $this->hydratorName;
+        $data['object_manager']         = $this->objectManager;
+        $data['by_value']               = $this->byValue;
+        $data['strategies']             = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
-        $data['service_name'] = $this->serviceName;
 
         return $data;
     }

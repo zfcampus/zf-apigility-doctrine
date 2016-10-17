@@ -1,38 +1,21 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Server;
 
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManager;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface;
 
-class Module implements ConfigProviderInterface, AutoloaderProviderInterface, DependencyIndicatorInterface
+class Module
 {
-    /**
-     * Return an array for passing to Zend\Loader\AutoloaderFactory.
-     *
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__,
-                ),
-            ),
-        );
-    }
-
     /**
      * Returns configuration to merge with application configuration
      *
-     * @return array|\Traversable
+     * @return array
      */
     public function getConfig()
     {
@@ -52,14 +35,14 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface, De
         $serviceListener->addServiceManager(
             'ZfApigilityDoctrineQueryProviderManager',
             'zf-apigility-doctrine-query-provider',
-            'ZF\Apigility\Doctrine\Server\Query\Provider\QueryProviderInterface',
+            QueryProviderInterface::class,
             'getZfApigilityDoctrineQueryProviderConfig'
         );
 
         $serviceListener->addServiceManager(
             'ZfApigilityDoctrineQueryCreateFilterManager',
             'zf-apigility-doctrine-query-create-filter',
-            'ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface',
+            QueryCreateFilterInterface::class,
             'getZfApigilityDoctrineQueryCreateFilterConfig'
         );
     }
@@ -71,6 +54,6 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface, De
      */
     public function getModuleDependencies()
     {
-        return array('Phpro\DoctrineHydrationModule');
+        return ['Phpro\DoctrineHydrationModule'];
     }
 }

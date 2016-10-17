@@ -50,29 +50,31 @@ First, use [Composer](https://getcomposer.org) to install all dependencies:
 $ composer install
 ```
 
-To run tests, use the PHPUnit executable installed by Composer:
+To run tests:
 
 ```console
-$ ./vendor/bin/phpunit
+$ composer test
 ```
 
 ## CODING STANDARDS
 
 While Apigility uses Zend Framework 2 coding standards, in practice, we check
-standards using [phpcs](https://github.com/squizlabs/PHP_CodeSniffer) (which is
-installed via Composer with other dependencies). To check for CS issues:
+standards against PSR-1/2. To check for CS issues:
 
 ```console
-$ ./vendor/bin/phpcs
+$ composer cs-check
 ```
 
-This will report CS issues.
-
-`phpcs` also provides a tool for automatically fixing many issues, `phpcbf`:
+This will report CS issues. You can also attempt to fix many reported errors
+automatically:
 
 ```console
-$ ./vendor/bin/phpcbf
+$ composer cs-fix
 ```
 
-If you use the tool and it fixes any files, make sure you run tests to confirm
-nothing was broken as a result, and then add and commit any changed files.
+If you use `cs-fix` to fix issues, make certain you add and commit any files
+changed!
+
+## Conduct
+
+Please see our [CONDUCT.md](CONDUCT.md) to understand expected behavior when interacting with others in the project.

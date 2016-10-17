@@ -1,0 +1,13 @@
+<?php
+
+namespace ZFTestApigilityGeneral;
+
+use Zend\ServiceManager\Factory\InvokableFactory;
+
+return [
+    'service_manager' => [
+        'factories' => [
+            Listener\EventCatcher::class => InvokableFactory::class,
+        ],
+    ],
+];

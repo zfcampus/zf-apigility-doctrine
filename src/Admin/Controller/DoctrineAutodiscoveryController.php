@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Controller;
@@ -34,6 +34,6 @@ class DoctrineAutodiscoveryController extends AbstractActionController
         $adapter = $this->params()->fromRoute('object_manager_alias');
         $data = $this->model->fetchFields($module, $version, $adapter);
 
-        return new ViewModel(array('payload' => $data));
+        return new ViewModel(['payload' => $data]);
     }
 }
