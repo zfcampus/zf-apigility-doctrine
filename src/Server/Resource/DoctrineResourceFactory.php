@@ -1,112 +1,85 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use DoctrineModule\Stdlib\Hydrator;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ORM\EntityManager;
+use Interop\Container\ContainerInterface;
+use RuntimeException;
+use Zend\Hydrator\HydratorInterface;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Hydrator\HydratorInterface;
-use ZF\Apigility\Doctrine\Server\Collection\Query;
-use RuntimeException;
+use ZF\Apigility\Doctrine\Server\Query\CreateFilter\QueryCreateFilterInterface;
+use ZF\Hal\Plugin\Hal;
 
-/**
- * Class AbstractDoctrineResourceFactory
- *
- * @package ZF\Apigility\Doctrine\Server\Resource
- */
 class DoctrineResourceFactory implements AbstractFactoryInterface
 {
     /**
-     * Cache of canCreateServiceWithName lookups
-     * @var array
-     */
-    protected $lookupCache = array();
-
-    /**
-     * Determine if we can create a service with name
+     * Can this factory create the requested service?
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param $name
-     * @param $requestedName
-     *
+     * @param ContainerInterface $container
+     * @param string $requestedName
      * @return bool
      * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreate(ContainerInterface $container, $requestedName)
     {
-        if (array_key_exists($requestedName, $this->lookupCache)) {
-            return $this->lookupCache[$requestedName];
-        }
-
-        if (!$serviceLocator->has('Config')) {
-            // @codeCoverageIgnoreStart
-
+        if (! $container->has('config')) {
             return false;
         }
-            // @codeCoverageIgnoreEnd
 
-        // Validate object is set
-        $config = $serviceLocator->get('Config');
+        $config = $container->get('config');
 
-        if (!isset($config['zf-apigility']['doctrine-connected'])
-            || !is_array($config['zf-apigility']['doctrine-connected'])
-            || !isset($config['zf-apigility']['doctrine-connected'][$requestedName])
+        if (! isset($config['zf-apigility']['doctrine-connected'])
+            || ! is_array($config['zf-apigility']['doctrine-connected'])
         ) {
-            $this->lookupCache[$requestedName] = false;
-
             return false;
         }
 
-        // Validate if class a valid DoctrineResource
-        $className = isset($config['class']) ? $config['class'] : $requestedName;
-        $className = $this->normalizeClassname($className);
-        $reflection = new \ReflectionClass($className);
-        if (!$reflection->isSubclassOf('\ZF\Apigility\Doctrine\Server\Resource\DoctrineResource')) {
-            // @codeCoverageIgnoreStart
-            throw new ServiceNotFoundException(
-                sprintf(
-                    '%s requires that a valid DoctrineResource "class" is specified for listener %s; no service found',
-                    __METHOD__,
-                    $requestedName
-                )
-            );
-        }
-        // @codeCoverageIgnoreEnd
+        $config = $config['zf-apigility']['doctrine-connected'];//[$requestedName];
 
-        // Validate object manager
-        $config = $config['zf-apigility']['doctrine-connected'];
-        if (!isset($config[$requestedName]) || !isset($config[$requestedName]['object_manager'])) {
-            // @codeCoverageIgnoreStart
-            throw new ServiceNotFoundException(
-                sprintf(
-                    '%s requires that a valid "object_manager" is specified for listener %s; no service found',
-                    __METHOD__,
-                    $requestedName
-                )
-            );
+        if (! isset($config[$requestedName])
+            || ! is_array($config[$requestedName])
+            || ! $this->isValidConfig($config[$requestedName], $requestedName, $container)
+        ) {
+            return false;
         }
-            // @codeCoverageIgnoreEnd
-
-        $this->lookupCache[$requestedName] = true;
 
         return true;
     }
 
     /**
-     * Create service with name
+     * Can this factory create the requested service? (v2)
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param $name
-     * @param $requestedName
+     * Provided for backwards compatiblity; proxies to canCreate().
      *
+     * @param ServiceLocatorInterface $container
+     * @param string $name
+     * @param string $requestedName
+     * @return bool
+     */
+    public function canCreateServiceWithName(ServiceLocatorInterface $container, $name, $requestedName)
+    {
+        return $this->canCreate($container, $requestedName);
+    }
+
+    /**
+     * Create and return the doctrine-connected resource.
+     *
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param null|array $options
      * @return DoctrineResource
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $serviceLocator->get('Config');
+        $config = $container->get('config');
         $doctrineConnectedConfig = $config['zf-apigility']['doctrine-connected'][$requestedName];
         $doctrineHydratorConfig = $config['doctrine-hydrator'];
 
@@ -119,30 +92,22 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         }
 
         if (is_null($restConfig)) {
-            // @codeCoverageIgnoreStart
             throw new RuntimeException(
-                'No zf-rest configuration found for resource ' . $requestedName
+                sprintf('No zf-rest configuration found for resource %s', $requestedName)
             );
         }
-            // @codeCoverageIgnoreEnd
 
-        $className = isset($doctrineConnectedConfig['class']) ? $doctrineConnectedConfig['class'] : $requestedName;
-        $className = $this->normalizeClassname($className);
+        $resourceClass = $this->getResourceClassFromConfig($doctrineConnectedConfig, $requestedName);
+        $objectManager = $container->get($doctrineConnectedConfig['object_manager']);
 
-        $objectManager = $this->loadObjectManager($serviceLocator, $doctrineConnectedConfig);
-        $hydrator = $this->loadHydrator(
-            $serviceLocator,
-            $doctrineConnectedConfig,
-            $doctrineHydratorConfig,
-            $objectManager
-        );
-        $queryProviders = $this->loadQueryProviders($serviceLocator, $doctrineConnectedConfig, $objectManager);
-        $queryCreateFilter = $this->loadQueryCreateFilter($serviceLocator, $doctrineConnectedConfig, $objectManager);
-        $configuredListeners = $this->loadConfiguredListeners($serviceLocator, $doctrineConnectedConfig);
+        $hydrator = $this->loadHydrator($container, $doctrineConnectedConfig, $doctrineHydratorConfig);
+        $queryProviders = $this->loadQueryProviders($container, $doctrineConnectedConfig, $objectManager);
+        $queryCreateFilter = $this->loadQueryCreateFilter($container, $doctrineConnectedConfig, $objectManager);
+        $configuredListeners = $this->loadConfiguredListeners($container, $doctrineConnectedConfig);
 
         /** @var DoctrineResource $listener */
-        $listener = new $className();
-        $listener->setSharedEventManager($serviceLocator->get('Application')->getEventManager()->getSharedManager());
+        $listener = new $resourceClass();
+        $listener->setSharedEventManager($container->get('Application')->getEventManager()->getSharedManager());
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);
         $listener->setQueryProviders($queryProviders);
@@ -150,9 +115,10 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $listener->setEntityIdentifierName($restConfig['entity_identifier_name']);
         $listener->setRouteIdentifierName($restConfig['route_identifier_name']);
 
-        if (count($configuredListeners)) {
+        if ($configuredListeners) {
+            $events = $listener->getEventManager();
             foreach ($configuredListeners as $configuredListener) {
-                $listener->getEventManager()->attach($configuredListener);
+                $configuredListener->attach($events);
             }
         }
 
@@ -160,8 +126,74 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     }
 
     /**
-     * @param $className
+     * Retrieve the resource class based on the provided configuration.
      *
+     * Defaults to ZF\Apigility\Doctrine\Server\Resource\DoctrineResource.
+     *
+     * @param array $config
+     * @param string $requestedName
+     * @return string
+     * @throws ServiceNotCreatedException if the discovered resource class
+     *     does not exist or is not a subclass of DoctrineResource.
+     */
+    protected function getResourceClassFromConfig($config, $requestedName)
+    {
+        $defaultClass = DoctrineResource::class;
+
+        $resourceClass = isset($config['class']) ? $config['class'] : $requestedName;
+        $resourceClass = $this->normalizeClassname($resourceClass);
+
+        if (! class_exists($resourceClass) || ! is_subclass_of($resourceClass, $defaultClass)) {
+            throw new ServiceNotCreatedException(sprintf(
+                'Unable to create instance for service "%s"; resource class "%s" cannot be found or does not extend %s',
+                $requestedName,
+                $resourceClass,
+                $defaultClass
+            ));
+        }
+
+        return $resourceClass;
+    }
+
+    /**
+     * Tests if the configuration is valid
+     *
+     * If the configuration has a "object_manager" key, and that service exists,
+     * then the configuration is valid.
+     *
+     * @param array $config
+     * @param string $requestedName
+     * @param ContainerInterface $container
+     * @return bool
+     */
+    protected function isValidConfig(array $config, $requestedName, ContainerInterface $container)
+    {
+        if (! isset($config['object_manager'])
+            || ! $container->has($config['object_manager'])
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Create and return the doctrine-connected resource (v2).
+     *
+     * Provided for backwards compatibility; proxies to __invoke().
+     *
+     * @param ServiceLocatorInterface $container
+     * @param string $name
+     * @param string $requestedName
+     * @return DoctrineResource
+     */
+    public function createServiceWithName(ServiceLocatorInterface $container, $name, $requestedName)
+    {
+        return $this($container, $requestedName);
+    }
+
+    /**
+     * @param string $className
      * @return string
      */
     protected function normalizeClassname($className)
@@ -170,49 +202,26 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     *
-     * @return ObjectManager
-     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
-     */
-    protected function loadObjectManager(ServiceLocatorInterface $serviceLocator, $config)
-    {
-        if ($serviceLocator->has($config['object_manager'])) {
-            $objectManager = $serviceLocator->get($config['object_manager']);
-        } else {
-            // @codeCoverageIgnoreStart
-            throw new ServiceNotCreatedException('The object_manager could not be found.');
-        }
-        // @codeCoverageIgnoreEnd
-
-        return $objectManager;
-    }
-
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     *
+     * @param ContainerInterface $container
+     * @param array $doctrineConnectedConfig
+     * @param array $doctrineHydratorConfig
      * @return HydratorInterface
      */
     protected function loadHydrator(
-        ServiceLocatorInterface $serviceLocator,
+        ContainerInterface $container,
         array $doctrineConnectedConfig,
-        array $doctrineHydratorConfig,
-        $objectManager
+        array $doctrineHydratorConfig
     ) {
-
-        // @codeCoverageIgnoreStart
-        if (!isset($doctrineConnectedConfig['hydrator'])) {
+        if (! isset($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
 
-        if (!$serviceLocator->has('HydratorManager')) {
+        if (! $container->has('HydratorManager')) {
             return null;
         }
 
-        $hydratorManager = $serviceLocator->get('HydratorManager');
-        if (!$hydratorManager->has($doctrineConnectedConfig['hydrator'])) {
+        $hydratorManager = $container->get('HydratorManager');
+        if (! $hydratorManager->has($doctrineConnectedConfig['hydrator'])) {
             return null;
         }
 
@@ -221,65 +230,60 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         // allowing multiple hydrators per resource.
         if (isset($doctrineConnectedConfig['hydrator'])) {
             $entityClass = $doctrineHydratorConfig[$doctrineConnectedConfig['hydrator']]['entity_class'];
-            $viewHelpers  = $serviceLocator->get('ViewHelperManager');
+            $viewHelpers  = $container->get('ViewHelperManager');
+            /** @var Hal $hal */
             $hal = $viewHelpers->get('Hal');
             $hal->getEntityHydratorManager()->addHydrator($entityClass, $doctrineConnectedConfig['hydrator']);
         }
 
-        // @codeCoverageIgnoreEnd
 
         return $hydratorManager->get($doctrineConnectedConfig['hydrator']);
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     * @param                         $objectManager
-     *
-     * @return ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
-     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
+     * @param ContainerInterface $container
+     * @param array $config
+     * @param ObjectManager $objectManager
+     * @return QueryCreateFilterInterface
      */
-    protected function loadQueryCreateFilter(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function loadQueryCreateFilter(ContainerInterface $container, array $config, $objectManager)
     {
-        $createFilterManager = $serviceLocator->get('ZfApigilityDoctrineQueryCreateFilterManager');
-        $filterManagerAlias = (isset($config['query_create_filter'])) ? $config['query_create_filter']: 'default';
+        $createFilterManager = $container->get('ZfApigilityDoctrineQueryCreateFilterManager');
+        $filterManagerAlias = isset($config['query_create_filter']) ? $config['query_create_filter'] : 'default';
 
+        /** @var QueryCreateFilterInterface $queryCreateFilter */
         $queryCreateFilter = $createFilterManager->get($filterManagerAlias);
 
         // Set object manager for all query providers
-        $queryCreateFilter ->setObjectManager($objectManager);
+        $queryCreateFilter->setObjectManager($objectManager);
 
         return $queryCreateFilter;
     }
 
-
     /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     * @param                         $objectManager
-     *
-     * @return ZF\Apigility\Doctrine\Query\Provider\FetchAll\FetchAllQueryProviderInterface
-     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
+     * @param ContainerInterface $serviceLocator
+     * @param array $config
+     * @param ObjectManager $objectManager
+     * @return array
+     * @throws ServiceNotCreatedException
      */
-    protected function loadQueryProviders(ServiceLocatorInterface $serviceLocator, $config, $objectManager)
+    protected function loadQueryProviders(ContainerInterface $serviceLocator, array $config, $objectManager)
     {
-        $queryProviders = array();
+        $queryProviders = [];
         $queryManager = $serviceLocator->get('ZfApigilityDoctrineQueryProviderManager');
 
         // Load default query provider
-        if (class_exists('\\Doctrine\\ORM\\EntityManager')
-            && $objectManager instanceof \Doctrine\ORM\EntityManager
+        if (class_exists(EntityManager::class)
+            && $objectManager instanceof EntityManager
         ) {
             $queryProviders['default'] = $queryManager->get('default_orm');
-        } elseif (class_exists('\\Doctrine\\ODM\\MongoDB\\DocumentManager')
-            && $objectManager instanceof \Doctrine\ODM\MongoDB\DocumentManager
+        } elseif (class_exists(DocumentManager::class)
+            && $objectManager instanceof DocumentManager
         ) {
             $queryProviders['default'] = $queryManager->get('default_odm');
         } else {
-            // @codeCoverageIgnoreStart
             throw new ServiceNotCreatedException('No valid doctrine module is found for objectManager.');
         }
-        // @codeCoverageIgnoreEnd
 
         // Load custom query providers
         if (isset($config['query_providers'])) {
@@ -297,20 +301,19 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $config
-     *
+     * @param ContainerInterface $container
+     * @param array $config
      * @return array
      */
-    protected function loadConfiguredListeners(ServiceLocatorInterface $serviceLocator, $config)
+    protected function loadConfiguredListeners(ContainerInterface $container, array $config)
     {
-        if (!isset($config['listeners'])) {
-            return array();
+        if (! isset($config['listeners'])) {
+            return [];
         }
 
-        $listeners = array();
+        $listeners = [];
         foreach ($config['listeners'] as $listener) {
-            $listeners[] = $serviceLocator->get($listener);
+            $listeners[] = $container->get($listener);
         }
 
         return $listeners;

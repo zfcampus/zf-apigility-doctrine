@@ -1,9 +1,12 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
 use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOdmAdapter;
-use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\ResourceEvent;
 
 class DefaultOdm extends AbstractQueryProvider
@@ -13,9 +16,7 @@ class DefaultOdm extends AbstractQueryProvider
      */
     public function createQuery(ResourceEvent $event, $entityClass, $parameters)
     {
-        /**
-         * @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder
-         */
+        /** @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder */
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder->find($entityClass);
 
@@ -23,8 +24,7 @@ class DefaultOdm extends AbstractQueryProvider
     }
 
     /**
-     * @param   $queryBuilder
-     *
+     * @param $queryBuilder
      * @return DoctrineOdmAdapter
      */
     public function getPaginatedQuery($queryBuilder)
@@ -35,8 +35,7 @@ class DefaultOdm extends AbstractQueryProvider
     }
 
     /**
-     * @param   $entityClass
-     *
+     * @param $entityClass
      * @return int
      */
     public function getCollectionTotal($entityClass)

@@ -1,19 +1,17 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ */
 
 namespace ZF\Apigility\Doctrine\Server\Query\Provider;
 
-use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
-use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\Paginator\Adapter\AdapterInterface;
-use ZF\ApiProblem\ApiProblem;
+use ZF\Apigility\Doctrine\Server\Paginator\Adapter\DoctrineOrmAdapter;
 use ZF\Rest\ResourceEvent;
 
-/**
- * Class FetchAllOrm
- *
- * @package ZF\Apigility\Doctrine\Server\Query\Provider
- */
 abstract class AbstractQueryProvider implements ObjectManagerAwareInterface, QueryProviderInterface
 {
     /**
@@ -42,16 +40,15 @@ abstract class AbstractQueryProvider implements ObjectManagerAwareInterface, Que
     }
 
     /**
+     * @param ResourceEvent $event
      * @param string $entityClass
-     * @param array  $parameters
-     *
+     * @param array $parameters
      * @return mixed This will return an ORM or ODM Query\Builder
      */
     abstract public function createQuery(ResourceEvent $event, $entityClass, $parameters);
 
     /**
-     * @param   $queryBuilder
-     *
+     * @param $queryBuilder
      * @return AdapterInterface
      */
     public function getPaginatedQuery($queryBuilder)
@@ -62,8 +59,7 @@ abstract class AbstractQueryProvider implements ObjectManagerAwareInterface, Que
     }
 
     /**
-     * @param   $entityClass
-     *
+     * @param $entityClass
      * @return int
      */
     public function getCollectionTotal($entityClass)
@@ -73,7 +69,8 @@ abstract class AbstractQueryProvider implements ObjectManagerAwareInterface, Que
         $entityMetaData = $cmf->getMetadataFor($entityClass);
 
         $identifier = $entityMetaData->getIdentifier();
-        $queryBuilder->select('count(row.' . $identifier[0] . ')')
+        $queryBuilder
+            ->select('count(row.' . $identifier[0] . ')')
             ->from($entityClass, 'row');
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();

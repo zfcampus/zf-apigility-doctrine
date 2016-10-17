@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -12,20 +12,21 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Filter\FilterChain;
+use Zend\Filter\StringToLower;
+use Zend\Filter\Word\CamelCaseToDash;
+use Zend\ServiceManager\ServiceManager;
 use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use ZF\Apigility\Admin\Exception;
-use ZF\Apigility\Admin\Utility;
-use ZF\Configuration\ConfigResource;
+use ZF\Apigility\Admin\Model\ModuleEntity;
 use ZF\Apigility\Admin\Model\ModulePathSpec;
-use ZF\Rest\Exception\CreationException;
-use Zf\Apigility\Admin\Model\ModuleEntity;
-use Zend\ServiceManager\ServiceManager;
+use ZF\Apigility\Admin\Utility;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Configuration\ConfigResource;
+use ZF\Rest\Exception\CreationException;
 
-class DoctrineRestServiceModel implements
-    EventManagerAwareInterface
+class DoctrineRestServiceModel implements EventManagerAwareInterface
 {
     /**
      * @var ConfigResource
@@ -53,7 +54,7 @@ class DoctrineRestServiceModel implements
     protected $modulePath;
 
     /**
-     * @var ModuleUtils
+     * @var ModulePathSpec
      */
     protected $modules;
 
@@ -67,33 +68,36 @@ class DoctrineRestServiceModel implements
      *
      * @var array
      */
-    protected $restScalarUpdateOptions = array(
-        'pageSize'                 => 'page_size',
-        'pageSizeParam'            => 'page_size_param',
-        'entityClass'              => 'entity_class',
-        'entityIdentifierName'     => 'entity_identifier_name',
-        'collectionClass'          => 'collection_class',
-        'collectionName'           => 'collection_name',
-    );
+    protected $restScalarUpdateOptions = [
+        'pageSize'             => 'page_size',
+        'pageSizeParam'        => 'page_size_param',
+        'entityClass'          => 'entity_class',
+        'entityIdentifierName' => 'entity_identifier_name',
+        'collectionClass'      => 'collection_class',
+        'collectionName'       => 'collection_name',
+    ];
 
     /**
      * Allowed REST update options that are arrays
      *
      * @var array
      */
-    protected $restArrayUpdateOptions = array(
+    protected $restArrayUpdateOptions = [
         'collectionHttpMethods'    => 'collection_http_methods',
         'collectionQueryWhitelist' => 'collection_query_whitelist',
         'entityHttpMethods'        => 'entity_http_methods',
-    );
+    ];
 
-    protected $doctrineHydratorOptions = array(
-        'entityClass'              => 'entity_class',
-        'objectManager'            => 'object_manager',
-        'byValue'                  => 'by_value',
-        'useGeneratedHydrator'     => 'use_generated_hydrator',
-        'hydratorStrategies'       => 'strategies',
-    );
+    /**
+     * @var array
+     */
+    protected $doctrineHydratorOptions = [
+        'entityClass'          => 'entity_class',
+        'objectManager'        => 'object_manager',
+        'byValue'              => 'by_value',
+        'useGeneratedHydrator' => 'use_generated_hydrator',
+        'hydratorStrategies'   => 'strategies',
+    ];
 
     /**
      * @var FilterChain
@@ -106,8 +110,8 @@ class DoctrineRestServiceModel implements
     protected $serviceManager;
 
     /**
-     * @param ModuleEntity   $moduleEntity
-     * @param ModulePathSpec    $modules
+     * @param ModuleEntity $moduleEntity
+     * @param ModulePathSpec $modules
      * @param ConfigResource $config
      */
     public function __construct(ModuleEntity $moduleEntity, ModulePathSpec $modules, ConfigResource $config)
@@ -122,7 +126,7 @@ class DoctrineRestServiceModel implements
     /**
      * Determine if the given entity is doctrine-connected, and, if so, recast to a DoctrineRestServiceEntity
      *
-     * @param  \Zend\EventManager\EventInterface $event
+     * @param \Zend\EventManager\EventInterface $event
      * @return null|DoctrineRestServiceEntity
      */
     public static function onFetch($event)
@@ -133,7 +137,7 @@ class DoctrineRestServiceModel implements
             return;
         }
 
-        $config = $event->getParam('config', array());
+        $config = $event->getParam('config', []);
         if (! isset($config['zf-apigility']['doctrine-connected'][$entity->resourceClass])) {
             // No DB-connected configuration for this service; nothing to do
             return;
@@ -158,7 +162,7 @@ class DoctrineRestServiceModel implements
     /**
      * Allow read-only access to properties
      *
-     * @param  string $name
+     * @param string $name
      * @return mixed
      * @throws OutOfRangeException
      */
@@ -199,15 +203,15 @@ class DoctrineRestServiceModel implements
     /**
      * Set the EventManager instance
      *
-     * @param  EventManagerInterface $events
+     * @param EventManagerInterface $events
      * @return self
      */
     public function setEventManager(EventManagerInterface $events)
     {
-        $events->setIdentifiers(array(
+        $events->setIdentifiers([
             __CLASS__,
             get_class($this),
-        ));
+        ]);
         $this->events = $events;
         return $this;
     }
@@ -229,16 +233,14 @@ class DoctrineRestServiceModel implements
     }
 
     /**
-     * @param  string $controllerService
+     * @param string $controllerService
      * @return DoctrineRestServiceEntity|false
      */
     public function fetch($controllerService)
     {
         $config = $this->configResource->fetch(true);
 
-        if (!isset($config['zf-rest'])
-            || !isset($config['zf-rest'][$controllerService])
-        ) {
+        if (! isset($config['zf-rest'][$controllerService])) {
             throw new Exception\RuntimeException(sprintf(
                 'Could not find REST resource by name of %s',
                 $controllerService
@@ -258,9 +260,7 @@ class DoctrineRestServiceModel implements
         $this->mergeContentNegotiationConfig($controllerService, $entity, $config);
         $this->mergeHalConfig($controllerService, $entity, $config);
 
-        if (! isset($entity->serviceName)
-            || empty($entity->serviceName)
-        ) {
+        if (empty($entity->serviceName)) {
             $serviceName = $controllerService;
             $q = preg_quote('\\');
             if (preg_match(
@@ -274,9 +274,9 @@ class DoctrineRestServiceModel implements
                 $serviceName = $matches['service'];
             }
 
-            $entity->exchangeArray(array(
+            $entity->exchangeArray([
                 'service_name' => $serviceName,
-            ));
+            ]);
         }
 
         // Trigger an event, allowing a listener to alter the entity and/or
@@ -284,10 +284,10 @@ class DoctrineRestServiceModel implements
         $eventResults = $this->getEventManager()->trigger(
             __FUNCTION__,
             $this,
-            array(
+            [
                 'entity' => $entity,
                 'config' => $config,
-            ),
+            ],
             function ($r) {
                 return ($r instanceof DoctrineRestServiceEntity);
             }
@@ -309,10 +309,10 @@ class DoctrineRestServiceModel implements
     {
         $config = $this->configResource->fetch(true);
         if (! isset($config['zf-rest'])) {
-            return array();
+            return [];
         }
 
-        $services = array();
+        $services = [];
         $pattern  = false;
 
         // Initialize pattern if a version was passed and it is valid
@@ -334,7 +334,7 @@ class DoctrineRestServiceModel implements
         }
 
         foreach (array_keys($config['zf-rest']) as $controllerService) {
-            // Because a verion is always supplied this check may not be necessary
+            // Because a version is always supplied this check may not be necessary
             if (! $pattern) {
                 $services[] = $this->fetch($controllerService);
                 continue;
@@ -352,7 +352,7 @@ class DoctrineRestServiceModel implements
     /**
      * Create a default hydrator name
      *
-     * @param  string $resourceName
+     * @param string $resourceName
      * @return string
      */
     public function createHydratorName($resourceName)
@@ -393,39 +393,28 @@ class DoctrineRestServiceModel implements
 
         $mediaType = $this->createMediaType();
 
-        $resourceClass = ($details->resourceClass)
-            ? $details->resourceClass
-            : $this->createResourceClass($resourceName, $details);
+        $resourceClass = $details->resourceClass ?: $this->createResourceClass($resourceName, $details);
+        $collectionClass = $details->collectionClass ?: $this->createCollectionClass($resourceName);
+        $serviceName = $details->serviceName ?: $resourceName;
 
-        $collectionClass = ($details->collectionClass)
-            ? $details->collectionClass
-            : $this->createCollectionClass($resourceName);
-
-        $serviceName = ($details->serviceName)
-            ? $details->serviceName
-            : $resourceName;
-
-        if (! $entityClass = $details->entityClass or ! class_exists($details->entityClass)) {
+        $entityClass = $details->entityClass;
+        if (! $entityClass || ! class_exists($entityClass)) {
             throw new CreationException('entityClass is required and must exist');
         }
-        $module = ($details->module) ? $details->module: $this->module;
+        $module = $details->module ?: $this->module;
 
-        $controllerService = ($details->controllerServiceName)
-            ? $details->controllerServiceName
-            : $this->createControllerServiceName($resourceName);
+        $controllerService = $details->controllerServiceName ?: $this->createControllerServiceName($resourceName);
 
-        $routeName = ($details->routeName)
-            ? $details->routeName
-            : $this->createRoute(
-                $resourceName,
-                $details->routeMatch,
-                $details->routeIdentifierName,
-                $controllerService
-            );
-        $hydratorName  = ($details->hydratorName) ? $details->hydratorName: $this->createHydratorName($resourceName);
-        $objectManager = ($details->objectManager) ? $details->objectManager: 'doctrine.entitymanager.orm_default';
+        $routeName = $details->routeName ?: $this->createRoute(
+            $resourceName,
+            $details->routeMatch,
+            $details->routeIdentifierName,
+            $controllerService
+        );
+        $hydratorName  = $details->hydratorName ?: $this->createHydratorName($resourceName);
+        $objectManager = $details->objectManager ?: 'doctrine.entitymanager.orm_default';
 
-        $entity->exchangeArray(array(
+        $entity->exchangeArray([
             'service_name'            => $serviceName,
             'collection_class'        => $collectionClass,
             'controller_service_name' => $controllerService,
@@ -434,17 +423,17 @@ class DoctrineRestServiceModel implements
             'module'                  => $module,
             'resource_class'          => $resourceClass,
             'route_name'              => $routeName,
-            'accept_whitelist'        => array(
+            'accept_whitelist'        => [
                 $mediaType,
                 'application/hal+json',
                 'application/json',
-            ),
-            'content_type_whitelist'  => array(
+            ],
+            'content_type_whitelist'  => [
                 $mediaType,
                 'application/json',
-            ),
+            ],
             'object_manager' => $objectManager,
-        ));
+        ]);
 
         $this->createRestConfig($entity, $controllerService, $resourceClass, $routeName);
         $this->createContentNegotiationConfig($entity, $controllerService);
@@ -455,10 +444,10 @@ class DoctrineRestServiceModel implements
         $this->getEventManager()->trigger(
             __FUNCTION__,
             $this,
-            array(
+            [
                 'entity' => $entity,
                 'configResource' => $this->configResource,
-            )
+            ]
         );
 
         return $entity;
@@ -467,7 +456,7 @@ class DoctrineRestServiceModel implements
     /**
      * Update an existing service
      *
-     * @param  DoctrineRestServiceEntity $update
+     * @param DoctrineRestServiceEntity $update
      * @return DoctrineRestServiceEntity
      */
     public function updateService(DoctrineRestServiceEntity $update)
@@ -495,9 +484,9 @@ class DoctrineRestServiceModel implements
     /**
      * Delete a named service
      *
-     * @todo   Remove content-negotiation and/or HAL configuration?
-     * @param  string $controllerService
-     * @param  bool $recursive
+     * @todo Remove content-negotiation and/or HAL configuration?
+     * @param string $controllerService
+     * @param bool $recursive
      * @return true
      */
     public function deleteService($controllerService, $recursive = false)
@@ -528,8 +517,7 @@ class DoctrineRestServiceModel implements
     /**
      * Generate the controller service name from the module and resource name
      *
-     * @param  string $module
-     * @param  string $resourceName
+     * @param string $resourceName
      * @return string
      */
     public function createControllerServiceName($resourceName)
@@ -545,7 +533,7 @@ class DoctrineRestServiceModel implements
     /**
      * Creates a new resource class based on the specified resource name
      *
-     * @param  string $resourceName
+     * @param string $resourceName
      * @return string The name of the newly created class
      */
     public function createResourceClass($resourceName, NewDoctrineServiceEntity $details)
@@ -563,13 +551,13 @@ class DoctrineRestServiceModel implements
             ));
         }
 
-        $view = new ViewModel(array(
+        $view = new ViewModel([
             'module'    => $module,
             'resource'  => $resourceName,
             'classname' => $className,
             'details'   => $details,
             'version'   => $this->moduleEntity->getLatestVersion(),
-        ));
+        ]);
 
         if (! $this->createClassFile($view, 'resource', $classPath)) {
             throw new Exception\RuntimeException(sprintf(
@@ -592,16 +580,16 @@ class DoctrineRestServiceModel implements
     /**
      * Create a collection class for the resource
      *
-     * @param  string $resourceName
+     * @param string $resourceName
      * @return string The name of the newly created collection class
      */
     public function createCollectionClass($resourceName)
     {
-        $module     = $this->module;
-        $srcPath    = $this->getSourcePath($resourceName);
+        $module    = $this->module;
+        $srcPath   = $this->getSourcePath($resourceName);
 
-        $className  = sprintf('%sCollection', $resourceName);
-        $classPath  = sprintf('%s/%s.php', $srcPath, $className);
+        $className = sprintf('%sCollection', $resourceName);
+        $classPath = sprintf('%s/%s.php', $srcPath, $className);
 
         if (file_exists($classPath)) {
             throw new Exception\RuntimeException(sprintf(
@@ -610,12 +598,12 @@ class DoctrineRestServiceModel implements
             ));
         }
 
-        $view = new ViewModel(array(
+        $view = new ViewModel([
             'module'    => $module,
             'resource'  => $resourceName,
             'classname' => $className,
             'version'   => $this->moduleEntity->getLatestVersion(),
-        ));
+        ]);
 
         if (! $this->createClassFile($view, 'collection', $classPath)) {
             throw new Exception\RuntimeException(sprintf(
@@ -638,10 +626,10 @@ class DoctrineRestServiceModel implements
     /**
      * Create the route configuration
      *
-     * @param  string $resourceName
-     * @param  string $route
-     * @param  string $identifier
-     * @param  string $controllerService
+     * @param string $resourceName
+     * @param string $route
+     * @param string $identifier
+     * @param string $controllerService
      * @return string
      */
     public function createRoute($resourceName, $route, $identifier, $controllerService)
@@ -653,26 +641,26 @@ class DoctrineRestServiceModel implements
             $filter->filter($resourceName)
         );
 
-        $config = array(
-            'router' => array(
-                'routes' => array(
-                    $routeName => array(
+        $config = [
+            'router' => [
+                'routes' => [
+                    $routeName => [
                         'type' => 'Segment',
-                        'options' => array(
+                        'options' => [
                             'route' => sprintf('%s[/:%s]', $route, $identifier),
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => $controllerService,
-                            ),
-                        ),
-                    ),
-                )
-            ),
-            'zf-versioning' => array(
-                'uri' => array(
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'zf-versioning' => [
+                'uri' => [
                     $routeName,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->configResource->patch($config, true);
 
         return $routeName;
@@ -700,14 +688,14 @@ class DoctrineRestServiceModel implements
      * Creates REST configuration
      *
      * @param DoctrineRestServiceEntity $details
-     * @param string                    $controllerService
-     * @param string                    $resourceClass
-     * @param string                    $routeName
+     * @param string $controllerService
+     * @param string $resourceClass
+     * @param string $routeName
      */
     public function createRestConfig(DoctrineRestServiceEntity $details, $controllerService, $resourceClass, $routeName)
     {
-        $config = array('zf-rest' => array(
-            $controllerService => array(
+        $config = ['zf-rest' => [
+            $controllerService => [
                 'listener'                   => $resourceClass,
                 'route_name'                 => $routeName,
                 'route_identifier_name'      => $details->routeIdentifierName,
@@ -715,16 +703,14 @@ class DoctrineRestServiceModel implements
                 'collection_name'            => $details->collectionName,
                 'entity_http_methods'        => $details->entityHttpMethods,
                 'collection_http_methods'    => $details->collectionHttpMethods,
-                'collection_query_whitelist' => ($details->collectionQueryWhitelist)
-                    ?  $details->collectionQueryWhitelist
-                    : array(),
+                'collection_query_whitelist' => $details->collectionQueryWhitelist ?: [],
                 'page_size'                  => $details->pageSize,
                 'page_size_param'            => $details->pageSizeParam,
                 'entity_class'               => $details->entityClass,
                 'collection_class'           => $details->collectionClass,
                 'service_name'               => $details->serviceName,
-            ),
-        ));
+            ],
+        ]];
         $this->configResource->patch($config, true);
     }
 
@@ -733,24 +719,24 @@ class DoctrineRestServiceModel implements
      * controller service name
      *
      * @param DoctrineRestServiceEntity $details
-     * @param string                    $controllerService
+     * @param string $controllerService
      */
     public function createContentNegotiationConfig(DoctrineRestServiceEntity $details, $controllerService)
     {
-        $config = array(
-            'controllers' => array(
+        $config = [
+            'controllers' => [
                 $controllerService => $details->selector,
-            ),
-        );
+            ],
+        ];
         $whitelist = $details->acceptWhitelist;
         if (! empty($whitelist)) {
-            $config['accept-whitelist'] = array($controllerService => $whitelist);
+            $config['accept-whitelist'] = [$controllerService => $whitelist];
         }
         $whitelist = $details->contentTypeWhitelist;
         if (! empty($whitelist)) {
-            $config['content-type-whitelist'] = array($controllerService => $whitelist);
+            $config['content-type-whitelist'] = [$controllerService => $whitelist];
         }
-        $config = array('zf-content-negotiation' => $config);
+        $config = ['zf-content-negotiation' => $config];
         $this->configResource->patch($config, true);
     }
 
@@ -758,27 +744,27 @@ class DoctrineRestServiceModel implements
      * Create Doctrine configuration
      *
      * @param DoctrineRestServiceEntity $details
-     * @param string                    $entityClass
-     * @param string                    $collectionClass
-     * @param string                    $routeName
+     * @param string $entityClass
+     * @param string $collectionClass
+     * @param string $routeName
      */
     public function createDoctrineConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
         $entityValue        = $details->getArrayCopy();
         $objectManager      = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = array();
+        $hydratorStrategies = [];
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
-        $config = array(
-            'zf-apigility' => array(
-                'doctrine-connected' => array(
-                    $details->resourceClass => array(
+        $config = [
+            'zf-apigility' => [
+                'doctrine-connected' => [
+                    $details->resourceClass => [
                         'object_manager' => $details->objectManager,
                         'hydrator' => $details->hydratorName,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         $this->configResource->patch($config, true);
     }
@@ -787,9 +773,9 @@ class DoctrineRestServiceModel implements
      * Create Doctrine hydrator configuration
      *
      * @param DoctrineRestServiceEntity $details
-     * @param string                    $entityClass
-     * @param string                    $collectionClass
-     * @param string                    $routeName
+     * @param string $entityClass
+     * @param string $collectionClass
+     * @param string $routeName
      * @throws CreationException
      */
     public function createDoctrineHydratorConfig(
@@ -802,7 +788,7 @@ class DoctrineRestServiceModel implements
 
         // Verify the object manager exists
         $objectManager      = $this->getServiceManager()->get($details->objectManager);
-        $hydratorStrategies = (isset($entityValue['strategies'])) ? $entityValue['strategies']: array();
+        $hydratorStrategies = isset($entityValue['strategies']) ? $entityValue['strategies'] : [];
 
         foreach ($hydratorStrategies as $strategy) {
             if (! $this->getServiceManager()->has($strategy)) {
@@ -811,17 +797,17 @@ class DoctrineRestServiceModel implements
         }
 
         // The abstract_factories key is set to the value so these factories do not get duplicaed with each resource
-        $config = array(
-            'doctrine-hydrator' => array(
-                $details->hydratorName => array(
+        $config = [
+            'doctrine-hydrator' => [
+                $details->hydratorName => [
                     'entity_class'           => $entityClass,
                     'object_manager'         => $details->objectManager,
                     'by_value'               => $entityValue['by_value'],
                     'strategies'             => $hydratorStrategies,
                     'use_generated_hydrator' => $entityValue['use_generated_hydrator'],
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $this->configResource->patch($config, true);
     }
@@ -830,27 +816,33 @@ class DoctrineRestServiceModel implements
      * Create HAL configuration
      *
      * @param DoctrineRestServiceEntity $details
-     * @param string                    $entityClass
-     * @param string                    $collectionClass
-     * @param string                    $routeName
+     * @param string $entityClass
+     * @param string $collectionClass
+     * @param string $routeName
      */
     public function createHalConfig(DoctrineRestServiceEntity $details, $entityClass, $collectionClass, $routeName)
     {
-        $config = array('zf-hal' => array('metadata_map' => array(
-            $entityClass => array(
-                'route_identifier_name'  => $details->routeIdentifierName,
-                'entity_identifier_name' => $details->entityIdentifierName,
-                'route_name'             => $routeName,
-            ),
-            $collectionClass => array(
-                'entity_identifier_name' => $details->entityIdentifierName,
-                'route_name'             => $routeName,
-                'is_collection'          => true,
-            ),
-        )));
+        $config = [
+            'zf-hal' => [
+                'metadata_map' => [
+                    $entityClass => [
+                        'route_identifier_name'  => $details->routeIdentifierName,
+                        'entity_identifier_name' => $details->entityIdentifierName,
+                        'route_name'             => $routeName,
+                    ],
+                    $collectionClass => [
+                        'entity_identifier_name' => $details->entityIdentifierName,
+                        'route_name'             => $routeName,
+                        'is_collection'          => true,
+                    ],
+                ],
+            ],
+        ];
+
         if (isset($details->hydratorName)) {
             $config['zf-hal']['metadata_map'][$entityClass]['hydrator'] = $details->hydratorName;
         }
+
         $this->configResource->patch($config, true);
     }
 
@@ -868,11 +860,18 @@ class DoctrineRestServiceModel implements
         }
 
         $routeName = $original->routeName;
-        $config    = array('router' => array('routes' => array(
-            $routeName => array('options' => array(
-                'route' => $route,
-            )),
-        )));
+        $config = [
+            'router' => [
+                'routes' => [
+                    $routeName => [
+                        'options' => [
+                            'route' => $route,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
         $this->configResource->patch($config, true);
     }
 
@@ -884,7 +883,7 @@ class DoctrineRestServiceModel implements
      */
     public function updateRestConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch = array();
+        $patch = [];
         foreach ($this->restScalarUpdateOptions as $property => $configKey) {
             if (! $update->$property) {
                 continue;
@@ -896,9 +895,9 @@ class DoctrineRestServiceModel implements
             goto updateArrayOptions;
         }
 
-        $config = array('zf-rest' => array(
+        $config = ['zf-rest' => [
             $original->controllerServiceName => $patch,
-        ));
+        ]];
         $this->configResource->patch($config, true);
 
         updateArrayOptions:
@@ -920,7 +919,7 @@ class DoctrineRestServiceModel implements
      */
     public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch = array();
+        $patch = [];
         foreach ($this->doctrineHydratorOptions as $property => $configKey) {
             if ($update->$property === null) {
                 continue;
@@ -949,17 +948,13 @@ class DoctrineRestServiceModel implements
         }
 
         $acceptWhitelist = $update->acceptWhitelist;
-        if (is_array($acceptWhitelist)
-            && ! empty($acceptWhitelist)
-        ) {
+        if (is_array($acceptWhitelist) && $acceptWhitelist) {
             $key = $baseKey . 'accept-whitelist.' . $service;
             $this->configResource->patchKey($key, $acceptWhitelist);
         }
 
         $contentTypeWhitelist = $update->contentTypeWhitelist;
-        if (is_array($contentTypeWhitelist)
-            && ! empty($contentTypeWhitelist)
-        ) {
+        if (is_array($contentTypeWhitelist) && $contentTypeWhitelist) {
             $key = $baseKey . 'content-type-whitelist.' . $service;
             $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
@@ -973,7 +968,7 @@ class DoctrineRestServiceModel implements
      */
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch                   = array();
+        $patch                   = [];
         $patch['object_manager'] = $update->objectManager;
         $patch['hydrator']       = $update->hydratorName;
         $basekey                 = 'zf-apigility.doctrine-connected.';
@@ -1011,12 +1006,12 @@ class DoctrineRestServiceModel implements
         $config = $this->configResource->fetch(true);
 
         $route = $entity->routeName;
-        $key   = array('router', 'routes', $route);
+        $key   = ['router', 'routes', $route];
         $this->configResource->deleteKey($key);
 
         $uriKey = array_search($route, $config['zf-versioning']['uri']);
         if ($uriKey !== false) {
-            $key = array('zf-versioning', 'uri', $uriKey);
+            $key = ['zf-versioning', 'uri', $uriKey];
             $this->configResource->deleteKey($key);
         }
     }
@@ -1034,36 +1029,36 @@ class DoctrineRestServiceModel implements
         $hydratorName = $config['zf-hal']['metadata_map'][$entity->entityClass]['hydrator'];
         $objectManagerClass = $config['doctrine-hydrator'][$hydratorName]['object_manager'];
 
-        $key = array('doctrine-hydrator', $hydratorName);
+        $key = ['doctrine-hydrator', $hydratorName];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-apigility', 'doctrine-connected', $entity->resourceClass);
+        $key = ['zf-apigility', 'doctrine-connected', $entity->resourceClass];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-rest', $entity->controllerServiceName);
+        $key = ['zf-rest', $entity->controllerServiceName];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'controllers', $entity->controllerServiceName);
+        $key = ['zf-content-negotiation', 'controllers', $entity->controllerServiceName];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'accept-whitelist', $entity->controllerServiceName);
+        $key = ['zf-content-negotiation', 'accept-whitelist', $entity->controllerServiceName];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-content-negotiation', 'content-type-whitelist', $entity->controllerServiceName);
+        $key = ['zf-content-negotiation', 'content-type-whitelist', $entity->controllerServiceName];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-hal', 'metadata_map', $entity->collectionClass);
+        $key = ['zf-hal', 'metadata_map', $entity->collectionClass];
         $this->configResource->deleteKey($key);
 
-        $key = array('zf-hal', 'metadata_map', $entity->entityClass);
+        $key = ['zf-hal', 'metadata_map', $entity->entityClass];
         $this->configResource->deleteKey($key);
 
         $validator = $config['zf-content-validation'][$entity->controllerServiceName]['input_filter'];
 
-        $key = array('zf-content-validation', $entity->controllerServiceName);
+        $key = ['zf-content-validation', $entity->controllerServiceName];
         $this->configResource->deleteKey($key);
 
-        $key = array('input_filter_specs', $validator);
+        $key = ['input_filter_specs', $validator];
         $this->configResource->deleteKey($key);
     }
 
@@ -1071,9 +1066,9 @@ class DoctrineRestServiceModel implements
      * Creates a class file based on the view model passed, the type of resource,
      * and writes it to the path provided.
      *
-     * @param  ViewModel $model
-     * @param  string    $type
-     * @param  string    $classPath
+     * @param ViewModel $model
+     * @param string $type
+     * @param string $classPath
      * @return bool
      */
     protected function createClassFile(ViewModel $model, $type, $classPath)
@@ -1114,19 +1109,17 @@ class DoctrineRestServiceModel implements
      * Seed the resolver with a template name and path based on the $type passed, and inject it
      * into the renderer.
      *
-     * @param  PhpRenderer $renderer
-     * @param  string      $type
-     * @return string      Template name
+     * @param PhpRenderer $renderer
+     * @param string $type
+     * @return string Template name
      */
     protected function injectResolver(PhpRenderer $renderer, $type)
     {
         $template = sprintf('doctrine/rest-', $type);
         $path     = sprintf('%s/../../../view/doctrine/rest-%s.phtml', __DIR__, $type);
-        $resolver = new Resolver\TemplateMapResolver(
-            array(
+        $resolver = new Resolver\TemplateMapResolver([
             $template => $path,
-            )
-        );
+        ]);
         $renderer->setResolver($resolver);
 
         return $template;
@@ -1135,7 +1128,7 @@ class DoctrineRestServiceModel implements
     /**
      * Get the source path for the module
      *
-     * @param  string $resourceName
+     * @param string $resourceName
      * @return string
      */
     protected function getSourcePath($resourceName)
@@ -1166,8 +1159,8 @@ class DoctrineRestServiceModel implements
 
         $this->routeNameFilter = new FilterChain();
         $this->routeNameFilter
-            ->attachByName('Word\CamelCaseToDash')
-            ->attachByName('StringToLower');
+            ->attachByName(CamelCaseToDash::class)
+            ->attachByName(StringToLower::class);
 
         return $this->routeNameFilter;
     }
@@ -1176,7 +1169,7 @@ class DoctrineRestServiceModel implements
      * Retrieve route information for a given service based on the configuration available
      *
      * @param DoctrineRestServiceEntity $metadata
-     * @param array                     $config
+     * @param array $config
      */
     protected function getRouteInfo(DoctrineRestServiceEntity $metadata, array $config)
     {
@@ -1186,75 +1179,60 @@ class DoctrineRestServiceModel implements
         ) {
             return;
         }
-        $metadata->exchangeArray(array(
+
+        $metadata->exchangeArray([
             'route_match' => $config['router']['routes'][$routeName]['options']['route'],
-        ));
+        ]);
     }
 
     /**
      * Merge the content negotiation configuration for the given controller
      * service into the REST metadata
      *
-     * @param string                    $controllerServiceName
+     * @param string $controllerServiceName
      * @param DoctrineRestServiceEntity $metadata
-     * @param array                     $config
+     * @param array $config
      */
     protected function mergeContentNegotiationConfig(
         $controllerServiceName,
         DoctrineRestServiceEntity $metadata,
         array $config
     ) {
-        // @codeCoverageIgnoreStart
         if (! isset($config['zf-content-negotiation'])) {
             return;
         }
-        // @codeCoverageIgnoreEnd
 
         $config = $config['zf-content-negotiation'];
 
-        if (isset($config['controllers'])
-            && isset($config['controllers'][$controllerServiceName])
-        ) {
-            $metadata->exchangeArray(
-                array(
+        if (isset($config['controllers'][$controllerServiceName])) {
+            $metadata->exchangeArray([
                 'selector' => $config['controllers'][$controllerServiceName],
-                )
-            );
+            ]);
         }
 
-        if (isset($config['accept-whitelist'])
-            && isset($config['accept-whitelist'][$controllerServiceName])
-        ) {
-            $metadata->exchangeArray(
-                array(
+        if (isset($config['accept-whitelist'][$controllerServiceName])) {
+            $metadata->exchangeArray([
                 'accept_whitelist' => $config['accept-whitelist'][$controllerServiceName],
-                )
-            );
+            ]);
         }
 
-        if (isset($config['content-type-whitelist'])
-            && isset($config['content-type-whitelist'][$controllerServiceName])
-        ) {
-            $metadata->exchangeArray(
-                array(
+        if (isset($config['content-type-whitelist'][$controllerServiceName])) {
+            $metadata->exchangeArray([
                 'content-type-whitelist' => $config['content-type-whitelist'][$controllerServiceName],
-                )
-            );
+            ]);
         }
     }
 
     /**
      * Merge entity and collection class into metadata, if found
      *
-     * @param string                    $controllerServiceName
+     * @param string $controllerServiceName
      * @param DoctrineRestServiceEntity $metadata
-     * @param array                     $config
+     * @param array $config
      */
     protected function mergeHalConfig($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
     {
-        if (! isset($config['zf-hal'])
-            || ! isset($config['zf-hal']['metadata_map'])
-        ) {
+        if (! isset($config['zf-hal']['metadata_map'])) {
             return;
         }
 
@@ -1262,7 +1240,7 @@ class DoctrineRestServiceModel implements
 
         $entityClass     = $this->deriveEntityClass($controllerServiceName, $metadata, $config);
         $collectionClass = $this->deriveCollectionClass($controllerServiceName, $metadata, $config);
-        $merge           = array();
+        $merge           = [];
 
         if (isset($config[$entityClass])) {
             $merge['entity_class'] = $entityClass;
@@ -1278,9 +1256,9 @@ class DoctrineRestServiceModel implements
     /**
      * Derive the name of the entity class from the controller service name
      *
-     * @param  string                    $controllerServiceName
-     * @param  DoctrineRestServiceEntity $metadata
-     * @param  array                     $config
+     * @param string $controllerServiceName
+     * @param DoctrineRestServiceEntity $metadata
+     * @param array $config
      * @return string
      */
     protected function deriveEntityClass($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
@@ -1289,7 +1267,7 @@ class DoctrineRestServiceModel implements
             return $config['zf-rest'][$controllerServiceName]['entity_class'];
         }
 
-        $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
+        $module = $metadata->module == $this->module ? $this->module : $metadata->module;
         $q = preg_quote('\\');
         if (! preg_match(
             sprintf(
@@ -1312,9 +1290,9 @@ class DoctrineRestServiceModel implements
     /**
      * Derive the name of the collection class from the controller service name
      *
-     * @param  string                    $controllerServiceName
-     * @param  DoctrineRestServiceEntity $metadata
-     * @param  array                     $config
+     * @param string $controllerServiceName
+     * @param DoctrineRestServiceEntity $metadata
+     * @param array $config
      * @return string
      */
     protected function deriveCollectionClass($controllerServiceName, DoctrineRestServiceEntity $metadata, array $config)
@@ -1323,7 +1301,7 @@ class DoctrineRestServiceModel implements
             return $config['zf-rest'][$controllerServiceName]['collection_class'];
         }
 
-        $module = ($metadata->module == $this->module) ? $this->module : $metadata->module;
+        $module = $metadata->module == $this->module ? $this->module : $metadata->module;
         if (! preg_match(
             '#'
             . preg_quote($module . '\\Rest\\')

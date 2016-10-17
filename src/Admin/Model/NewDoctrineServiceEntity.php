@@ -1,65 +1,64 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 use Zend\Stdlib\ArraySerializableInterface;
+use ZF\Apigility\Admin\Model\NewRestServiceEntity as ZFNewRestServiceEntity;
 
 class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySerializableInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
     /**
      * @var string
      */
     protected $hydratorName;
 
     /**
-     * @var boolean
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * @var bool
      */
     protected $byValue = true;
 
     /**
      * @var array
      */
-    protected $hydratorStrategies = array();
+    protected $hydratorStrategies = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $useGeneratedHydrator = true;
 
     public function exchangeArray(array $data)
     {
         parent::exchangeArray($data);
+
         foreach ($data as $key => $value) {
             $key = strtolower($key);
             $key = str_replace('_', '', $key);
             switch ($key) {
-                case 'objectmanager':
-                    $this->objectManager = $value;
-                    break;
                 case 'hydrator':
                     $this->hydratorName = $value;
+                    break;
+                case 'objectmanager':
+                    $this->objectManager = $value;
                     break;
                 case 'byvalue':
                     $this->byValue = $value;
                     break;
-                case 'hydratorstrategies':
+                case 'strategies':
                     $this->hydratorStrategies = $value;
                     break;
                 case 'usegeneratedhydrator':
                     $this->useGeneratedHydrator = $value;
-                    break;
-                default:
                     break;
             }
         }
@@ -68,10 +67,9 @@ class NewDoctrineServiceEntity extends ZFNewRestServiceEntity implements ArraySe
     public function getArrayCopy()
     {
         $data = parent::getArrayCopy();
-        $data['object_manager']         = $this->objectManager;
         $data['hydrator_name']          = $this->hydratorName;
+        $data['object_manager']         = $this->objectManager;
         $data['by_value']               = $this->byValue;
-        $data['entity_identifier_name'] = $this->entityIdentifierName;
         $data['strategies']             = $this->hydratorStrategies;
         $data['use_generated_hydrator'] = $this->useGeneratedHydrator;
 
