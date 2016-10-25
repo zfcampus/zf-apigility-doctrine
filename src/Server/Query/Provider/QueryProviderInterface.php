@@ -13,12 +13,12 @@ use ZF\Rest\ResourceEvent;
 interface QueryProviderInterface extends ObjectManagerAwareInterface
 {
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $parameters
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery(ResourceEvent $event, $entityClass, $parameters);
+    public function createQuery(ResourceEvent $event = null, $entityClass, $parameters);
 
     /**
      * This function is not necessary for any but fetch-all queries
