@@ -23,8 +23,8 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\StaticEventManager;
 use Zend\Stdlib\ArrayUtils;
-use Zend\Stdlib\Hydrator\HydratorAwareInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorAwareInterface;
+use Zend\Hydrator\HydratorInterface;
 use Traversable;
 use ReflectionClass;
 
