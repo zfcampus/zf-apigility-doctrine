@@ -2,6 +2,7 @@ Doctrine in Apigility
 ==============================
 
 [![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
+[![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-apigility-doctrine/badge.svg)](https://coveralls.io/github/zfcampus/zf-apigility-doctrine)
 [![Total Downloads](https://poser.pugx.org/zfcampus/zf-apigility-doctrine/downloads)](https://packagist.org/packages/zfcampus/zf-apigility-doctrine)
 
 This module provides the classes for integrating Doctrine with Apigility.
@@ -16,20 +17,32 @@ Installation of this module uses composer. For composer documentation, please re
 $ composer require zfcampus/zf-apigility-doctrine
 ```
 
-This library provides two modules.  The first, `ZF\Apigility\Doctrine\Server` provides
-the classes to serve data created by the second, `ZF\Apigility\Doctrine\Admin`.  The
-*Admin* module is used to create apigility resources and the Server serves those
-created resoruces.  Generally you would include *Admin* in your `development.config.php`
-and *Server* in your `application.config.php`
+This library provides two modules. The first, `ZF\Apigility\Doctrine\Server` provides
+the classes to serve data created by the second, `ZF\Apigility\Doctrine\Admin`.
+The *Admin* module is used to create apigility resources and the Server serves those
+created resources. Generally you would include *Admin* in your `cofnig/development.config.php`
+and *Server* in your `config/application.config.php`.
 
-`ZF\Apigility\Doctrine\Server` has a dependency with `Phpro\DoctrineHydrationModule` to handle entity hydration. See [documentation and instructions](https://github.com/phpro/zf-doctrine-hydration-module) on how to set up this module.
+`ZF\Apigility\Doctrine\Server` has a dependency with `Phpro\DoctrineHydrationModule` to handle
+entity hydration. See [documentation and instructions](https://github.com/phpro/zf-doctrine-hydration-module)
+on how to set up this module.
 
-For Apache installations it is recommended the [AllowEncodedSlashes-directive is set to On](http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes) so the configuration can be read.
+> ### zf-component-installer
+>
+> If you use [zf-component-installer](https://github.com/zendframework/zf-component-installer),
+> that plugin will install zf-apigility-doctrine as a module for you.
+
+For Apache installations it is recommended the
+[AllowEncodedSlashes-directive is set to On](http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes)
+so the configuration can be read.
 
 API Resources
 -------------
 
-**NOTE!**  This section was/is intended for the authors of [zf-apigility-admin-ui](https://github.com/zfcampus/zf-apigility-admin-ui).  While it is possible to use these instructions to manually create Apigility Doctrine resources it is strongly recommended to use the UI.
+**NOTE!** This section was/is intended for the authors of
+[zf-apigility-admin-ui](https://github.com/zfcampus/zf-apigility-admin-ui).
+While it is possible to use these instructions to manually create Apigility Doctrine resources
+it is strongly recommended to use the UI.
 
 
 `/apigility/api/doctrine[/:object_manager_alias]/metadata[/:name]`
@@ -53,16 +66,17 @@ POST Parameters
     "routeIdentifierName": "artist_id",
     "entityIdentifierName": "id",
     "routeMatch": "/api/artist",
-    "pageSizeParam": "limit", // optional default null
-    "hydratorName": "DbApi\\V1\\Rest\\Artist\\ArtistHydrator", // Optional default generated
-    "hydrateByValue": true // Optional default true
+    "pageSizeParam": "limit", // optional, default null
+    "hydratorName": "DbApi\\V1\\Rest\\Artist\\ArtistHydrator", // optional, default generated
+    "hydrateByValue": true // optional, default true
 }
 ```
 
 Hydrating Entities by Value or Reference
 ----------------------------------------
 
-By default the admin tool hydrates entities by reference by setting `$config['doctrine-hydrator']['hydrator_class']['by_value']` to false.
+By default the admin tool hydrates entities by reference by setting
+`$config['doctrine-hydrator']['hydrator_class']['by_value']` to `false`.
 
 
 Custom Events
@@ -128,17 +142,17 @@ Querying Single Entities
 Multi-keyed entities
 --------------------
 
-You may delimit multi keys through the route parameter.  The default
-delimiter is a period . (e.g. 1.2.3).  You may change the delimiter by
-setting the DoctrineResource::setMultiKeyDelimiter($value)
+You may delimit multi keys through the route parameter. The default
+delimiter is a period `.` (e.g. `1.2.3`). You may change the delimiter by
+setting the `DoctrineResource::setMultiKeyDelimiter($value)`.
 
 
 Complex queries through route parameters
 ----------------------------------------
 
-NO LONGER SUPPORTED.  As of version 2.0.4 this functionality has been removed from
-this module.  The intended use of this module is a 1:1 mapping of entities to resources
-and using subroutes is not in the spirit of this intention.  It is STRONGLY recommended
+**NO LONGER SUPPORTED.** As of version 2.0.4 this functionality has been removed from
+this module. The intended use of this module is a 1:1 mapping of entities to resources
+and using subroutes is not in the spirit of this intention. It is STRONGLY recommended
 you use [zfcampus/zf-doctrine-querybuilder](https://github.com/zfcampus/zf-doctrine-querybuilder)
 for complex query-ability.
 
@@ -147,11 +161,17 @@ for complex query-ability.
 Query Providers
 ===============
 
-Query Providers are available for all find operations.  The find query provider is used to fetch an entity before it is acted upon for all *DoctrineResource* methods except create.
+Query Providers are available for all find operations. The find query provider is used
+to fetch an entity before it is acted upon for all *DoctrineResource* methods except create.
 
-A query provider returns a *QueryBuilder* object.  By using a custom query provider you may inject conditions specific to the resource or user without modifying the resource.  For instance, you may add a ```$queryBuilder->andWhere('user = ' . $event->getIdentity());``` in your query provider before returning the *QueryBuilder* created therein.  Other uses include soft deletes so the end user can only see the active records.
+A query provider returns a *QueryBuilder* object. By using a custom query provider you may
+inject conditions specific to the resource or user without modifying the resource.
+For instance, you may add a `$queryBuilder->andWhere('user = ' . $event->getIdentity());`
+in your query provider before returning the *QueryBuilder* created therein. Other uses
+include soft deletes so the end user can only see the active records.
 
-A custom plugin manager is available to register your own query providers.  This can be done through this configuration:
+A custom plugin manager is available to register your own query providers. This can be done
+through this configuration:
 
 ```php
 'zf-apigility-doctrine-query-provider' => [
@@ -164,7 +184,9 @@ A custom plugin manager is available to register your own query providers.  This
 ],
 ```
 
-When the query provider is registered attach it to the doctrine-connected resource configuration.  The default query provider is used if no specific query provider is set.  You may set query providers for these keys:
+When the query provider is registered attach it to the doctrine-connected resource configuration.
+The default query provider is used if no specific query provider is set. You may set query
+providers for these keys:
 
 * default
 * fetch
@@ -190,11 +212,14 @@ When the query provider is registered attach it to the doctrine-connected resour
 Query Create Filters
 ==============
 
-In order to filter or change data sent to a create statement before it is used to hydrate the entity you may use a query create filter.  Create filters are very similar to *Query Providers* in their implementation.
+In order to filter or change data sent to a create statement before it is used to hydrate
+the entity you may use a query create filter. Create filters are very similar to
+*Query Providers* in their implementation.
 
 Create filters take the data as a parameter and return the data, modified or filtered.
 
-A custom plugin manager is available to register your own create filters.  This can be done through following configuration:
+A custom plugin manager is available to register your own create filters. This can be
+done through following configuration:
 
 ```php
 'zf-apigility-doctrine-query-create-filter' => [
