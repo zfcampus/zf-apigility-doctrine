@@ -20,7 +20,7 @@ $ composer require zfcampus/zf-apigility-doctrine
 This library provides two modules. The first, `ZF\Apigility\Doctrine\Server` provides
 the classes to serve data created by the second, `ZF\Apigility\Doctrine\Admin`.
 The *Admin* module is used to create apigility resources and the Server serves those
-created resources. Generally you would include *Admin* in your `cofnig/development.config.php`
+created resources. Generally you would include *Admin* in your `config/development.config.php`
 and *Server* in your `config/application.config.php`.
 
 `ZF\Apigility\Doctrine\Server` has a dependency with `Phpro\DoctrineHydrationModule` to handle
@@ -30,7 +30,8 @@ on how to set up this module.
 > ### zf-component-installer
 >
 > If you use [zf-component-installer](https://github.com/zendframework/zf-component-installer),
-> that plugin will install zf-apigility-doctrine as a module for you.
+> that plugin will install zf-apigility-doctrine, and all modules it depends on, as a
+> module in your application configuration for you.
 
 For Apache installations it is recommended the
 [AllowEncodedSlashes-directive is set to On](http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes)
