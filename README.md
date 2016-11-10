@@ -1,8 +1,8 @@
 Doctrine in Apigility
 ==============================
 
-[![Build status](https://api.travis-ci.org/zfcampus/zf-apigility-doctrine.svg)](http://travis-ci.org/zfcampus/zf-apigility-doctrine)
-[![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-apigility-doctrine/badge.svg)](https://coveralls.io/github/zfcampus/zf-apigility-doctrine)
+[![Build Status](https://travis-ci.org/zfcampus/zf-apigility-doctrine.svg?branch=master)](https://travis-ci.org/zfcampus/zf-apigility-doctrine)
+[![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-apigility-doctrine/badge.svg?branch=master)](https://coveralls.io/github/zfcampus/zf-apigility-doctrine?branch=master)
 [![Total Downloads](https://poser.pugx.org/zfcampus/zf-apigility-doctrine/downloads)](https://packagist.org/packages/zfcampus/zf-apigility-doctrine)
 
 This module provides the classes for integrating Doctrine with Apigility.
