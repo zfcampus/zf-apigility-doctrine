@@ -382,7 +382,7 @@ class CRUDTest extends TestCase
     public function testDeleteEntityNotFound()
     {
         $meta = $this->createMeta();
-        $id = $meta->getId() + 1;
+        $id = $meta->getId() . '0';
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
 
