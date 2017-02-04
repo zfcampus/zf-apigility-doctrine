@@ -6,6 +6,8 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event\Listener;
 
+use Cube\DoctrineEntityFactory\EntityFactoryInterface;
+use Cube\DoctrineEntityFactory\SimpleEntityFactory;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
@@ -74,6 +76,24 @@ class CollectionListener implements ListenerAggregateInterface
      * @var ServiceLocatorInterface
      */
     protected $serviceManager;
+
+    /**
+     * @var EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
+     * @param EntityFactoryInterface $entityFactory A factory that knows how to create your Doctrine entities
+     */
+    public function __construct(EntityFactoryInterface $entityFactory = null)
+    {
+        if (null === $entityFactory) {
+            $entityFactory = new SimpleEntityFactory();
+        }
+
+        $this->entityFactory = $entityFactory;
+    }
+
 
     /**
      * @param EventManagerInterface $events
@@ -193,7 +213,7 @@ class CollectionListener implements ListenerAggregateInterface
         }
 
         if (! $entity) {
-            $entity = new $targetEntityClassName;
+            $entity = $this->entityFactory->get($targetEntityClassName);
         }
 
         $hydrator = $this->getEntityHydrator($targetEntityClassName, $this->getObjectManager());
