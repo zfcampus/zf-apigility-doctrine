@@ -6,6 +6,8 @@
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
 
+use Cube\DoctrineEntityFactory\EntityFactoryInterface;
+use Cube\DoctrineEntityFactory\SimpleEntityFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
@@ -85,6 +87,24 @@ class DoctrineResource extends AbstractResourceListener implements
      * @var HydratorInterface
      */
     protected $hydrator;
+
+    /**
+     * @var EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
+     * @param EntityFactoryInterface $entityFactory A factory that knows how to create your Doctrine entities
+     */
+    public function __construct(EntityFactoryInterface $entityFactory = null)
+    {
+        if (null === $entityFactory) {
+            $entityFactory = new SimpleEntityFactory();
+        }
+
+        $this->setEntityFactory($entityFactory);
+    }
+
 
     /**
      * @return SharedEventManager
@@ -330,7 +350,8 @@ class DoctrineResource extends AbstractResourceListener implements
             return $data;
         }
 
-        $entity = new $entityClass;
+        $entity = $this->entityFactory->get($entityClass);
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
@@ -746,5 +767,13 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         return $entity;
+    }
+
+    /**
+     * @param EntityFactoryInterface $entityFactory
+     */
+    public function setEntityFactory(EntityFactoryInterface $entityFactory)
+    {
+        $this->entityFactory = $entityFactory;
     }
 }

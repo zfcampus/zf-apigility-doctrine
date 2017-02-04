@@ -6,19 +6,22 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
+use Cube\DoctrineEntityFactory\EntityFactoryInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
 use Zend\Http\Request;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource;
-use ZF\Apigility\Doctrine\DoctrineResource;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
+use ZF\Apigility\Doctrine\Server\Resource\DoctrineResource;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
+use ZFTest\Apigility\Doctrine\Server\ORM\CRUD\Factory\DoctrineResourceFactoryUsingEntityFactory;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album;
 use ZFTestApigilityDb\Entity\Artist;
@@ -219,6 +222,28 @@ class CRUDTest extends TestCase
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateByExplicitlySettingEntityFactoryInConstructor()
+    {
+        /** @var EntityFactoryInterface|\PHPUnit_Framework_MockObject_MockObject $entityFactoryMock */
+        $entityFactoryMock = $this->getMockBuilder(EntityFactoryInterface::class)->getMock();
+        $entityFactoryMock->expects(self::once())->method('get')->with()
+            ->willReturnCallback(function ($class) {
+                return new $class;
+            });
+
+        /** @var ServiceManager $sm */
+        $sm = $this->getApplication()->getServiceManager();
+        $sm->setFactory(
+            'ZFTestApigilityDbApi\V1\Rest\Artist\ArtistResource',
+            new DoctrineResourceFactoryUsingEntityFactory($entityFactoryMock)
+        );
+
+        $this->testCreate();
     }
 
     public function testFetch()

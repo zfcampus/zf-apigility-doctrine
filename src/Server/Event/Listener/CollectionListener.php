@@ -6,6 +6,8 @@
 
 namespace ZF\Apigility\Doctrine\Server\Event\Listener;
 
+use Cube\DoctrineEntityFactory\EntityFactoryInterface;
+use Cube\DoctrineEntityFactory\SimpleEntityFactory;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
@@ -76,6 +78,24 @@ class CollectionListener implements ListenerAggregateInterface
     protected $serviceManager;
 
     /**
+     * @var EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
+     * @param EntityFactoryInterface $entityFactory A factory that knows how to create your Doctrine entities
+     */
+    public function __construct(EntityFactoryInterface $entityFactory = null)
+    {
+        if (null === $entityFactory) {
+            $entityFactory = new SimpleEntityFactory();
+        }
+
+        $this->entityFactory = $entityFactory;
+    }
+
+
+    /**
      * @param EventManagerInterface $events
      * @param int $priority
      */
@@ -113,7 +133,7 @@ class CollectionListener implements ListenerAggregateInterface
         // Setup the dependencies
         $this->setObjectManager($event->getObjectManager());
         $this->setRootEntity($event->getEntity());
-        $this->setObjectData((array) $event->getData());
+        $this->setObjectData((array)$event->getData());
         $this->setInputFilter($event->getResourceEvent()->getInputFilter());
         $this->setServiceManager($event->getTarget()->getServiceManager());
 
@@ -135,7 +155,7 @@ class CollectionListener implements ListenerAggregateInterface
      */
     protected function iterateEntity($entity, $data, InputFilterInterface $inputFilter)
     {
-        $metadata     = $this->getClassMetadata($entity);
+        $metadata = $this->getClassMetadata($entity);
         $associations = $this->getEntityCollectionValuedAssociations($entity, $data, true);
 
         if ($associations->count() > 0) {
@@ -172,7 +192,7 @@ class CollectionListener implements ListenerAggregateInterface
      */
     protected function processEntity($targetEntityClassName, $data)
     {
-        $metadata        = $this->getClassMetadata($targetEntityClassName);
+        $metadata = $this->getClassMetadata($targetEntityClassName);
         $identifierNames = $metadata->getIdentifierFieldNames($targetEntityClassName);
         if (empty($identifierNames)) {
             return null; // Not really sure what would cause this or how to handle, skipping for now
@@ -193,7 +213,7 @@ class CollectionListener implements ListenerAggregateInterface
         }
 
         if (! $entity) {
-            $entity = new $targetEntityClassName;
+            $entity = $this->entityFactory->get($targetEntityClassName);
         }
 
         $hydrator = $this->getEntityHydrator($targetEntityClassName, $this->getObjectManager());
@@ -239,8 +259,8 @@ class CollectionListener implements ListenerAggregateInterface
         }
         if (! array_key_exists($entity, $this->entityCollectionValuedAssociations)) {
             $collectionValuedAssociations = [];
-            $metadata                     = $this->getClassMetadata($entity);
-            $associations                 = $metadata->getAssociationNames();
+            $metadata = $this->getClassMetadata($entity);
+            $associations = $metadata->getAssociationNames();
 
             foreach ($associations as $association) {
                 if ($metadata->isCollectionValuedAssociation($association)) {
@@ -283,7 +303,7 @@ class CollectionListener implements ListenerAggregateInterface
     protected function validateAssociationData($association, $data)
     {
         return ! empty($data[$association])
-           && (is_array($data[$association]) || $data[$association] instanceof \Traversable);
+            && (is_array($data[$association]) || $data[$association] instanceof \Traversable);
     }
 
     /**
@@ -318,7 +338,7 @@ class CollectionListener implements ListenerAggregateInterface
      */
     protected function getEntityHydrator($entityClass, $objectManager)
     {
-        $hydrator    = false;
+        $hydrator = false;
         $hydratorMap = $this->getEntityHydratorMap();
         if ($hydratorMap !== false && array_key_exists($entityClass, $hydratorMap)) {
             if ($hydratorMap[$entityClass] instanceof HydratorInterface) {
