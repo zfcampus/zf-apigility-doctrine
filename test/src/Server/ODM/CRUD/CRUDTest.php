@@ -152,7 +152,7 @@ class CRUDTest extends TestCase
 
         $config = $sm->get('config');
         $resourceName = 'ZFTestApigilityDbMongoApi\V1\Rest\Meta\MetaResource';
-        $resourceConfig = !empty($config['zf-apigility']['doctrine-connected'][$resourceName])
+        $resourceConfig = ! empty($config['zf-apigility']['doctrine-connected'][$resourceName])
             ? $config['zf-apigility']['doctrine-connected'][$resourceName]
             : [];
         $resourceConfig['entity_factory'] = 'ResourceInstantiator';

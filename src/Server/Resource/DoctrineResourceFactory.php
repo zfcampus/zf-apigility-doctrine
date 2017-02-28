@@ -99,7 +99,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         $resourceClass = $this->getResourceClassFromConfig($doctrineConnectedConfig, $requestedName);
         $objectManager = $container->get($doctrineConnectedConfig['object_manager']);
-        $entityFactory = !empty($doctrineConnectedConfig['entity_factory'])
+        $entityFactory = ! empty($doctrineConnectedConfig['entity_factory'])
             ? $container->get($doctrineConnectedConfig['entity_factory'])
             : null;
 
