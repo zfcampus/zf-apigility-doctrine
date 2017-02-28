@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2016-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
@@ -22,6 +22,7 @@ use ZF\ApiProblem\ApiProblemResponse;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album;
 use ZFTestApigilityDb\Entity\Artist;
+use ZFTestApigilityDbApi\V1\Rest\Artist\ArtistResource;
 use ZFTestApigilityGeneral\Listener\EventCatcher;
 
 class CRUDTest extends TestCase
@@ -193,17 +194,15 @@ class CRUDTest extends TestCase
         $this->assertEquals($artist->getId(), $body['_embedded']['artist']['id']);
     }
 
-    public function testCreateWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testCreateWithListenerThatReturnsApiProblem($method, $message)
     {
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_CREATE_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestCreateFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_CREATE_PRE);
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
 
         $this->dispatch(
@@ -218,7 +217,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_CREATE_PRE),
+            $body['detail']
+        );
     }
 
     public function testFetch()
@@ -265,18 +267,16 @@ class CRUDTest extends TestCase
         $this->assertEquals('NewAlbum', $body['name']);
     }
 
-    public function testFetchWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testFetchWithListenerThatReturnsApiProblem($method, $message)
     {
         $artist = $this->createArtist('Artist Fetch ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_FETCH_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestFetchFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_FETCH_PRE);
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
 
         $this->dispatch('/test/rest/artist/' . $artist->getId());
@@ -284,7 +284,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestFetchFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_FETCH_PRE),
+            $body['detail']
+        );
     }
 
     public function testFetchAll()
@@ -325,18 +328,16 @@ class CRUDTest extends TestCase
         ]);
     }
 
-    public function testFetchAllWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testFetchAllWithListenerThatReturnsApiProblem($method, $message)
     {
         $this->createArtist('Artist FetchAll ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_FETCH_ALL_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestFetchAllFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_FETCH_ALL_PRE);
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
 
         $this->dispatch('/test/rest/artist');
@@ -344,7 +345,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestFetchAllFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_FETCH_ALL_PRE),
+            $body['detail']
+        );
     }
 
     public function testPatch()
@@ -371,18 +375,16 @@ class CRUDTest extends TestCase
         ]);
     }
 
-    public function testPatchWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testPatchWithListenerThatReturnsApiProblem($method, $message)
     {
         $artist = $this->createArtist('Artist Patch ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_PATCH_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestPatchFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_PATCH_PRE);
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
@@ -395,7 +397,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestPatchFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_PATCH_PRE),
+            $body['detail']
+        );
     }
 
     public function testPatchList()
@@ -441,18 +446,16 @@ class CRUDTest extends TestCase
         ]);
     }
 
-    public function testPatchListWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testPatchListWithListenerThatReturnsApiProblem($method, $message)
     {
         $artist = $this->createArtist('Artist Patch List ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_PATCH_LIST_POST,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestPatchFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_PATCH_LIST_PRE);
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
@@ -470,7 +473,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestPatchFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_PATCH_LIST_PRE),
+            $body['detail']
+        );
     }
 
     public function testPut()
@@ -500,18 +506,16 @@ class CRUDTest extends TestCase
         ]);
     }
 
-    public function testPutWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testPutWithListenerThatReturnsApiProblem($method, $message)
     {
         $artist = $this->createArtist('Artist Put ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_UPDATE_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestPutFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_UPDATE_PRE);
         $this->getRequest()->getHeaders()->addHeaders([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
@@ -527,7 +531,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestPutFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_UPDATE_PRE),
+            $body['detail']
+        );
     }
 
     public function testDelete()
@@ -547,18 +554,16 @@ class CRUDTest extends TestCase
         ]);
     }
 
-    public function testDeleteWithListenerThatReturnsApiProblem()
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testDeleteWithListenerThatReturnsApiProblem($method, $message)
     {
         $artist = $this->createArtist('Artist Delete ApiProblem');
-        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
-        $sharedEvents->attach(
-            DoctrineResource::class,
-            DoctrineResourceEvent::EVENT_DELETE_PRE,
-            function (DoctrineResourceEvent $e) {
-                $e->stopPropagation();
-                return new ApiProblem(400, 'ZFTestDeleteFailure');
-            }
-        );
+        $this->$method(DoctrineResourceEvent::EVENT_DELETE_PRE);
         $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
         $this->getRequest()->setMethod(Request::METHOD_DELETE);
 
@@ -567,7 +572,10 @@ class CRUDTest extends TestCase
 
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
-        $this->assertEquals('ZFTestDeleteFailure', $body['detail']);
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_DELETE_PRE),
+            $body['detail']
+        );
         $foundEntity = $this->em->getRepository(Artist::class)->find($artist->getId());
         $this->assertEquals($artist->getId(), $foundEntity->getId());
     }
@@ -606,7 +614,7 @@ class CRUDTest extends TestCase
     {
         $artist1 = $this->createArtist('Artist Delete 1');
         $artist2 = $this->createArtist('Artist Delete 2');
-        $artist3 = $this->createArtist('Artist Dleete 3');
+        $artist3 = $this->createArtist('Artist Delete 3');
 
         $deleteList = [
             ['id' => $artist1->getId()],
@@ -633,6 +641,52 @@ class CRUDTest extends TestCase
             DoctrineResourceEvent::EVENT_DELETE_LIST_PRE,
             DoctrineResourceEvent::EVENT_DELETE_LIST_POST,
         ]);
+    }
+
+    /**
+     * @dataProvider listener
+     *
+     * @param string $method
+     * @param string $message
+     */
+    public function testDeleteListWithListenerThatReturnsApiProblem($method, $message)
+    {
+        $this->$method(DoctrineResourceEvent::EVENT_DELETE_LIST_PRE);
+
+        $artist1 = $this->createArtist('Artist Delete 1');
+        $artist2 = $this->createArtist('Artist Delete 2');
+        $artist3 = $this->createArtist('Artist Delete 3');
+
+        $deleteList = [
+            ['id' => $artist1->getId()],
+            ['id' => $artist2->getId()],
+            ['id' => $artist3->getId()],
+        ];
+
+        $this->em->clear();
+
+        $this->getRequest()->getHeaders()->addHeaders([
+            'Accept' => 'application/json',
+            'Content-type' => 'application/json',
+        ]);
+        $this->getRequest()->setMethod(Request::METHOD_DELETE);
+        $this->getRequest()->setContent(json_encode($deleteList));
+
+        $this->dispatch('/test/rest/artist');
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(400);
+        $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
+        $this->assertEquals(
+            sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_DELETE_LIST_PRE),
+            $body['detail']
+        );
+        $foundEntity1 = $this->em->getRepository(Artist::class)->find($artist1->getId());
+        $foundEntity2 = $this->em->getRepository(Artist::class)->find($artist2->getId());
+        $foundEntity3 = $this->em->getRepository(Artist::class)->find($artist3->getId());
+        $this->assertEquals($artist1->getId(), $foundEntity1->getId());
+        $this->assertEquals($artist2->getId(), $foundEntity2->getId());
+        $this->assertEquals($artist3->getId(), $foundEntity3->getId());
     }
 
     public function testGetRpcNoParams()
@@ -722,5 +776,49 @@ class CRUDTest extends TestCase
         $this->em->flush();
 
         return $album;
+    }
+
+    public function listener()
+    {
+        return [
+            //          $methodToAttachListener,     $detailMessage
+            'shared' => ['attachSharedListener',     'ZFTestSharedListenerFailure'],
+            'config' => ['attachAggregatedListener', 'ZFTestFailureAggregateListener'],
+        ];
+    }
+
+    /**
+     * @param string $eventName
+     * @return void
+     */
+    protected function attachSharedListener($eventName)
+    {
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            DoctrineResource::class,
+            $eventName,
+            function (DoctrineResourceEvent $e) use ($eventName) {
+                $e->stopPropagation();
+                return new ApiProblem(400, sprintf('ZFTestSharedListenerFailure: %s', $eventName));
+            }
+        );
+    }
+
+    /**
+     * @param string $eventName
+     * @return void
+     */
+    protected function attachAggregatedListener($eventName)
+    {
+        $sm = $this->getApplication()->getServiceManager();
+        $sm->setAllowOverride(true);
+        $config = $sm->get('config');
+        $config['zf-apigility']['doctrine-connected'][ArtistResource::class]['listeners'][]
+            = 'ZFTestFailureAggregateListener';
+        $sm->setService('config', $config);
+        $sm->setAllowOverride(false);
+
+        $listener = new TestAsset\FailureAggregateListener($eventName);
+        $sm->setService('ZFTestFailureAggregateListener', $listener);
     }
 }
