@@ -8,6 +8,7 @@ namespace ZF\Apigility\Doctrine\Server\Resource;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ODM\MongoDB\Query\Builder as MongoDBQueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
@@ -85,6 +86,17 @@ class DoctrineResource extends AbstractResourceListener implements
      * @var HydratorInterface
      */
     protected $hydrator;
+
+    /** @var InstantiatorInterface */
+    private $entityFactory;
+
+    /**
+     * @param InstantiatorInterface|null $entityFactory
+     */
+    public function __construct(InstantiatorInterface $entityFactory = null)
+    {
+        $this->entityFactory = $entityFactory;
+    }
 
     /**
      * @return SharedEventManager
@@ -330,7 +342,10 @@ class DoctrineResource extends AbstractResourceListener implements
             return $data;
         }
 
-        $entity = new $entityClass;
+        $entity = $this->entityFactory
+            ? $this->entityFactory->instantiate($entityClass)
+            : new $entityClass;
+
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();

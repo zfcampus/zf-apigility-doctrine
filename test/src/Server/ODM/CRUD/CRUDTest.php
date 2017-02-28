@@ -6,9 +6,12 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
+use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Interop\Container\ContainerInterface;
 use MongoClient;
 use Zend\Http\Request;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use ZF\Apigility\Doctrine\DoctrineResource;
@@ -127,6 +130,46 @@ class CRUDTest extends TestCase
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateByExplicitlySettingEntityFactoryInConstructor()
+    {
+        /** @var InstantiatorInterface|\PHPUnit_Framework_MockObject_MockObject $entityFactoryMock */
+        $entityFactoryMock = $this->getMockBuilder(InstantiatorInterface::class)->getMock();
+        $entityFactoryMock->expects(self::once())
+            ->method('instantiate')
+            ->with('ZFTestApigilityDbMongo\Document\Meta')
+            ->willReturnCallback(function ($class) {
+                return new $class;
+            });
+
+
+        /** @var ServiceManager $sm */
+        $sm = $this->getApplication()->getServiceManager();
+
+        $config = $sm->get('config');
+        $resourceName = 'ZFTestApigilityDbMongoApi\V1\Rest\Meta\MetaResource';
+        $resourceConfig = !empty($config['zf-apigility']['doctrine-connected'][$resourceName])
+            ? $config['zf-apigility']['doctrine-connected'][$resourceName]
+            : [];
+        $resourceConfig['entity_factory'] = 'ResourceInstantiator';
+        $config['zf-apigility']['doctrine-connected'][$resourceName] = $resourceConfig;
+
+        $sm->setAllowOverride(true);
+        $sm->setService('config', $config);
+        $sm->setAllowOverride(false);
+
+        $sm->setFactory(
+            'ResourceInstantiator',
+            function () use ($entityFactoryMock) {
+                return $entityFactoryMock;
+            }
+        );
+
+        $this->testCreate();
     }
 
     public function testFetch()
@@ -427,7 +470,7 @@ class CRUDTest extends TestCase
     protected function createMeta($name = null)
     {
         $meta = new Meta();
-        $meta->setName($name ?: 'Meta Name');
+        $meta->setName($name ? : 'Meta Name');
         $meta->setCreatedAt(new \DateTime());
         $this->dm->persist($meta);
         $this->dm->flush();
