@@ -76,13 +76,15 @@ class CollectionListener implements ListenerAggregateInterface
      */
     protected $serviceManager;
 
-    /** @var InstantiatorInterface */
+    /**
+     * @var InstantiatorInterface|null
+     */
     private $entityFactory;
 
     /**
-     * @param InstantiatorInterface $entityFactory
+     * @param InstantiatorInterface|null $entityFactory
      */
-    public function __construct(InstantiatorInterface $entityFactory)
+    public function __construct(InstantiatorInterface $entityFactory = null)
     {
         $this->entityFactory = $entityFactory;
     }
@@ -207,7 +209,7 @@ class CollectionListener implements ListenerAggregateInterface
         if (! $entity) {
             $entity = $this->entityFactory
                 ? $this->entityFactory->instantiate($targetEntityClassName)
-                : new $targetEntityClassName;
+                : new $targetEntityClassName();
         }
 
         $hydrator = $this->getEntityHydrator($targetEntityClassName, $this->getObjectManager());

@@ -87,7 +87,7 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected $hydrator;
 
-    /** @var InstantiatorInterface */
+    /** @var InstantiatorInterface|null */
     private $entityFactory;
 
     /**
@@ -344,7 +344,7 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $entity = $this->entityFactory
             ? $this->entityFactory->instantiate($entityClass)
-            : new $entityClass;
+            : new $entityClass();
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
