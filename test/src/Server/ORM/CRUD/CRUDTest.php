@@ -6,11 +6,13 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
 
+use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Filter\FilterChain;
 use Zend\Http\Request;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceEntity;
@@ -219,6 +221,50 @@ class CRUDTest extends TestCase
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+    }
+
+    public function testCreateByExplicitlySettingEntityFactoryInConstructor()
+    {
+        /** @var InstantiatorInterface|\PHPUnit_Framework_MockObject_MockObject $entityFactoryMock */
+        $entityFactoryMock = $this->getMockBuilder(InstantiatorInterface::class)->getMock();
+        $entityFactoryMock->expects(self::once())
+            ->method('instantiate')
+            ->with(Artist::class)
+            ->willReturnCallback(function ($class) {
+                return new $class();
+            });
+
+        /** @var ServiceManager $sm */
+        $sm = $this->getApplication()->getServiceManager();
+
+        $config = $sm->get('config');
+        $resourceName = 'ZFTestApigilityDbApi\V1\Rest\Artist\ArtistResource';
+        $resourceConfig = $config['zf-apigility']['doctrine-connected'][$resourceName];
+        $resourceConfig['entity_factory'] = 'ResourceInstantiator';
+        $config['zf-apigility']['doctrine-connected'][$resourceName] = $resourceConfig;
+
+        $sm->setAllowOverride(true);
+        $sm->setService('config', $config);
+        $sm->setAllowOverride(false);
+
+        $sm->setService(
+            'ResourceInstantiator',
+            $entityFactoryMock
+        );
+
+        // dispatch a request to create a meta document (similar to testCreate())
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+
+        $this->dispatch(
+            '/test/rest/artist',
+            Request::METHOD_POST,
+            [
+                'name' => 'ArtistTwelve',
+                'createdAt' => '2017-03-01 08:56:32',
+            ]
+        );
+
+        $this->assertResponseStatusCode(201);
     }
 
     public function testFetch()
