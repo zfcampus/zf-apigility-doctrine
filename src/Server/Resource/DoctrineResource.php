@@ -87,7 +87,9 @@ class DoctrineResource extends AbstractResourceListener implements
      */
     protected $hydrator;
 
-    /** @var InstantiatorInterface|null */
+    /**
+     * @var InstantiatorInterface|null
+     */
     private $entityFactory;
 
     /**
