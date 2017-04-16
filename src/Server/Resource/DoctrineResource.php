@@ -735,11 +735,7 @@ class DoctrineResource extends AbstractResourceListener implements
             }
         }
 
-        try {
-            $entity = $queryBuilder->getQuery()->getSingleResult();
-        } catch (NoResultException $e) {
-            $entity = null;
-        }
+        $entity = $queryBuilder->getQuery()->getOneOrNullResult();
 
         if (! $entity) {
             $entity = new ApiProblem(404, 'Entity was not found');
