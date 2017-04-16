@@ -244,3 +244,22 @@ Register your Query Create Filter as:
     ],
 ],
 ```
+
+Content Negotiation
+=====================
+
+By default, your entities will return HalJson. If for whatever reason you want to return JSON then you can have your entities implement `\JsonSerializable` to determine how it should be handled when it hits the `JsonRenderer` like so:
+
+```php
+class MyEntity implements \JsonSerializable
+{
+    // etc
+
+    public function jsonSerialize()
+    {
+        return array(
+            'name' => $this->getName()
+        );
+    }
+}
+```
