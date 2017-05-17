@@ -906,8 +906,9 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             if ($update->$property === null) {
                 continue;
             }
-            $key = sprintf('zf-rest.%s.%s', $original->controllerServiceName, $configKey);
-            $this->configResource->patchKey($key, $update->$property);
+
+            $patch = ['zf-rest' => [$original->controllerServiceName => [$configKey => $update->$property]]];
+            $this->configResource->patch($patch);
         }
     }
 
@@ -919,13 +920,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch = [];
         foreach ($this->doctrineHydratorOptions as $property => $configKey) {
             if ($update->$property === null) {
                 continue;
             }
-            $key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
-            $this->configResource->patchKey($key, $update->$property);
+            $patch = ['doctrine-hydrator' => [$update->hydratorName => [$configKey => $update->$property]]];
+            $this->configResource->patch($patch);
         }
     }
 
@@ -943,20 +943,20 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         $service = $original->controllerServiceName;
 
         if ($update->selector) {
-            $key = $baseKey . 'controllers.' . $service;
-            $this->configResource->patchKey($key, $update->selector);
+            $patch = ['zf-content-negotiation' => ['controllers' => [$service => $update->selector]]];
+            $this->configResource->patch($patch);
         }
 
         $acceptWhitelist = $update->acceptWhitelist;
         if (is_array($acceptWhitelist) && $acceptWhitelist) {
-            $key = $baseKey . 'accept-whitelist.' . $service;
-            $this->configResource->patchKey($key, $acceptWhitelist);
+            $patch = ['zf-content-negotiation' => ['accept-whitelist' => [$service => $acceptWhitelist]]];
+            $this->configResource->patch($patch);
         }
 
         $contentTypeWhitelist = $update->contentTypeWhitelist;
         if (is_array($contentTypeWhitelist) && $contentTypeWhitelist) {
-            $key = $baseKey . 'content-type-whitelist.' . $service;
-            $this->configResource->patchKey($key, $contentTypeWhitelist);
+            $patch = ['zf-content-negotiation' => ['content-type-whitelist' => [$service => $contentTypeWhitelist]]];
+            $this->configResource->patch($patch);
         }
     }
 
@@ -968,13 +968,11 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch                   = [];
+        $patch                   = ['zf-apigility' => ['doctrine-connected' => [$update->resourceClass => []]]];
         $patch['object_manager'] = $update->objectManager;
         $patch['hydrator']       = $update->hydratorName;
-        $basekey                 = 'zf-apigility.doctrine-connected.';
-        $resource                = $update->resourceClass;
 
-        $this->configResource->patchKey($basekey . $resource, $patch);
+        $this->configResource->patch($patch);
     }
 
     /**
