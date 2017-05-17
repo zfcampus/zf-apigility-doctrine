@@ -906,9 +906,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
             if ($update->$property === null) {
                 continue;
             }
-
-            $patch = ['zf-rest' => [$original->controllerServiceName => [$configKey => $update->$property]]];
-            $this->configResource->patch($patch);
+            $key = sprintf('zf-rest.%s.%s', $original->controllerServiceName, $configKey);
+            $this->configResource->patchKey($key, $update->$property);
         }
     }
 
@@ -949,14 +948,14 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
 
         $acceptWhitelist = $update->acceptWhitelist;
         if (is_array($acceptWhitelist) && $acceptWhitelist) {
-            $patch = ['zf-content-negotiation' => ['accept-whitelist' => [$service => $acceptWhitelist]]];
-            $this->configResource->patch($patch);
+            $key = $baseKey . 'accept-whitelist.' . $service;
+            $this->configResource->patchKey($key, $acceptWhitelist);
         }
 
         $contentTypeWhitelist = $update->contentTypeWhitelist;
         if (is_array($contentTypeWhitelist) && $contentTypeWhitelist) {
-            $patch = ['zf-content-negotiation' => ['content-type-whitelist' => [$service => $contentTypeWhitelist]]];
-            $this->configResource->patch($patch);
+            $key = $baseKey . 'content-type-whitelist.' . $service;
+            $this->configResource->patchKey($key, $contentTypeWhitelist);
         }
     }
 
