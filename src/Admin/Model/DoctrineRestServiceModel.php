@@ -967,9 +967,16 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch                   = ['zf-apigility' => ['doctrine-connected' => [$update->resourceClass => []]]];
-        $patch['object_manager'] = $update->objectManager;
-        $patch['hydrator']       = $update->hydratorName;
+        $patch = [
+            'zf-apigility' => [
+                'doctrine-connected' => [
+                    $update->resourceClass => [
+                        'object_manager' => $update->objectManager,
+                        'hydrator' => $update->hydratorName,
+                    ]
+                ]
+            ]
+        ];
 
         $this->configResource->patch($patch);
     }
