@@ -919,13 +919,12 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function updateDoctrineHydratorConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch = [];
         foreach ($this->doctrineHydratorOptions as $property => $configKey) {
             if ($update->$property === null) {
                 continue;
             }
-            $key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
-            $this->configResource->patchKey($key, $update->$property);
+            $patch = ['doctrine-hydrator' => [$update->hydratorName => [$configKey => $update->$property]]];
+            $this->configResource->patch($patch);
         }
     }
 
@@ -943,8 +942,8 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         $service = $original->controllerServiceName;
 
         if ($update->selector) {
-            $key = $baseKey . 'controllers.' . $service;
-            $this->configResource->patchKey($key, $update->selector);
+            $patch = ['zf-content-negotiation' => ['controllers' => [$service => $update->selector]]];
+            $this->configResource->patch($patch);
         }
 
         $acceptWhitelist = $update->acceptWhitelist;
@@ -968,13 +967,18 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
      */
     public function updateDoctrineConfig(DoctrineRestServiceEntity $original, DoctrineRestServiceEntity $update)
     {
-        $patch                   = [];
-        $patch['object_manager'] = $update->objectManager;
-        $patch['hydrator']       = $update->hydratorName;
-        $basekey                 = 'zf-apigility.doctrine-connected.';
-        $resource                = $update->resourceClass;
+        $patch = [
+            'zf-apigility' => [
+                'doctrine-connected' => [
+                    $update->resourceClass => [
+                        'object_manager' => $update->objectManager,
+                        'hydrator' => $update->hydratorName,
+                    ]
+                ]
+            ]
+        ];
 
-        $this->configResource->patchKey($basekey . $resource, $patch);
+        $this->configResource->patch($patch);
     }
 
     /**
