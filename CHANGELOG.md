@@ -48,6 +48,9 @@ All notable changes to this project will be documented in this file, in reverse 
   Doctrine Resource listener attached via config. These are now correctly
   dispatched.
 
+- [#298](https://github.com/zfcampus/zf-apigility-doctrine/pull/298) fixes
+  data passed to listener on patch method.
+
 ## 2.1.0 - 2016-10-17
 
 ### Added
