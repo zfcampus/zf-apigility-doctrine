@@ -26,6 +26,10 @@ All notable changes to this project will be documented in this file, in reverse 
   configuration keys, which resolves issue with Apigility Admin and populating
   forms from config file and writing duplicated values into config file.
 
+- [#290](https://github.com/zfcampus/zf-apigility-doctrine/pull/290) fixes
+  Doctrine Resource listener attached via config. These are now correctly
+  dispatched.
+
 ## 2.1.0 - 2016-10-17
 
 ### Added
