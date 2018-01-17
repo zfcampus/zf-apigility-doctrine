@@ -574,10 +574,15 @@ class DoctrineResource extends AbstractResourceListener implements
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_PRE, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
             return $results->last();
+        } elseif (! $results->isEmpty() && $results->last() !== null) {
+            // TODO Change to a more logical/secure way to see if data was acted and and we have the expected response
+            $preEventData = $results->last();
+        } else {
+            $preEventData = $data;
         }
 
         // Hydrate entity with patched data
-        $this->getHydrator()->hydrate((array) $data, $entity);
+        $this->getHydrator()->hydrate((array) $preEventData, $entity);
 
         $results = $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST, $entity, $data);
         if ($results->last() instanceof ApiProblem) {
