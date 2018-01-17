@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin\Model;
@@ -398,13 +398,13 @@ class DoctrineRpcServiceModel
                 'controllers' => [
                     $controllerService => $selector,
                 ],
-                'accept-whitelist' => [
+                'accept_whitelist' => [
                     $controllerService => [
                         'application/json',
                         'application/*+json',
                     ],
                 ],
-                'content-type-whitelist' => [
+                'content_type_whitelist' => [
                     $controllerService => [
                         'application/json',
                     ],
@@ -556,10 +556,10 @@ class DoctrineRpcServiceModel
         $key = ['zf-content-negotiation', 'controllers', $serviceName];
         $this->configResource->deleteKey($key);
 
-        $key = ['zf-content-negotiation', 'accept-whitelist', $serviceName];
+        $key = ['zf-content-negotiation', 'accept_whitelist', $serviceName];
         $this->configResource->deleteKey($key);
 
-        $key = ['zf-content-negotiation', 'content-type-whitelist', $serviceName];
+        $key = ['zf-content-negotiation', 'content_type_whitelist', $serviceName];
         $this->configResource->deleteKey($key);
     }
 

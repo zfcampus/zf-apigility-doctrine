@@ -26,6 +26,10 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - Nothing.
 
+### Changed
+
+- Nothing.
+
 ### Deprecated
 
 - Nothing.
@@ -36,7 +40,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#289](https://github.com/zfcampus/zf-apigility-doctrine/pull/289) fixes
+  configuration keys, which resolves issue with Apigility Admin and populating
+  forms from config file and writing duplicated values into config file.
 
 ## 2.1.0 - 2016-10-17
 
