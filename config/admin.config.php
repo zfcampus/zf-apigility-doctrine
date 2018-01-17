@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2013-2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2013-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Admin;
@@ -78,7 +78,7 @@ return [
             Controller\DoctrineRpcService::class      => 'HalJson',
             Controller\DoctrineMetadataService::class => 'HalJson',
         ],
-        'accept-whitelist' => [
+        'accept_whitelist' => [
             Controller\DoctrineAutodiscovery::class => [
                 'application/json',
                 'application/*+json',
@@ -96,7 +96,7 @@ return [
                 'application/*+json',
             ],
         ],
-        'content-type-whitelist' => [
+        'content_type_whitelist' => [
             Controller\DoctrineAutodiscovery::class => [
                 'application/json',
                 'application/*+json',
