@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2016-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Apigility\Doctrine\Server\Resource;
@@ -148,7 +148,7 @@ class DoctrineResource extends AbstractResourceListener implements
     public function getEventManager()
     {
         if (! $this->events instanceof EventManagerInterface) {
-            $this->setEventManager(new EventManager());
+            $this->setEventManager(new EventManager($this->getSharedEventManager()));
         }
 
         return $this->events;
