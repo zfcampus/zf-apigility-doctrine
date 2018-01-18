@@ -20,13 +20,17 @@ All notable changes to this project will be documented in this file, in reverse 
   ],
   ```
 
+- [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) adds
+  support for PHP 7.2.
+
 ### Deprecated
 
 - Nothing.
 
 ### Removed
 
-- Nothing.
+- [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) removes
+  support for HHVM.
 
 ### Fixed
 
