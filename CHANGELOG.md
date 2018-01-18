@@ -45,6 +45,10 @@ All notable changes to this project will be documented in this file, in reverse 
 - [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) adds
   support for PHP 7.2.
 
+### Changed
+
+- Nothing.
+
 ### Deprecated
 
 - Nothing.
@@ -83,7 +87,7 @@ All notable changes to this project will be documented in this file, in reverse 
   support for version 3 releases of zend-servicemanager and zend-eventmanager,
   while retaining compatibility for v2 releases.
 
-### Changes
+### Changed
 
 - [#267](https://github.com/zfcampus/zf-apigility-doctrine/pull/267) exposes the
   module to [zendframework/zend-component-installer](https://github.com/zendframework/zend-component-installer),
