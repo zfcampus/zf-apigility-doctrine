@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.2.1 - TBD
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 2.2.0 - 2018-01-18
 
 ### Added
@@ -22,6 +44,10 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) adds
   support for PHP 7.2.
+
+### Changed
+
+- Nothing.
 
 ### Deprecated
 
@@ -61,7 +87,7 @@ All notable changes to this project will be documented in this file, in reverse 
   support for version 3 releases of zend-servicemanager and zend-eventmanager,
   while retaining compatibility for v2 releases.
 
-### Changes
+### Changed
 
 - [#267](https://github.com/zfcampus/zf-apigility-doctrine/pull/267) exposes the
   module to [zendframework/zend-component-installer](https://github.com/zendframework/zend-component-installer),
