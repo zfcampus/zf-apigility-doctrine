@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xsi="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="ZFTestApigilityDb\Entity\Product">
+    <id name="id" type="rev">
+      <generator strategy="CUSTOM"/>
+      <custom-id-generator class="ZFTestApigilityDb\Type\RevGenerator"/>
+    </id>
+  </entity>
+</doctrine-mapping>
