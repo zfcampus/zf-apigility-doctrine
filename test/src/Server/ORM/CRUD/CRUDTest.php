@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2016-2017 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2016-2018 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Apigility\Doctrine\Server\ORM\CRUD;
@@ -22,6 +22,7 @@ use ZF\ApiProblem\ApiProblemResponse;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album;
 use ZFTestApigilityDb\Entity\Artist;
+use ZFTestApigilityDb\Entity\Product;
 use ZFTestApigilityDbApi\V1\Rest\Artist\ArtistResource;
 use ZFTestApigilityGeneral\Listener\EventCatcher;
 
@@ -95,14 +96,31 @@ class CRUDTest extends TestCase
             ],
         ];
 
+        $productResourceDefinition = [
+            'objectManager'         => 'doctrine.entitymanager.orm_default',
+            'serviceName'           => 'Product',
+            'entityClass'           => Product::class,
+            'routeIdentifierName'   => 'product_id',
+            'entityIdentifierName'  => 'id',
+            'routeMatch'            => '/test/rest/product',
+            'collectionHttpMethods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+                3 => 'DELETE',
+            ],
+        ];
+
         $this->setModuleName($restServiceResource, 'ZFTestApigilityDbApi');
         $artistEntity       = $restServiceResource->create($artistResourceDefinition);
         $artistByNameEntity = $restServiceResource->create($artistResourceDefinitionWithNonKeyIdentifier);
         $albumEntity        = $restServiceResource->create($albumResourceDefinition);
+        $productEntity      = $restServiceResource->create($productResourceDefinition);
 
         $this->assertInstanceOf(DoctrineRestServiceEntity::class, $artistEntity);
         $this->assertInstanceOf(DoctrineRestServiceEntity::class, $artistByNameEntity);
         $this->assertInstanceOf(DoctrineRestServiceEntity::class, $albumEntity);
+        $this->assertInstanceOf(DoctrineRestServiceEntity::class, $productEntity);
 
         // Build relation
         $filter = new FilterChain();
@@ -221,6 +239,37 @@ class CRUDTest extends TestCase
             sprintf('%s: %s', $message, DoctrineResourceEvent::EVENT_CREATE_PRE),
             $body['detail']
         );
+    }
+
+    public function testFetchByCustomIdField()
+    {
+        $product = $this->createProduct();
+
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+
+        $this->dispatch('/test/rest/product/' . $product->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals($product->getId(), $body['id']);
+        $this->validateTriggeredEvents([
+            DoctrineResourceEvent::EVENT_FETCH_PRE,
+            DoctrineResourceEvent::EVENT_FETCH_POST,
+        ]);
+    }
+
+    public function testFetchByCustomIdFieldWithInvalidIdValue()
+    {
+        $product = $this->createProduct();
+
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+
+        $this->dispatch('/test/rest/product/' . strrev($product->getId()));
+
+        $this->assertResponseStatusCode(404);
+        $this->validateTriggeredEvents([DoctrineResourceEvent::EVENT_FETCH_PRE]);
     }
 
     public function testFetch()
@@ -776,6 +825,18 @@ class CRUDTest extends TestCase
         $this->em->flush();
 
         return $album;
+    }
+
+    /**
+     * @return Product
+     */
+    protected function createProduct()
+    {
+        $product = new Product();
+        $this->em->persist($product);
+        $this->em->flush();
+
+        return $product;
     }
 
     public function listener()

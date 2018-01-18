@@ -1,8 +1,10 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2016-2018 Zend Technologies USA Inc. (http://www.zend.com)
  */
+
+use ZFTestApigilityDb\Type\RevType;
 
 return [
     'doctrine' => [
@@ -13,6 +15,13 @@ return [
                 'driverClass'   => \Doctrine\DBAL\Driver\PDOSqlite\Driver::class,
                 'params' => [
                     'memory' => true,
+                ],
+            ],
+        ],
+        'configuration' => [
+            'orm_default' => [
+                'types' => [
+                    RevType::NAME => RevType::class,
                 ],
             ],
         ],

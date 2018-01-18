@@ -51,6 +51,10 @@ All notable changes to this project will be documented in this file, in reverse 
 - [#298](https://github.com/zfcampus/zf-apigility-doctrine/pull/298) fixes
   data passed to listener on patch method.
 
+- [#293](https://github.com/zfcampus/zf-apigility-doctrine/pull/293) fixes
+  binding parameters with type. In case of custom field type php value was not
+  converted to database value.
+
 ## 2.1.0 - 2016-10-17
 
 ### Added

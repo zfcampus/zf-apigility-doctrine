@@ -736,7 +736,7 @@ class DoctrineResource extends AbstractResourceListener implements
             } else {
                 $parameterName = 'a' . md5(rand());
                 $queryBuilder->andwhere($queryBuilder->expr()->eq('row.' . $key, ":$parameterName"));
-                $queryBuilder->setParameter($parameterName, $value);
+                $queryBuilder->setParameter($parameterName, $value, $classMetaData->getTypeOfField($key));
             }
         }
 
