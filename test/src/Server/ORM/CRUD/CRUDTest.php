@@ -259,6 +259,25 @@ class CRUDTest extends TestCase
         ]);
     }
 
+    public function testFetchEntityWithVersionFieldWithVersionParamInPath()
+    {
+        $product = $this->createProduct();
+
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+
+        $this->dispatch('/v1/test/rest/product/' . $product->getId());
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertEquals($product->getId(), $body['id']);
+        $this->assertNull($body['version']);
+        $this->validateTriggeredEvents([
+            DoctrineResourceEvent::EVENT_FETCH_PRE,
+            DoctrineResourceEvent::EVENT_FETCH_POST,
+        ]);
+    }
+
     public function testFetchByCustomIdFieldWithInvalidIdValue()
     {
         $product = $this->createProduct();

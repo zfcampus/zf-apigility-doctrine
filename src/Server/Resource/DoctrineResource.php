@@ -707,6 +707,7 @@ class DoctrineResource extends AbstractResourceListener implements
         $reservedRouteParams = [
             'controller',
             'action',
+            'version',
             ModuleRouteListener::MODULE_NAMESPACE,
             ModuleRouteListener::ORIGINAL_CONTROLLER,
         ];
