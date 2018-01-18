@@ -5,5 +5,6 @@
       <generator strategy="CUSTOM"/>
       <custom-id-generator class="ZFTestApigilityDb\Type\RevGenerator"/>
     </id>
+    <field name="version" type="string" nullable="true"/>
   </entity>
 </doctrine-mapping>
