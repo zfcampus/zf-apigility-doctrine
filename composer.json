@@ -42,7 +42,7 @@
         "doctrine/doctrine-mongo-odm-module": "^1.0",
         "doctrine/doctrine-orm-module": "^1.1",
         "doctrine/mongodb-odm": "^1.0",
-        "phpunit/phpunit": "^4.8",
+        "phpunit/phpunit": "^5.7.26",
         "zendframework/zend-coding-standard": "~1.0.0",
         "zendframework/zend-form": "^2.9.2",
         "zendframework/zend-i18n": "^2.7.3",
