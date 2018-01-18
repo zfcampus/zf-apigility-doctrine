@@ -6,9 +6,12 @@
 
 namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
+use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Interop\Container\ContainerInterface;
 use MongoClient;
 use Zend\Http\Request;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceEntity;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRestServiceResource;
 use ZF\Apigility\Doctrine\DoctrineResource;
@@ -127,6 +130,56 @@ class CRUDTest extends TestCase
         $this->assertResponseStatusCode(400);
         $this->assertInstanceOf(ApiProblemResponse::class, $this->getResponse());
         $this->assertEquals('ZFTestCreateFailure', $body['detail']);
+    }
+
+    public function testCreateByExplicitlySettingEntityFactoryInConstructor()
+    {
+        /** @var InstantiatorInterface|\PHPUnit_Framework_MockObject_MockObject $entityFactoryMock */
+        $entityFactoryMock = $this->getMockBuilder(InstantiatorInterface::class)->getMock();
+        $entityFactoryMock->expects(self::once())
+            ->method('instantiate')
+            ->with(Meta::class)
+            ->willReturnCallback(function ($class) {
+                return new $class();
+            });
+
+        /** @var ServiceManager $sm */
+        $sm = $this->getApplication()->getServiceManager();
+
+        $config = $sm->get('config');
+        $resourceName = 'ZFTestApigilityDbMongoApi\V1\Rest\Meta\MetaResource';
+        $resourceConfig = $config['zf-apigility']['doctrine-connected'][$resourceName];
+        $resourceConfig['entity_factory'] = 'ResourceInstantiator';
+        $config['zf-apigility']['doctrine-connected'][$resourceName] = $resourceConfig;
+
+        $sm->setAllowOverride(true);
+        $sm->setService('config', $config);
+        $sm->setAllowOverride(false);
+
+        $sm->setService(
+            'ResourceInstantiator',
+            $entityFactoryMock
+        );
+
+        // dispatch a request to create a meta document (similar to testCreate())
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+
+        $this->dispatch(
+            '/test/meta',
+            Request::METHOD_POST,
+            [
+                'name' => 'MetaOne',
+                'createdAt' => '2016-08-21 23:04:19',
+            ]
+        );
+        $body = json_decode($this->getResponse()->getBody(), true);
+
+        $this->assertResponseStatusCode(201);
+        $this->assertEquals('MetaOne', $body['name']);
+        $this->validateTriggeredEvents([
+            DoctrineResourceEvent::EVENT_CREATE_PRE,
+            DoctrineResourceEvent::EVENT_CREATE_POST,
+        ]);
     }
 
     public function testFetch()
