@@ -37,6 +37,10 @@ All notable changes to this project will be documented in this file, in reverse 
   binding parameters with type. In case of custom field type php value was not
   converted to database value.
 
+- [#303](https://github.com/zfcampus/zf-apigility-doctrine/pull/303) fixes
+  version query parameter as it is restricted by apigility to indicate version
+  of the api.
+
 ## 2.1.0 - 2016-10-17
 
 ### Added
