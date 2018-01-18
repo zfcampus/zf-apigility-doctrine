@@ -6,7 +6,19 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
-- Nothing.
+- [#291](https://github.com/zfcampus/zf-apigility-doctrine/pull/291) adds
+  ability to use factory (doctrine instantiator instance) to create new
+  entities. To configure factory for a specific resource use:
+  ```
+  'zf-apigility' => [
+      'doctrine-connected' => [
+          'Api\\V1\\Rest\\...Resource' => [
+              'entity_factory' => 'key_in_service_manager',
+              ...
+          ],
+      ],
+  ],
+  ```
 
 ### Deprecated
 
