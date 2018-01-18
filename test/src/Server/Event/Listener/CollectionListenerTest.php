@@ -22,11 +22,11 @@ class CollectionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessNewEntity($withEntityFactory)
     {
-        $artist = $this->getMock(Artist::class);
+        $artist = $this->getMockBuilder(Artist::class)->getMock();
         $data = [];
 
         /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject $om */
-        $om = $this->getMock(ObjectManager::class);
+        $om = $this->getMockBuilder(ObjectManager::class)->getMock();
         $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -44,7 +44,7 @@ class CollectionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with(self::isInstanceOf(Artist::class));
 
-        $hydrator = $this->getMock(HydratorInterface::class);
+        $hydrator = $this->getMockBuilder(HydratorInterface::class)->getMock();
         $hydrator->expects(self::once())
             ->method('hydrate')
             ->with($data, self::isInstanceOf(Artist::class));

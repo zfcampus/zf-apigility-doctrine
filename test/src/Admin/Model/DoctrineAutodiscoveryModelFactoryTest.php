@@ -34,7 +34,8 @@ class DoctrineAutodiscoveryModelFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->container->has('config')->willReturn(false);
 
-        $this->setExpectedException(ServiceNotCreatedException::class, 'config service is not present');
+        $this->expectException(ServiceNotCreatedException::class);
+        $this->expectExceptionMessage('config service is not present');
         $factory($this->container->reveal());
     }
 

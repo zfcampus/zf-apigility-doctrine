@@ -33,13 +33,13 @@ class DoctrineAutodiscoveryModelTest extends TestCase
         $this->assertEquals('Album', $result[0]['service_name']);
         $this->assertCount(2, $result[0]['fields']);
 
-        $this->assertEquals(Product::class, $result[1]['entity_class']);
-        $this->assertEquals('Product', $result[1]['service_name']);
-        $this->assertCount(1, $result[1]['fields']);
+        $this->assertEquals(Artist::class, $result[1]['entity_class']);
+        $this->assertEquals('Artist', $result[1]['service_name']);
+        $this->assertCount(2, $result[1]['fields']);
 
-        $this->assertEquals(Artist::class, $result[2]['entity_class']);
-        $this->assertEquals('Artist', $result[2]['service_name']);
-        $this->assertCount(2, $result[2]['fields']);
+        $this->assertEquals(Product::class, $result[2]['entity_class']);
+        $this->assertEquals('Product', $result[2]['service_name']);
+        $this->assertCount(1, $result[2]['fields']);
     }
 
     public function testODMAutodiscoveryEntitiesWithFields()
