@@ -244,3 +244,22 @@ Register your Query Create Filter as:
     ],
 ],
 ```
+
+Using Entity Factories
+======================
+By default, Doctrine entities are instantiated by FQCN without arguments. If you need anything different than that,
+for example if your entities require arguments in their constructors, you may specify the name of a 
+`Doctrine\Instantiator\InstantiatorInterface` factory registered in the Service Manager in order to delegate 
+instantiation to that service. Currently this can only be done by directly editing the config for your resources as 
+follows:
+
+```php
+'zf-apigility' => [
+    'doctrine-connected' => [
+        'Api\\V1\\Rest\\...Resource' => [
+            'entity_factory' => 'key_in_service_manager',
+            ...
+        ],
+    ],
+],
+```

@@ -99,6 +99,9 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
 
         $resourceClass = $this->getResourceClassFromConfig($doctrineConnectedConfig, $requestedName);
         $objectManager = $container->get($doctrineConnectedConfig['object_manager']);
+        $entityFactory = ! empty($doctrineConnectedConfig['entity_factory'])
+            ? $container->get($doctrineConnectedConfig['entity_factory'])
+            : null;
 
         $hydrator = $this->loadHydrator($container, $doctrineConnectedConfig, $doctrineHydratorConfig);
         $queryProviders = $this->loadQueryProviders($container, $doctrineConnectedConfig, $objectManager);
@@ -106,7 +109,7 @@ class DoctrineResourceFactory implements AbstractFactoryInterface
         $configuredListeners = $this->loadConfiguredListeners($container, $doctrineConnectedConfig);
 
         /** @var DoctrineResource $listener */
-        $listener = new $resourceClass();
+        $listener = new $resourceClass($entityFactory);
         $listener->setSharedEventManager($container->get('Application')->getEventManager()->getSharedManager());
         $listener->setObjectManager($objectManager);
         $listener->setHydrator($hydrator);

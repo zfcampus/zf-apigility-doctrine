@@ -80,7 +80,8 @@ class DoctrineRpcServiceModelFactoryFactoryTest extends \PHPUnit_Framework_TestC
             $this->container->has($dependency)->willReturn($presence);
         }
 
-        $this->setExpectedException(ServiceNotCreatedException::class, 'missing one or more dependencies');
+        $this->expectException(ServiceNotCreatedException::class);
+        $this->expectExceptionMessage('missing one or more dependencies');
         $factory($this->container->reveal());
     }
 

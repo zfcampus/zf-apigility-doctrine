@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.2.0 - TBD
+
+### Added
+
+- [#291](https://github.com/zfcampus/zf-apigility-doctrine/pull/291) adds
+  ability to use factory (doctrine instantiator instance) to create new
+  entities. To configure factory for a specific resource use:
+  ```
+  'zf-apigility' => [
+      'doctrine-connected' => [
+          'Api\\V1\\Rest\\...Resource' => [
+              'entity_factory' => 'key_in_service_manager',
+              ...
+          ],
+      ],
+  ],
+  ```
+
+- [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) adds
+  support for PHP 7.2.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- [#304](https://github.com/zfcampus/zf-apigility-doctrine/pull/304) removes
+  support for HHVM.
+
+### Fixed
+
+- Nothing.
+
 ## 2.1.1 - TBD
 
 ### Added
