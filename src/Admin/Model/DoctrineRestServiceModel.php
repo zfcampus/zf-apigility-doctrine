@@ -907,7 +907,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
                 continue;
             }
             $key = sprintf('zf-rest.%s.%s', $original->controllerServiceName, $configKey);
-            $this->configResource->patchKey($key, $update->$property);
+            $this->configResource->replaceKey($key, $update->$property);
         }
     }
 
@@ -925,7 +925,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
                 continue;
             }
             $key = sprintf('doctrine-hydrator.%s.%s', $update->hydratorName, $configKey);
-            $this->configResource->patchKey($key, $update->$property);
+            $this->configResource->replaceKey($key, $update->$property);
         }
     }
 
@@ -944,19 +944,19 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
 
         if ($update->selector) {
             $key = $baseKey . 'controllers.' . $service;
-            $this->configResource->patchKey($key, $update->selector);
+            $this->configResource->replaceKey($key, $update->selector);
         }
 
         $acceptWhitelist = $update->acceptWhitelist;
         if (is_array($acceptWhitelist) && $acceptWhitelist) {
             $key = $baseKey . 'accept_whitelist.' . $service;
-            $this->configResource->patchKey($key, $acceptWhitelist);
+            $this->configResource->replaceKey($key, $acceptWhitelist);
         }
 
         $contentTypeWhitelist = $update->contentTypeWhitelist;
         if (is_array($contentTypeWhitelist) && $contentTypeWhitelist) {
             $key = $baseKey . 'content_type_whitelist.' . $service;
-            $this->configResource->patchKey($key, $contentTypeWhitelist);
+            $this->configResource->replaceKey($key, $contentTypeWhitelist);
         }
     }
 
@@ -974,7 +974,7 @@ class DoctrineRestServiceModel implements EventManagerAwareInterface
         $basekey                 = 'zf-apigility.doctrine-connected.';
         $resource                = $update->resourceClass;
 
-        $this->configResource->patchKey($basekey . $resource, $patch);
+        $this->configResource->replaceKey($basekey . $resource, $patch);
     }
 
     /**
