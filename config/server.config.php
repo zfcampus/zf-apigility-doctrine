@@ -49,8 +49,8 @@ return [
 
     'validators' => [
         'factories' => [
-            Validator\NoObjectExists::class => Validator\NoObjectExistsFactory::class,
-            Validator\ObjectExists::class   => Validator\ObjectExistsFactory::class,
+            \DoctrineModule\Validator\NoObjectExists::class => Validator\NoObjectExistsFactory::class,
+            \DoctrineModule\Validator\ObjectExists::class   => Validator\ObjectExistsFactory::class,
         ],
     ],
 ];
