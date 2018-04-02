@@ -29,17 +29,29 @@ class DoctrineAutodiscoveryModelTest extends TestCase
         $this->assertInternalType('array', $result);
         $this->assertCount(3, $result);
 
-        $this->assertEquals(Album::class, $result[0]['entity_class']);
-        $this->assertEquals('Album', $result[0]['service_name']);
-        $this->assertCount(2, $result[0]['fields']);
+        $resultProcessed = [];
+        foreach ($result as $row) {
+            switch ($row['entity_class']) {
+                case Album::class:
+                    $this->assertEquals('Album', $row['service_name']);
+                    $this->assertCount(2, $row['fields']);
+                    break;
+                case Artist::class:
+                    $this->assertEquals('Artist', $row['service_name']);
+                    $this->assertCount(2, $row['fields']);
+                    break;
+                case Product::class:
+                    $this->assertEquals('Product', $row['service_name']);
+                    $this->assertCount(1, $row['fields']);
+                    break;
+                default:
+                    throw new \Exception("Unexpected result: " . $row['entity_class']);
+            }
 
-        $this->assertEquals(Artist::class, $result[1]['entity_class']);
-        $this->assertEquals('Artist', $result[1]['service_name']);
-        $this->assertCount(2, $result[1]['fields']);
+            $resultProcessed[$row['entity_class']] ++;
+        }
 
-        $this->assertEquals(Product::class, $result[2]['entity_class']);
-        $this->assertEquals('Product', $result[2]['service_name']);
-        $this->assertCount(1, $result[2]['fields']);
+        $this->assertEquals(3, sizeof($resultProcessed));
     }
 
     public function testODMAutodiscoveryEntitiesWithFields()
