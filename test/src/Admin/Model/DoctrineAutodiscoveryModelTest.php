@@ -29,6 +29,7 @@ class DoctrineAutodiscoveryModelTest extends TestCase
         $this->assertInternalType('array', $result);
         $this->assertCount(3, $result);
 
+        $resultProcessed = [];
         foreach ($result as $row) {
             switch ($row['entity_class']) {
                 case Album::class:
@@ -46,7 +47,11 @@ class DoctrineAutodiscoveryModelTest extends TestCase
                 default:
                     throw new \Exception("Unexpected result: " . $row['entity_class']);
             }
+
+            $resultProcessed[$row['entity_class']] ++;
         }
+
+        $this->assertEquals(3, sizeof($resultProcessed));
     }
 
     public function testODMAutodiscoveryEntitiesWithFields()
