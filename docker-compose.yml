@@ -1,0 +1,17 @@
+version: "3"
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    links:
+      - mongo
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./:/docker
+    tty: true
+  mongo:
+    image: mongo:latest
+    ports:
+        - "27017:27017"
