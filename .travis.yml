@@ -4,6 +4,7 @@ language: php
 
 services:
   - mongodb
+  - docker
 
 cache:
   directories:
@@ -59,17 +60,21 @@ matrix:
       env:
         - DEPS=lowest
         - MONGO_DRIVER=mongodb
+        - DOCKER=true
     - php: 7.2
       env:
         - DEPS=locked
         - MONGO_DRIVER=mongodb
+        - DOCKER=true
     - php: 7.2
       env:
         - DEPS=latest
         - MONGO_DRIVER=mongodb
+        - DOCKER=true
 
 before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
+  - if [[ $DOCKER == 'true' ]]; then docker-compose up -d; fi
 
 install:
   - yes '' | pecl -q install -f $MONGO_DRIVER
@@ -85,6 +90,7 @@ install:
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
+  - if [[ $DOCKER == 'true' ]]; then docker exec -it $(docker ps -f name=zfapigilitydoctrine_php_1 | awk '{print $1;}' | tail -n 1) bash /docker/.travis.docker; fi
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
