@@ -1,3 +1,0 @@
-cd /docker
-echo `host mongo` | awk '{print $4, "localhost"}' > /etc/hosts 
-vendor/bin/phpunit

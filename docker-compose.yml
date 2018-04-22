@@ -3,13 +3,16 @@ services:
   php:
     build:
       context: .
+      args:
+        - PHP_VERSION=${PHP_VERSION:-7.2}
       dockerfile: docker/Dockerfile
-    links:
+    depends_on:
       - mongo
-    ports:
-      - "9000:9000"
     volumes:
       - ./:/docker
-    tty: true
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+
   mongo:
     image: mongo:latest

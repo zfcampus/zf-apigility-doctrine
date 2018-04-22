@@ -27,26 +27,11 @@ To connect to the php container and run the unit tests
 run
 
 ```
-docker/connect
+docker-compose run php bash
 ```
 
 You will connect to the php container a the root directory.
 `cd` to `docker` to work with the mapped local files.
-
-
-## Configuration
-
-Because you're in a Docker environment with a differnet IP address and name for each
-container you need to either change the config files in the project to point to `mongo`
-or with a simple hack map `localhost` to the `mongo` container.
-
-* To edit the config file to point to the `mongo` container instead of `localhost` edit
-`test/config/ODM/local.php` and change the configuration.
-
-* Optionally you can map localhost to mongo with
-```
-echo `host mongo` | awk '{print $4, "localhost"}' > /etc/hosts
-```
 
 ## Unit Tests
 
