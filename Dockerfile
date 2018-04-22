@@ -8,7 +8,7 @@ RUN apk add --no-cache \
 	bash \
 	git
 
-RUN if [${PHP_VERSION} != '5.6'] ; then pecl install mongodb && docker-php-ext-enable mongodb ; else pecl install mongo && docker-php-ext-enable mongo ; fi
+RUN if [${PHP_VERSION} == '5.6'] ; then pecl install mongo && docker-php-ext-enable mongo ; else pecl install mongodb && docker-php-ext-enable mongodb ; fi
 RUN set -o pipefail && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN echo -e '#!/bin/sh' > /usr/local/bin/entrypoint.sh \
     && echo -e 'while ! nc -z ${MONGO_HOST:-mongo} ${MONGO_PORT:-27017}; do sleep 1; done' >> /usr/local/bin/entrypoint.sh \
