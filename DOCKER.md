@@ -15,19 +15,12 @@ From the root directory of this project run
 docker-compose build
 ```
 
-This will build the php container.  Next run
+This will build the php container.
+
+To connect to the php container and run the unit tests run
 
 ```
-docker-compose up
-```
-
-This will spin up the php container and a mongo container.
-
-To connect to the php container and run the unit tests
-run
-
-```
-docker-compose run php bash
+docker-compose run --rm php bash
 ```
 
 You will connect to the php container a the root directory.
@@ -36,7 +29,15 @@ You will connect to the php container a the root directory.
 ## Unit Tests
 
 Having run `composer install` you may now run the unit tests
+inside the container with
 
 ```
 vendor/bin/phpunit
+```
+
+You may run the unit tests through the container without connecting
+with bash via
+
+```
+docker-composer run --rm php
 ```

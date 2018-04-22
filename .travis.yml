@@ -56,23 +56,18 @@ matrix:
       env:
         - DEPS=latest
         - MONGO_DRIVER=mongodb
-        - PHP_VERSION=7.1
-        - DOCKER=true
     - php: 7.2
       env:
         - DEPS=lowest
         - MONGO_DRIVER=mongodb
-        - DOCKER=true
     - php: 7.2
       env:
         - DEPS=locked
         - MONGO_DRIVER=mongodb
-        - DOCKER=true
     - php: 7.2
       env:
         - DEPS=latest
         - MONGO_DRIVER=mongodb
-        - DOCKER=true
 
 before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
@@ -91,7 +86,7 @@ install:
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
-  - if [[ $DOCKER == 'true' ]]; then docker-compose run php; fi
+  - docker-compose run --rm php
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
