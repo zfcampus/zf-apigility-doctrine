@@ -91,7 +91,7 @@ install:
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
-  - if [[ $DOCKER == 'true' ]]; then docker exec -it $(docker ps -f name=zfapigilitydoctrine_php_1 | awk '{print $1;}' | tail -n 1) bash /docker/.travis.docker; fi
+  - if [[ $DOCKER == 'true' ]]; then docker-compose run php; fi
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
