@@ -6,9 +6,10 @@ RUN apk add --no-cache \
 	make \
 	g++ \
 	bash \
-	git
+	git \
+	openssl-dev
 
-RUN pecl install mongo && docker-php-ext-install mongo && docker-php-ext-enable mongo
+RUN pecl install mongo && echo "extension=mongo.so" >> /usr/local/etc/php/php.ini
 RUN set -o pipefail && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN echo -e '#!/bin/sh ' > /usr/local/bin/entrypoint.sh \
     && echo -e 'while ! nc -z ${MONGO_HOST:-mongo} ${MONGO_PORT:-27017}; do sleep 1; done' >> /usr/local/bin/entrypoint.sh \
