@@ -4,4 +4,3 @@ test/data/
 test/assets/module/*/config/module.config.php
 clover.xml
 coveralls-upload.json
-docker/data/
