@@ -4,6 +4,7 @@ language: php
 
 services:
   - mongodb
+  - docker
 
 cache:
   directories:
@@ -85,6 +86,7 @@ install:
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
+  - docker-compose run --rm php
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi

@@ -1,0 +1,18 @@
+version: "3"
+services:
+  php:
+    build:
+      context: .
+      args:
+        - PHP_VERSION=${TRAVIS_PHP_VERSION:-7.2}
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    volumes:
+      - ./:/docker
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+
+  mongo:
+    image: mongo:latest
