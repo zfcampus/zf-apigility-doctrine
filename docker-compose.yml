@@ -5,7 +5,7 @@ services:
       context: .
       args:
         - PHP_VERSION=${TRAVIS_PHP_VERSION:-7.2}
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     depends_on:
       - mongo
     volumes:

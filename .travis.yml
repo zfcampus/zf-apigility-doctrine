@@ -1,14 +1,7 @@
 sudo: false
 
-language: php
-
 services:
   - mongodb
-  - docker
-
-cache:
-  directories:
-    - $HOME/.composer/cache
 
 env:
   global:
@@ -19,49 +12,19 @@ env:
 
 matrix:
   include:
-    - php: 5.6
-      env:
+    - env:
+        - TRAVIS_PHP_VERSION=5.6
         - DEPS=lowest
         - MONGO_DRIVER=mongo
-    - php: 5.6
-      env:
+    - env:
+        - TRAVIS_PHP_VERSION=5.6
         - DEPS=locked
         - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
         - MONGO_DRIVER=mongo
-    - php: 5.6
-      env:
+    - env:
+        - TRAVIS_PHP_VERSION=5.6
         - DEPS=latest
         - MONGO_DRIVER=mongo
-    - php: 7
-      env:
-        - DEPS=lowest
-    - php: 7
-      env:
-        - DEPS=locked
-        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
-    - php: 7
-      env:
-        - DEPS=latest
-    - php: 7.1
-      env:
-        - DEPS=lowest
-    - php: 7.1
-      env:
-        - DEPS=locked
-        - CS_CHECK=true
-        - TEST_COVERAGE=true
-    - php: 7.1
-      env:
-        - DEPS=latest
-    - php: 7.2
-      env:
-        - DEPS=lowest
-    - php: 7.2
-      env:
-        - DEPS=locked
-    - php: 7.2
-      env:
-        - DEPS=latest
 
 before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
@@ -78,12 +41,9 @@ install:
   - stty cols 120 && composer show
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
+  - if [[ $TEST_COVERAGE == 'asdf' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
   - docker-compose run --rm php
 
 after_script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
-
-notifications:
-  email: false
+  - if [[ $TEST_COVERAGE == 'asdf' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
