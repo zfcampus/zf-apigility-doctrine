@@ -11,47 +11,47 @@ env:
 matrix:
   include:
     - env:
-        - TRAVIS_PHP_VERSION=5.6
+        - PHP_VERSION=5.6
         - DEPS=lowest
         - MONGO_DRIVER=mongo
     - env:
-        - TRAVIS_PHP_VERSION=5.6
+        - PHP_VERSION=5.6
         - DEPS=locked
         - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
         - MONGO_DRIVER=mongo
     - env:
-        - TRAVIS_PHP_VERSION=5.6
+        - PHP_VERSION=5.6
         - DEPS=latest
         - MONGO_DRIVER=mongo
     - env:
-        - TRAVIS_PHP_VERSION=7
+        - PHP_VERSION=7
         - DEPS=lowest
     - env:
-        - TRAVIS_PHP_VERSION=7
+        - PHP_VERSION=7
         - DEPS=locked
         - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
     - env:
-        - TRAVIS_PHP_VERSION=7
+        - PHP_VERSION=7
         - DEPS=latest
     - env:
-        - TRAVIS_PHP_VERSION=7.1
+        - PHP_VERSION=7.1
         - DEPS=lowest
     - env:
-        - TRAVIS_PHP_VERSION=7.1
+        - PHP_VERSION=7.1
         - DEPS=locked
         - CS_CHECK=true
         - TEST_COVERAGE=true
     - env:
-        - TRAVIS_PHP_VERSION=7.1
+        - PHP_VERSION=7.1
         - DEPS=latest
     - env:
-        - TRAVIS_PHP_VERSION=7.2
+        - PHP_VERSION=7.2
         - DEPS=lowest
     - env:
-        - TRAVIS_PHP_VERSION=7.2
+        - PHP_VERSION=7.2
         - DEPS=locked
     - env:
-        - TRAVIS_PHP_VERSION=7.2
+        - PHP_VERSION=7.2
         - DEPS=latest
 
 before_install:
@@ -67,6 +67,7 @@ install:
   - if [[ $MONGO_DRIVER == 'mongodb' ]]; then travis_retry composer require --dev $COMPOSER_ARGS $ADAPTER_DEPS ; fi
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer require --dev $COMPOSER_ARGS $COVERAGE_DEPS ; fi
   - stty cols 120 && composer show
+  - docker build --build-arg PHP_VERSION=$PHP_VERSION docker
 
 script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then docker-compose run php composer test-coverage ; else docker-compose run php composer test ; fi

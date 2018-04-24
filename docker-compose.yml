@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        - PHP_VERSION=${TRAVIS_PHP_VERSION:-7.2}
+        - PHP_VERSION=${PHP_VERSION:-7.2}
       dockerfile: docker/Dockerfile
     depends_on:
       - mongo
