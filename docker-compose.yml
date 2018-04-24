@@ -3,9 +3,9 @@ services:
   php:
     build:
       context: .
+      dockerfile: docker/Dockerfile
       args:
         - PHP_VERSION=${PHP_VERSION:-7.2}
-      dockerfile: docker/Dockerfile
     depends_on:
       - mongo
     volumes:

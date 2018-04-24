@@ -6,23 +6,23 @@ env:
     - COMPOSER_ARGS="--no-interaction"
     - ADAPTER_DEPS="alcaeus/mongo-php-adapter"
     - COVERAGE_DEPS="php-coveralls/php-coveralls"
-    - MONGO_DRIVER=mongodb
+    - MONGO_DRIVER="mongodb"
 
 matrix:
   include:
     - env:
         - PHP_VERSION=5.6
         - DEPS=lowest
-        - MONGO_DRIVER=mongo
+        - MONGO_DRIVER="mongo"
     - env:
         - PHP_VERSION=5.6
         - DEPS=locked
         - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
-        - MONGO_DRIVER=mongo
+        - MONGO_DRIVER="mongo"
     - env:
         - PHP_VERSION=5.6
         - DEPS=latest
-        - MONGO_DRIVER=mongo
+        - MONGO_DRIVER="mongo"
     - env:
         - PHP_VERSION=7
         - DEPS=lowest
@@ -58,20 +58,20 @@ before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
 
 install:
-  - yes '' | pecl -q install -f $MONGO_DRIVER
-  - composer config platform.ext-mongo '1.999'
-  - travis_retry composer install $COMPOSER_ARGS --ignore-platform-reqs
-  - if [[ $LEGACY_DEPS != '' ]]; then travis_retry composer update $COMPOSER_ARGS --with-dependencies $LEGACY_DEPS ; fi
-  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update $COMPOSER_ARGS ; fi
-  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --prefer-lowest --prefer-stable $COMPOSER_ARGS ; fi
-  - if [[ $MONGO_DRIVER == 'mongodb' ]]; then travis_retry composer require --dev $COMPOSER_ARGS $ADAPTER_DEPS ; fi
-  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer require --dev $COMPOSER_ARGS $COVERAGE_DEPS ; fi
+  - docker-compose build --no-cache php
+  - travis_retry docker-compose run --rm php composer install $COMPOSER_ARGS --ignore-platform-reqs
+
+  - composer config "platform.ext-mongo" "1.6.16"
+  - if [[ $LEGACY_DEPS != '' ]]; then travis_retry docker-compose run --rm php composer update $COMPOSER_ARGS --with-dependencies $LEGACY_DEPS ; fi
+  - if [[ $DEPS == 'latest' ]]; then travis_retry docker-compose run --rm php composer update $COMPOSER_ARGS ; fi
+  - if [[ $DEPS == 'lowest' ]]; then travis_retry docker-compose run --rm php composer update --prefer-lowest --prefer-stable $COMPOSER_ARGS ; fi
+  - if [[ $MONGO_DRIVER == 'mongodb' ]] ; then travis_retry docker-compose run --rm php composer config "platform.ext-mongo" "1.6.16" && travis_retry docker-compose run --rm php composer require --dev $COMPOSER_ARGS $ADAPTER_DEPS ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry docker-compose run --rm php composer require --dev $COMPOSER_ARGS $COVERAGE_DEPS ; fi
   - stty cols 120 && composer show
-  - docker build --build-arg PHP_VERSION=$PHP_VERSION docker
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then docker-compose run php composer test-coverage ; else docker-compose run php composer test ; fi
-  - if [[ $CS_CHECK == 'true' ]]; then docker-compose run php composer cs-check ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry docker-compose run --rm php composer test-coverage ; else docker-compose run --rm php composer test ; fi
+  - if [[ $CS_CHECK == 'true' ]]; then travis_retry docker-compose run --rm php composer cs-check ; fi
 
 after_script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then docker-compose run php vendor/bin/php-coveralls -v ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry docker-compose run --rm php vendor/bin/php-coveralls -v ; fi
