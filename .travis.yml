@@ -1,7 +1,6 @@
 sudo: false
 
-services:
-  - mongodb
+language: none
 
 env:
   global:
