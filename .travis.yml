@@ -1,5 +1,4 @@
 sudo: false
-
 language: none
 
 env:
@@ -24,6 +23,36 @@ matrix:
         - TRAVIS_PHP_VERSION=5.6
         - DEPS=latest
         - MONGO_DRIVER=mongo
+    - env:
+        - TRAVIS_PHP_VERSION=7
+        - DEPS=lowest
+    - env:
+        - TRAVIS_PHP_VERSION=7
+        - DEPS=locked
+        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
+    - env:
+        - TRAVIS_PHP_VERSION=7
+        - DEPS=latest
+    - env:
+        - TRAVIS_PHP_VERSION=7.1
+        - DEPS=lowest
+    - env:
+        - TRAVIS_PHP_VERSION=7.1
+        - DEPS=locked
+        - CS_CHECK=true
+        - TEST_COVERAGE=true
+    - env:
+        - TRAVIS_PHP_VERSION=7.1
+        - DEPS=latest
+    - env:
+        - TRAVIS_PHP_VERSION=7.2
+        - DEPS=lowest
+    - env:
+        - TRAVIS_PHP_VERSION=7.2
+        - DEPS=locked
+    - env:
+        - TRAVIS_PHP_VERSION=7.2
+        - DEPS=latest
 
 before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
@@ -40,9 +69,8 @@ install:
   - stty cols 120 && composer show
 
 script:
-  - if [[ $TEST_COVERAGE == 'asdf' ]]; then composer test-coverage ; else composer test ; fi
-  - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
-  - docker-compose run --rm php
+  - if [[ $TEST_COVERAGE == 'true' ]]; then docker-compose run php composer test-coverage ; else docker-compose run php composer test ; fi
+  - if [[ $CS_CHECK == 'true' ]]; then docker-compose run php composer cs-check ; fi
 
 after_script:
-  - if [[ $TEST_COVERAGE == 'asdf' ]]; then travis_retry php vendor/bin/php-coveralls -v ; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then docker-compose run php vendor/bin/php-coveralls -v ; fi
