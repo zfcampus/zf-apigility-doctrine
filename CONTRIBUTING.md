@@ -48,14 +48,16 @@ This library requires a running instance of Mongo in order to run and pass
 the unit tests.  It is not expected for each developer to configure their
 individual machine to match this environment so Docker is provided.
 
-### Running docker-compose
+### RUNNING DOCKER-COMPOSE
 
 You will need docker-compose installed on your machine.
 Docker supports many PHP versions.  You may specify the version of PHP you
-want to build against before running `docker-compose`.
+want (default:7.2) to build against before running `docker-compose` and flag XDEBUG to
+install (1) or not (default:0).
 
 ```
 export PHP_VERSION=7.1
+export XDEBUG=1
 ```
 
 Next, from the root directory of this project, run
@@ -92,7 +94,7 @@ You may run the unit tests through the container without running bash via
 docker-composer run --rm php
 ```
 
-## CONTINUOUS INTEGRATION
+### DOCKER AND CONTINUOUS INTEGRATION
 
 When you have made a change and created a pull request for it Travis-CI is used
 to validate the build.  For this a Docker container is created on travis for each
