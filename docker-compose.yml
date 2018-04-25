@@ -6,6 +6,7 @@ services:
       dockerfile: docker/Dockerfile
       args:
         - PHP_VERSION=${PHP_VERSION:-7.2}
+        - XDEBUG=${XDEBUG:-0}
     depends_on:
       - mongo
     volumes:

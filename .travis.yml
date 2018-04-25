@@ -41,6 +41,7 @@ matrix:
         - DEPS=locked
         - CS_CHECK=true
         - TEST_COVERAGE=true
+        - XDEBUG=1
     - env:
         - PHP_VERSION=7.1
         - DEPS=latest
