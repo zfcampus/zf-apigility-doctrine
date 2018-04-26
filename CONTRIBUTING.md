@@ -52,18 +52,13 @@ individual machine to match this environment so Docker is provided.
 
 You will need docker-compose installed on your machine.
 Docker supports many PHP versions.  You may specify the version of PHP you
-want (default:7.2) to build against before running `docker-compose` and flag XDEBUG to
+want (default:7.2) to build against when running `docker-compose` and flag XDEBUG to
 install (1) or not (default:0).
-
-```
-export PHP_VERSION=7.1
-export XDEBUG=1
-```
 
 Next, from the root directory of this project, run
 
 ```
-docker-compose build
+docker-compose build --build-arg PHP_VERSION=7.2 --build-arg XDEBUG=0 --no-cache php
 ```
 
 To connect to the php container for development run
