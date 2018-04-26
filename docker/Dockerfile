@@ -1,6 +1,7 @@
 ARG PHP_VERSION=7.2
-ARG XDEBUG=0
 FROM php:${PHP_VERSION}-alpine
+
+ARG XDEBUG=0
 
 RUN apk add --no-cache \
 	autoconf \
