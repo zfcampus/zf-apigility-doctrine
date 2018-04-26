@@ -11,7 +11,6 @@ RUN apk add --no-cache \
 	git \
 	openssl-dev
 
-RUN php --ini | sed -n -e 's/^.*Path: //p'
 RUN echo "memory_limit=2G" >> 'test' >> `php --ini | sed -n -e 's/^.*Path: //p'`/php.ini
 RUN set -o pipefail && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN if [ ${PHP_VERSION:0:3} == "5.6" ] ; then pecl -q install -f mongo && echo "extension=mongo.so" >> `php --ini | sed -n -e 's/^.*Path: //p'`/php.ini ; fi
