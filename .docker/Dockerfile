@@ -13,7 +13,7 @@ RUN apk add --no-cache \
 
 RUN echo -e 'memory_limit=2G' > /usr/local/etc/php/conf.d/memory.ini
 RUN set -o pipefail && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN if [ ${PHP_VERSION} == "5.6" ] ; then \
+RUN if [ ${PHP_VERSION:0:3} == "5.6" ] ; then \
         pecl install mongo && docker-php-ext-enable mongo ; \
     else \
         pecl install mongodb && docker-php-ext-enable mongodb ; \
