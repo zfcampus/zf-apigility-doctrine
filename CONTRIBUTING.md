@@ -58,13 +58,19 @@ install (1) or not (default:0).
 Next, from the root directory of this project, run
 
 ```
-docker-compose build --build-arg PHP_VERSION=7.2 --build-arg XDEBUG=0 --no-cache php
+$ docker-compose build
+```
+
+To build a custom container use the flags
+
+```
+$ docker-compose build --build-arg PHP_VERSION=7.1 --build-arg XDEBUG=1
 ```
 
 To connect to the php container for development run
 
 ```
-docker-compose run php bash
+$ docker-compose run --rm php bash
 ```
 
 ### RUNNING UNIT TESTS IN THE CONTAINER
@@ -86,7 +92,7 @@ $ composer test
 You may run the unit tests through the container without running bash via
 
 ```
-docker-composer run --rm php
+$ docker-compose run --rm php composer test
 ```
 
 ### DOCKER AND CONTINUOUS INTEGRATION

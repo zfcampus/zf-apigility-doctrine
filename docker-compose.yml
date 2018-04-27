@@ -3,7 +3,7 @@ services:
   php:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: .docker/Dockerfile
       args:
         - PHP_VERSION=${PHP_VERSION:-7.2}
         - XDEBUG=${XDEBUG:-0}

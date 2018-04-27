@@ -74,3 +74,6 @@ script:
 
 after_script:
   - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/php-coveralls -v ; fi
+
+notifications:
+  email: false
