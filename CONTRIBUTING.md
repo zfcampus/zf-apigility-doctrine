@@ -48,6 +48,12 @@ This library requires a running instance of Mongo in order to run and pass
 the unit tests.  It is not expected for each developer to configure their
 individual machine to match this environment so Docker is provided.
 
+To use Docker you must copy the included `docker-compose.yml.dist` to `docker-compose.yml`
+
+```
+$ cp docker-compose.yml.dist docker-compose.yml
+```
+
 ### RUNNING DOCKER-COMPOSE
 
 You will need docker-compose installed on your machine.
