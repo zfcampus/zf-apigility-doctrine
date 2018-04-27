@@ -6,4 +6,4 @@
 phpcs.xml export-ignore
 phpunit.xml.dist export-ignore
 docker-compose.yml export-ignore
-Dockerfile export-ignore
+/.docker export-ignore
