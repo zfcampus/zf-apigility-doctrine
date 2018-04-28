@@ -51,7 +51,6 @@ matrix:
         - DEPS=latest
 
 before_install:
-  - cp docker-compose.yml.dist docker-compose.yml
   - shopt -s expand_aliases
   - alias composer="travis_retry docker-compose run --rm php composer"
   - alias php="travis_retry docker-compose run --rm php php"

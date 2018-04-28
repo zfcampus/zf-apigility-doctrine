@@ -48,12 +48,6 @@ This library requires a running instance of Mongo in order to run and pass
 the unit tests.  It is not expected for each developer to configure their
 individual machine to match this environment so Docker is provided.
 
-To use Docker you must copy the included `docker-compose.yml.dist` to `docker-compose.yml`
-
-```
-$ cp docker-compose.yml.dist docker-compose.yml
-```
-
 ### RUNNING DOCKER-COMPOSE
 
 You will need docker-compose installed on your machine.
@@ -106,6 +100,12 @@ $ docker-compose run --rm php composer test
 When you have made a change and created a pull request for it Travis-CI is used
 to validate the build.  For this a Docker container is created on travis for each
 build matrix and the unit tests are ran identical to running unit tests on Docker locally.
+
+### OVERRIDING DOCKER FOR LOCAL DEVELOPMENT
+
+Docker supports overriding the docker-compose.yml file.  See
+[https://docs.docker.com/compose/extends/#multiple-compose-files](https://docs.docker.com/compose/extends/#multiple-compose-files)
+for more information.
 
 ## CODING STANDARDS
 
