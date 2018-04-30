@@ -70,7 +70,12 @@
             "ZFTest\\Apigility\\Doctrine\\": "test/src/"
         }
     },
+    "bin": [
+        "./scripts/mongodb-shim"
+    ],
     "scripts": {
+        "pre-install-cmd": "mongodb-shim",
+        "pre-update-cmd": "mongodb-shim",
         "check": [
             "@cs-check",
             "@test"
