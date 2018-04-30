@@ -29,7 +29,9 @@ if (! isset($config['config'])
 
 if ($change) {
     echo "Including MongoDB shim alcaeus/mongo-php-adapter\n";
-    $contents = json_encode($config, JSON_PRETTY_PRINT);
-    $contents = str_replace('\\/', '/', $contents);
-    file_put_contents(__DIR__ . '/../composer.json', $contents);
+
+    file_put_contents(
+        __DIR__ . '/../composer.json',
+        json_encode($config, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES)
+    );
 }
