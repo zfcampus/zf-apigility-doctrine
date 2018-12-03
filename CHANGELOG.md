@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 2.2.1 - TBD
+## 2.2.1 - 2018-12-03
 
 ### Added
 
@@ -22,7 +22,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#316](https://github.com/zfcampus/zf-apigility-doctrine/pull/316) updates the `DoctrineResource::fetch()` method to add the `ZF\Apigility\ResourceEvent`
+  to the generated `DoctrineResourceEvent` prior to triggering the
+  `EVENT_FETCH_PRE` event, ensuring users have access to all necessary data.
 
 ## 2.2.0 - 2018-01-18
 
