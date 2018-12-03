@@ -10,6 +10,7 @@ use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Framework\Assert;
 use Zend\Filter\FilterChain;
 use Zend\Http\Request;
 use Zend\ServiceManager\ServiceManager;
@@ -21,6 +22,7 @@ use ZF\Apigility\Doctrine\DoctrineResource;
 use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
+use ZF\Rest\ResourceEvent;
 use ZFTest\Apigility\Doctrine\TestCase;
 use ZFTestApigilityDb\Entity\Album;
 use ZFTestApigilityDb\Entity\Artist;
@@ -259,6 +261,33 @@ class CRUDTest extends TestCase
             DoctrineResourceEvent::EVENT_FETCH_PRE,
             DoctrineResourceEvent::EVENT_FETCH_POST,
         ]);
+    }
+
+    /**
+     * @see https://github.com/zfcampus/zf-apigility-doctrine/pull/316
+     */
+    public function testFetchByCustomIdFieldIncludesApigilityResourceEventInDoctrineResourceEvent()
+    {
+        $product = $this->createProduct();
+
+        $this->getRequest()->getHeaders()->addHeaderLine('Accept', 'application/json');
+        $this->getRequest()->setMethod(Request::METHOD_GET);
+
+        $spy = (object) ['caught' => false];
+        $sharedEvents = $this->getApplication()->getEventManager()->getSharedManager();
+        $sharedEvents->attach(
+            DoctrineResource::class,
+            DoctrineResourceEvent::EVENT_FETCH_PRE,
+            function (DoctrineResourceEvent $e) use ($spy) {
+                Assert::assertInstanceOf(ResourceEvent::class, $e->getResourceEvent());
+                $spy->caught = true;
+            }
+        );
+
+        $this->dispatch('/test/rest/product/' . $product->getId());
+
+        $this->assertResponseStatusCode(200);
+        $this->assertTrue($spy->caught, 'EVENT_FETCH_PRE listener was not triggered');
     }
 
     public function testFetchEntityWithVersionFieldWithVersionParamInPath()
