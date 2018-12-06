@@ -39,10 +39,41 @@ contributors a chance to resolve the vulnerability and issue a new release prior
 to any public exposure; this helps protect Apigility users, and provides them
 with a chance to upgrade and/or update in order to protect their applications.
 
-For sensitive email communications, please use 
+For sensitive email communications, please use
 [our PGP key](http://framework.zend.com/zf-security-pgp-key.asc).
 
-## RUNNING TESTS
+## DOCKER FOR DEVELOPMENT
+
+This library requires a running instance of Mongo in order to run and pass
+the unit tests.  It is not expected for each developer to configure their
+individual machine to match this environment so Docker is provided.
+
+### RUNNING DOCKER-COMPOSE
+
+You will need docker-compose installed on your machine.
+Docker supports many PHP versions.  You may specify the version of PHP you
+want (default:7.2) to build against when running `docker-compose` and flag XDEBUG to
+install (1) or not (default:0).
+
+Next, from the root directory of this project, run
+
+```
+$ docker-compose build
+```
+
+To build a custom container use the flags
+
+```
+$ docker-compose build --build-arg PHP_VERSION=7.1 --build-arg XDEBUG=1
+```
+
+To connect to the php container for development run
+
+```
+$ docker-compose run --rm php bash
+```
+
+### RUNNING UNIT TESTS IN THE CONTAINER
 
 First, use [Composer](https://getcomposer.org) to install all dependencies:
 
@@ -55,6 +86,26 @@ To run tests:
 ```console
 $ composer test
 ```
+
+### RUNNING UNIT TESTS ON DOCKER
+
+You may run the unit tests through the container without running bash via
+
+```
+$ docker-compose run --rm php composer test
+```
+
+### DOCKER AND CONTINUOUS INTEGRATION
+
+When you have made a change and created a pull request for it Travis-CI is used
+to validate the build.  For this a Docker container is created on travis for each
+build matrix and the unit tests are ran identical to running unit tests on Docker locally.
+
+### OVERRIDING DOCKER FOR LOCAL DEVELOPMENT
+
+Docker supports overriding the docker-compose.yml file.  See
+[https://docs.docker.com/compose/extends/#multiple-compose-files](https://docs.docker.com/compose/extends/#multiple-compose-files)
+for more information.
 
 ## CODING STANDARDS
 
