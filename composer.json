@@ -34,13 +34,13 @@
     },
     "require": {
         "php": "^5.6 || ^7.0",
-        "phpro/zf-doctrine-hydration-module": "^2.0.1 || ^3.0",
+        "phpro/zf-doctrine-hydration-module": "^2.0.1 || ^3.0 || ^4.1",
         "zfcampus/zf-apigility": "^1.3"
     },
     "require-dev": {
-        "doctrine/doctrine-module": "^1.2",
+        "doctrine/doctrine-module": "^1.2 || ^2.1.7",
         "doctrine/doctrine-mongo-odm-module": "^0.11 || ^1.0",
-        "doctrine/doctrine-orm-module": "^1.1",
+        "doctrine/doctrine-orm-module": "^1.1 || ^2.1.3",
         "doctrine/mongodb-odm": "^1.0",
         "phpunit/phpunit": "^5.7.26",
         "zendframework/zend-coding-standard": "~1.0.0",
@@ -55,7 +55,7 @@
         "zfcampus/zf-hal": "^1.4.2"
     },
     "suggest": {
-        "api-skeletons/zf-doctrine-hydrator": "Hydrator strategies for Doctrine in Apipgility",
+        "api-skeletons/zf-doctrine-hydrator": "Hydrator strategies for Doctrine in Apigility",
         "api-skeletons/zf-oauth2-doctrine": "OAuth2 Doctrine Adapter for Apigility",
         "doctrine/doctrine-mongo-odm-module": "For Mongo ODM mapping",
         "doctrine/doctrine-orm-module": "For ORM mapping"
