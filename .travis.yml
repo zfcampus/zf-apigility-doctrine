@@ -23,7 +23,7 @@ matrix:
     - php: 5.6
       env:
         - DEPS=locked
-        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
+        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-mongo-odm-module doctrine/doctrine-orm-module paragonie/random_compat phpunit/phpunit zendframework/zend-code zendframework/zend-permissions-rbac"
         - MONGO_DRIVER=mongo
     - php: 5.6
       env:
@@ -35,7 +35,7 @@ matrix:
     - php: 7
       env:
         - DEPS=locked
-        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code"
+        - LEGACY_DEPS="doctrine/doctrine-module doctrine/doctrine-mongo-odm-module doctrine/doctrine-orm-module phpunit/phpunit zendframework/zend-code zendframework/zend-permissions-rbac"
     - php: 7
       env:
         - DEPS=latest
