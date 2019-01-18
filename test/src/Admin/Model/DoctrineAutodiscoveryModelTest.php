@@ -29,6 +29,10 @@ class DoctrineAutodiscoveryModelTest extends TestCase
         $this->assertInternalType('array', $result);
         $this->assertCount(3, $result);
 
+        usort($result, function (array $a, array $b) {
+            return strcasecmp($a['service_name'], $b['service_name']);
+        });
+
         $this->assertEquals(Album::class, $result[0]['entity_class']);
         $this->assertEquals('Album', $result[0]['service_name']);
         $this->assertCount(2, $result[0]['fields']);
