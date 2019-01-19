@@ -9,11 +9,12 @@ namespace ZFTest\Apigility\Doctrine\Server\Event\Listener;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use PHPUnit\Framework\TestCase;
 use Zend\Hydrator\HydratorInterface;
 use ZF\Apigility\Doctrine\Server\Event\Listener\CollectionListener;
 use ZFTestApigilityDb\Entity\Artist;
 
-class CollectionListenerTest extends \PHPUnit_Framework_TestCase
+class CollectionListenerTest extends TestCase
 {
     /**
      * @dataProvider trueFalseProvider

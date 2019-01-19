@@ -6,12 +6,13 @@
 
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ProphecyInterface;
 use Zend\ServiceManager\ServiceManager;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineMetadataServiceResourceFactory;
 
-class DoctrineMetadataServiceResourceFactoryTest extends \PHPUnit_Framework_TestCase
+class DoctrineMetadataServiceResourceFactoryTest extends TestCase
 {
     /**
      * @var ProphecyInterface|ServiceManager

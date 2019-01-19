@@ -7,6 +7,7 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use Interop\Container\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ProphecyInterface;
 use Zend\Mvc\Controller\ControllerManager;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
@@ -16,7 +17,7 @@ use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceModelFactory;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResource;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineRpcServiceResourceFactory;
 
-class DoctrineRpcServiceResourceFactoryTest extends \PHPUnit_Framework_TestCase
+class DoctrineRpcServiceResourceFactoryTest extends TestCase
 {
     /**
      * @var ProphecyInterface|ContainerInterface
