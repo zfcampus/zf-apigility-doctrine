@@ -1,4 +1,4 @@
-Copyright (c) 2016, Zend Technologies USA, Inc.
+Copyright (c) 2016-2019, Zend Technologies USA, Inc.
 
 All rights reserved.
 
