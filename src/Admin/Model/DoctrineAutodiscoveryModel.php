@@ -72,9 +72,6 @@ class DoctrineAutodiscoveryModel extends AbstractAutodiscoveryModel
                     case 'int':
                         $field['filters'] = $this->filters['integer'];
                         break;
-                    default:
-                        continue;
-                        break;
                 }
                 $entity['fields'][] = $field;
             }
