@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#317](https://github.com/zfcampus/zf-apigility-doctrine/pull/317) adds support for PHP 7.3.
 
+- [#319](https://github.com/zfcampus/zf-apigility-doctrine/pull/319) adds support for DoctrineModule 2.1
+  and DoctrineORMModule 2.1.
+
 ### Changed
 
 - Nothing.
