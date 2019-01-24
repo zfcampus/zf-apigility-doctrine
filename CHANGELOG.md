@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 2.3.0 - TBD
+## 2.3.0 - 2019-01-24
 
 ### Added
 
@@ -10,28 +10,6 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#319](https://github.com/zfcampus/zf-apigility-doctrine/pull/319) adds support for DoctrineModule 2.1
   and DoctrineORMModule 2.1.
-
-### Changed
-
-- Nothing.
-
-### Deprecated
-
-- Nothing.
-
-### Removed
-
-- Nothing.
-
-### Fixed
-
-- Nothing.
-
-## 2.2.2 - TBD
-
-### Added
-
-- Nothing.
 
 ### Changed
 
