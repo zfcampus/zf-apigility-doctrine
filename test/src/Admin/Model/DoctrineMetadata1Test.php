@@ -13,7 +13,7 @@ use ZFTest\Apigility\Doctrine\TestCase;
 
 class DoctrineMetadata1Test extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->markTestIncomplete();
 
@@ -23,7 +23,7 @@ class DoctrineMetadata1Test extends TestCase
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         # FIXME: Drop database from in-memory
     }

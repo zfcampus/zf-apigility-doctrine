@@ -9,12 +9,13 @@ namespace ZFTest\Apigility\Doctrine\Server\Validator;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use DoctrineModule\Validator\NoObjectExists as NoObjectExistsOrigin;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Validator\ValidatorPluginManager;
 use ZF\Apigility\Doctrine\Server\Validator\NoObjectExists;
 
-class NoObjectExistsFactoryTest extends \PHPUnit_Framework_TestCase
+class NoObjectExistsFactoryTest extends TestCase
 {
     /**
      * @var ObjectProphecy|ServiceManager

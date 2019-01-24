@@ -12,7 +12,7 @@ use ZFTest\Util\ServiceManagerFactory;
 
 class DoctrineRestServiceResourceTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->markTestIncomplete();
 
@@ -22,7 +22,7 @@ class DoctrineRestServiceResourceTest extends TestCase
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         # FIXME: Drop database from in-memory
     }
