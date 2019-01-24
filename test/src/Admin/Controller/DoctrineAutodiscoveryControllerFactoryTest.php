@@ -7,13 +7,14 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Controller;
 
 use Interop\Container\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ProphecyInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscoveryController;
 use ZF\Apigility\Doctrine\Admin\Controller\DoctrineAutodiscoveryControllerFactory;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel;
 
-class DoctrineAutodiscoveryControllerFactoryTest extends \PHPUnit_Framework_TestCase
+class DoctrineAutodiscoveryControllerFactoryTest extends TestCase
 {
     /**
      * @var ProphecyInterface|ContainerInterface

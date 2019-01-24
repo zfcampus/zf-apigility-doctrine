@@ -8,7 +8,6 @@ namespace ZFTest\Apigility\Doctrine\Server\ODM\CRUD;
 
 use Doctrine\Instantiator\InstantiatorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Interop\Container\ContainerInterface;
 use MongoClient;
 use Zend\Http\Request;
 use Zend\ServiceManager\ServiceManager;

@@ -7,13 +7,14 @@
 namespace ZFTest\Apigility\Doctrine\Admin\Model;
 
 use Interop\Container\ContainerInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ProphecyInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModel;
 use ZF\Apigility\Doctrine\Admin\Model\DoctrineAutodiscoveryModelFactory;
 
-class DoctrineAutodiscoveryModelFactoryTest extends \PHPUnit_Framework_TestCase
+class DoctrineAutodiscoveryModelFactoryTest extends TestCase
 {
     /**
      * @var ProphecyInterface|ServiceLocatorInterface|ContainerInterface
