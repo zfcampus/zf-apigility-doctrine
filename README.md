@@ -37,6 +37,15 @@ For Apache installations it is recommended the
 [AllowEncodedSlashes-directive is set to On](http://httpd.apache.org/docs/2.4/mod/core.html#allowencodedslashes)
 so the configuration can be read.
 
+
+Documentation
+-------------
+
+Use of this library is not a strait-forward affair.  While you can read all the documentation for the involved modules some design aspects will help with your use and integration.
+
+A book titled the [Doctrine in Apigility Book](http://book.apiskeletons.com) has been authored by Tom H Anderson <tom.h.anderson@gmail.com> of API Skeletons.  This book offers a workable design pattern.
+
+
 API Resources
 -------------
 
