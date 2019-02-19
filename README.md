@@ -27,9 +27,9 @@ and *Server* in your `config/application.config.php`.
 entity hydration. See [documentation and instructions](https://github.com/phpro/zf-doctrine-hydration-module)
 on how to set up this module.
 
-> ### zf-component-installer
+> ### zend-component-installer
 >
-> If you use [zf-component-installer](https://github.com/zendframework/zf-component-installer),
+> If you use [zend-component-installer](https://github.com/zendframework/zend-component-installer),
 > that plugin will install zf-apigility-doctrine, and all modules it depends on, as a
 > module in your application configuration for you.
 
