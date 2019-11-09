@@ -192,6 +192,7 @@ class CRUDTest extends TestCase
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_CREATE_PRE,
             DoctrineResourceEvent::EVENT_CREATE_POST,
+            DoctrineResourceEvent::EVENT_CREATE_POST_FLUSH,
         ]);
     }
 
@@ -515,6 +516,7 @@ class CRUDTest extends TestCase
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_PATCH_PRE,
             DoctrineResourceEvent::EVENT_PATCH_POST,
+            DoctrineResourceEvent::EVENT_PATCH_POST_FLUSH,
         ]);
     }
 
@@ -646,6 +648,7 @@ class CRUDTest extends TestCase
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_UPDATE_PRE,
             DoctrineResourceEvent::EVENT_UPDATE_POST,
+            DoctrineResourceEvent::EVENT_UPDATE_POST_FLUSH,
         ]);
     }
 
@@ -694,6 +697,7 @@ class CRUDTest extends TestCase
         $this->validateTriggeredEvents([
             DoctrineResourceEvent::EVENT_DELETE_PRE,
             DoctrineResourceEvent::EVENT_DELETE_POST,
+            DoctrineResourceEvent::EVENT_DELETE_POST_FLUSH,
         ]);
     }
 
