@@ -370,6 +370,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getObjectManager()->flush();
 
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_CREATE_POST_FLUSH, $entity, $data);
+
         return $entity;
     }
 
@@ -400,6 +402,8 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->flush();
+
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_DELETE_POST_FLUSH, $entity);
 
         return true;
     }
@@ -609,6 +613,8 @@ class DoctrineResource extends AbstractResourceListener implements
 
         $this->getObjectManager()->flush();
 
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_PATCH_POST_FLUSH, $entity, $data);
+
         return $entity;
     }
 
@@ -656,6 +662,8 @@ class DoctrineResource extends AbstractResourceListener implements
         }
 
         $this->getObjectManager()->flush();
+
+        $this->triggerDoctrineEvent(DoctrineResourceEvent::EVENT_UPDATE_POST_FLUSH, $entity, $data);
 
         return $entity;
     }
