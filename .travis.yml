@@ -45,6 +45,7 @@ matrix:
     - php: 7.1
       env:
         - DEPS=locked
+        - LEGACY_DEPS="symfony/yaml"
         - CS_CHECK=true
         - TEST_COVERAGE=true
     - php: 7.1
