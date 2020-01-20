@@ -3,7 +3,7 @@ Doctrine in Apigility
 
 > ## Repository abandoned 2019-12-31
 >
-> This repository has moved to laminas-api-tools/api-tools-doctrine.
+> This repository has moved to [laminas-api-tools/api-tools-doctrine](https://github.com/laminas-api-tools/api-tools-doctrine).
 
 [![Build Status](https://travis-ci.org/zfcampus/zf-apigility-doctrine.svg?branch=master)](https://travis-ci.org/zfcampus/zf-apigility-doctrine)
 [![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-apigility-doctrine/badge.svg?branch=master)](https://coveralls.io/github/zfcampus/zf-apigility-doctrine?branch=master)
