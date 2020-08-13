@@ -11,12 +11,12 @@ use ZF\Rest\ResourceEvent;
 class DefaultOrm extends AbstractQueryProvider
 {
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $parameters
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    public function createQuery(ResourceEvent $event, $entityClass, $parameters)
+    public function createQuery(ResourceEvent $event = null, $entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
         $queryBuilder

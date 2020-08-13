@@ -13,12 +13,12 @@ use ZF\Rest\ResourceEvent;
 abstract class AbstractCreateFilter implements ObjectManagerAwareInterface, QueryCreateFilterInterface
 {
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $data
      * @return array
      */
-    abstract public function filter(ResourceEvent $event, $entityClass, $data);
+    abstract public function filter(ResourceEvent $event = null, $entityClass, $data);
 
     /**
      * @var ObjectManager

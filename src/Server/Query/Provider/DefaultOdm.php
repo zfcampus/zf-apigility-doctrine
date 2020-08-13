@@ -14,7 +14,7 @@ class DefaultOdm extends AbstractQueryProvider
     /**
      * {@inheritDoc}
      */
-    public function createQuery(ResourceEvent $event, $entityClass, $parameters)
+    public function createQuery(ResourceEvent $event = null, $entityClass, $parameters)
     {
         /** @var \Doctrine\Odm\MongoDB\Query\Builder $queryBuilder */
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();

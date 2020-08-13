@@ -40,12 +40,12 @@ abstract class AbstractQueryProvider implements ObjectManagerAwareInterface, Que
     }
 
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $parameters
      * @return mixed This will return an ORM or ODM Query\Builder
      */
-    abstract public function createQuery(ResourceEvent $event, $entityClass, $parameters);
+    abstract public function createQuery(ResourceEvent $event = null, $entityClass, $parameters);
 
     /**
      * @param $queryBuilder

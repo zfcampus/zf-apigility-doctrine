@@ -12,10 +12,10 @@ use ZF\Rest\ResourceEvent;
 interface QueryCreateFilterInterface extends ObjectManagerAwareInterface
 {
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $data
      * @return array
      */
-    public function filter(ResourceEvent $event, $entityClass, $data);
+    public function filter(ResourceEvent $event = null, $entityClass, $data);
 }

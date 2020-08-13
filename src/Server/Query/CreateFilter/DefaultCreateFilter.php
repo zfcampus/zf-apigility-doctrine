@@ -11,12 +11,12 @@ use ZF\Rest\ResourceEvent;
 class DefaultCreateFilter extends AbstractCreateFilter
 {
     /**
-     * @param ResourceEvent $event
+     * @param ResourceEvent|null $event
      * @param string $entityClass
      * @param array $data
      * @return array
      */
-    public function filter(ResourceEvent $event, $entityClass, $data)
+    public function filter(ResourceEvent $event = null, $entityClass, $data)
     {
         return $data;
     }
